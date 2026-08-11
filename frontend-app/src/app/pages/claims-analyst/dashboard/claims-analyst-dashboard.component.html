@@ -1,0 +1,388 @@
+<div class="space-y-6 animate-fade-in relative">
+      <!-- Page Header -->
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-2xl font-bold text-surface-100 flex items-center gap-2.5">
+            <span class="material-symbols-outlined text-primary-600">admin_panel_settings</span>
+            Claims Adjudication Command Center
+          </h1>
+          <p class="text-sm text-surface-200">Loss Verification, Policy Threshold Audit & Automated Payout Authorization</p>
+        </div>
+        <button (click)="refresh()" class="btn-secondary text-xs">
+          <span class="material-symbols-outlined align-middle">sync</span> Refresh Queue
+        </button>
+      </div>
+
+      <!-- High-Level KPI Summary Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="bg-white border border-surface-800 shadow-[0_4px_20px_rgb(0,0,0,0.03)] p-5 rounded-2xl flex flex-col justify-between">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] uppercase font-bold tracking-widest text-surface-100">Total Claims Filed</span>
+            <span class="material-symbols-outlined text-surface-200 text-base">history_edu</span>
+          </div>
+          <div class="mt-3">
+            <div class="text-3xl font-black font-mono text-primary-600">{{ allClaimsCount() }}</div>
+            <div class="text-[10px] text-surface-200 mt-1 uppercase tracking-wider font-semibold">Platform-Wide Submissions</div>
+          </div>
+        </div>
+
+        <div class="bg-white border border-orange-200 shadow-[0_4px_20px_rgb(0,0,0,0.03)] p-5 rounded-2xl flex flex-col justify-between">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] uppercase font-bold tracking-widest text-orange-600">Action Required</span>
+            <span class="material-symbols-outlined text-orange-500 text-base">pending_actions</span>
+          </div>
+          <div class="mt-3">
+            <div class="text-3xl font-black font-mono text-orange-600">{{ pendingClaims().length }}</div>
+            <div class="text-[10px] text-orange-600 font-bold mt-1 uppercase tracking-wider">Pending Analyst Review</div>
+          </div>
+        </div>
+
+        <div class="bg-white border border-emerald-200 shadow-[0_4px_20px_rgb(0,0,0,0.03)] p-5 rounded-2xl flex flex-col justify-between">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] uppercase font-bold tracking-widest text-emerald-700">Authorized Payouts</span>
+            <span class="material-symbols-outlined text-emerald-600 text-base">verified</span>
+          </div>
+          <div class="mt-3">
+            <div class="text-3xl font-black font-mono text-emerald-700">{{ approvedClaimsCount() }}</div>
+            <div class="text-[10px] text-emerald-700 font-bold mt-1 uppercase tracking-wider">Settled / Direct Credited</div>
+          </div>
+        </div>
+
+        <div class="bg-white border border-rose-200 shadow-[0_4px_20px_rgb(0,0,0,0.03)] p-5 rounded-2xl flex flex-col justify-between">
+          <div class="flex items-center justify-between">
+            <span class="text-[10px] uppercase font-bold tracking-widest text-rose-600">Declined / Disallowed</span>
+            <span class="material-symbols-outlined text-rose-500 text-base">block</span>
+          </div>
+          <div class="mt-3">
+            <div class="text-3xl font-black font-mono text-rose-600">{{ rejectedClaimsCount() }}</div>
+            <div class="text-[10px] text-rose-600 font-bold mt-1 uppercase tracking-wider">Breach & Criteria Disallowed</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Required: Pending Claims Queue Table -->
+      <div class="bg-white border border-surface-800 shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-[24px] overflow-hidden space-y-0">
+        <div class="flex flex-col sm:flex-row justify-between items-center border-b border-surface-800 p-6 bg-gradient-to-r from-[#f4f5f6] to-white gap-4">
+          <div class="flex items-center gap-2.5">
+            <span class="w-2.5 h-2.5 rounded-full bg-rose-500 animate-ping"></span>
+            <h2 class="text-xl font-display font-bold text-surface-100">Pending Adjudication Queue</h2>
+            <span class="px-3 py-1 rounded-full text-[11px] font-black font-mono bg-rose-100 text-rose-700 border border-rose-200 shadow-sm uppercase tracking-wider">
+              {{ pendingClaims().length }} Awaiting Review
+            </span>
+          </div>
+          <span class="text-xs text-surface-200 font-medium">Click any row or 'Adjudicate Claim' to inspect audit breakdown</span>
+        </div>
+
+        <div class="w-full overflow-x-auto">
+          <table class="w-full text-left text-sm text-surface-200">
+            <thead>
+              <tr class="bg-[#f4f5f6] border-b border-surface-800">
+                <th class="py-4 px-6 font-bold text-[11px] uppercase tracking-wider text-surface-100 text-left">Claim Ref</th>
+                <th class="py-4 px-6 font-bold text-[11px] uppercase tracking-wider text-surface-100 text-left">Policy No</th>
+                <th class="py-4 px-6 font-bold text-[11px] uppercase tracking-wider text-surface-100 text-left">Applicant</th>
+                <th class="py-4 px-6 font-bold text-[11px] uppercase tracking-wider text-surface-100 text-right">Actual Gross Loss</th>
+                <th class="py-4 px-6 font-bold text-[11px] uppercase tracking-wider text-surface-100 text-right">Requested Payout</th>
+                <th class="py-4 px-6 font-bold text-[11px] uppercase tracking-wider text-surface-100 text-left">Submitted Date</th>
+                <th class="py-4 px-6 font-bold text-[11px] uppercase tracking-wider text-surface-100 text-center">Status</th>
+                <th class="py-4 px-6 font-bold text-[11px] uppercase tracking-wider text-surface-100 text-center">Action</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-surface-800/60 bg-white">
+              @for (claim of pendingClaims(); track (claim.claimId || claim.id)) {
+                <tr class="cursor-pointer hover:bg-rose-50/30 transition-colors group" (click)="openModal(claim)">
+                  <td class="py-4 px-6 font-mono text-xs font-black text-primary-600">
+                    {{ claim.claimNumber || claim.claimId?.substring(0,8) || claim.id?.substring(0,8) }}
+                  </td>
+                  <td class="py-4 px-6 font-mono text-xs text-surface-200 font-bold">
+                    {{ getPolicyNumber(claim.policyId) }}
+                  </td>
+                  <td class="py-4 px-6">
+                    <div class="flex items-center gap-2.5">
+                      <div class="w-7 h-7 rounded-full bg-[#f4f5f6] border border-surface-800 text-surface-100 flex items-center justify-center font-bold text-xs shrink-0 shadow-sm">
+                        {{ getUserInitial(claim.userId) }}
+                      </div>
+                      <div class="min-w-0">
+                        <div class="text-xs font-bold text-surface-100 truncate">{{ getUserFullName(claim.userId) }}</div>
+                        <div class="text-[10px] text-surface-200 font-mono truncate font-semibold">{{ getUserEmail(claim.userId) }}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="py-4 px-6 text-right text-rose-600 font-mono font-black text-sm">
+                    ₹{{ formatCurrency(claim.grossLoss || claim.eligibleLoss || claim.actualLossAmount || 0) }}
+                  </td>
+                  <td class="py-4 px-6 text-right text-emerald-700 font-mono font-black text-sm">
+                    ₹{{ formatCurrency(claim.payoutAmount || 0) }}
+                  </td>
+                  <td class="py-4 px-6 text-surface-200 text-xs font-bold">
+                    {{ (claim.submittedAt || todayStr) | date:'mediumDate' }}
+                  </td>
+                  <td class="py-4 px-6 text-center">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold bg-orange-100 text-orange-700 border border-orange-200 shadow-sm uppercase tracking-wider">
+                      <span class="w-1.5 h-1.5 rounded-full bg-orange-500 animate-ping"></span>
+                      {{ claim.claimStatus || claim.status || 'UNDER_REVIEW' }}
+                    </span>
+                  </td>
+                  <td class="py-4 px-6 text-center">
+                    <button class="bg-rose-600 hover:bg-rose-500 text-white border border-rose-700 text-[11px] uppercase tracking-wider px-4 py-1.5 rounded-full font-bold shadow-sm transition-all flex items-center gap-2 mx-auto" (click)="openModal(claim); $event.stopPropagation()">
+                      <span class="material-symbols-outlined text-[13px]">gavel</span>
+                      Adjudicate
+                    </button>
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="8" class="text-center py-16 text-surface-200 bg-[#f4f5f6]/50">
+                    <div class="w-12 h-12 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-600 mx-auto flex items-center justify-center mb-3 shadow-sm">
+                      <span class="material-symbols-outlined text-2xl">task_alt</span>
+                    </div>
+                    <div class="text-base font-bold text-surface-100">Inbox Zero — All Claims Adjudicated!</div>
+                    <p class="text-xs text-surface-200 mt-1 font-medium">There are no pending claims requiring actuarial review at this time.</p>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════════════════════════════════ -->
+      <!-- EXECUTIVE CLAIM ADJUDICATION & LOSS VERIFICATION MODAL                -->
+      <!-- ══════════════════════════════════════════════════════════════════════ -->
+      @if (selectedClaim(); as claim) {
+        <div class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 sm:p-6 overflow-y-auto" (click)="closeModal()">
+          <div class="relative my-auto w-full max-w-4xl bg-surface-900 border border-surface-700/80 rounded-2xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.85)] flex flex-col max-h-[calc(100vh-3.5rem)] animate-scale-in overflow-hidden" (click)="$event.stopPropagation()">
+            
+            <!-- Modal Header -->
+            <div class="p-5 border-b border-surface-800 bg-surface-800/80 flex justify-between items-center rounded-t-2xl shrink-0">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-primary-500/15 border border-primary-500/30 text-primary-600 flex items-center justify-center font-bold shadow-inner">
+                  <span class="material-symbols-outlined text-xl">gavel</span>
+                </div>
+                <div>
+                  <div class="flex items-center gap-2.5">
+                    <h2 class="text-lg font-bold text-surface-100">Claim Adjudication & Loss Verification</h2>
+                    <span class="bg-accent-500/20 text-accent-800 border border-accent-500/40 text-[10px] font-bold px-2.5 py-0.5 rounded-full font-mono uppercase tracking-wider">
+                      {{ claim.claimStatus || claim.status || 'UNDER_REVIEW' }}
+                    </span>
+                  </div>
+                  <div class="flex items-center gap-2 mt-1 text-xs text-surface-200">
+                    <span>Claim Ref: <strong class="font-mono text-primary-600">{{ claim.claimNumber || claim.claimId || claim.id }}</strong></span>
+                    <span>•</span>
+                    <span>Policy: <strong class="font-mono text-surface-200">{{ getPolicyNumber(claim.policyId) }}</strong></span>
+                    <span>•</span>
+                    <span>Submitted: <span class="text-surface-200">{{ (claim.submittedAt || todayStr) | date:'mediumDate' }}</span></span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Top Right Profile Quick-Link & Close -->
+              <div class="flex items-center gap-2.5">
+                <a [routerLink]="['/claims-analyst/crm']" (click)="closeModal()" class="btn-secondary text-xs px-3 py-1.5 flex items-center gap-1.5 text-surface-200 hover:text-white" title="Open Investor CRM Details">
+                  <span class="material-symbols-outlined text-sm">person_search</span>
+                  <span>View Full Profile</span>
+                </a>
+                <button (click)="closeModal()" class="text-surface-200 hover:text-surface-100 text-lg leading-none p-1 rounded-lg hover:bg-surface-800 transition-colors" title="Close"><span class="material-symbols-outlined text-xl align-middle">close</span></button>
+              </div>
+            </div>
+
+            <!-- Modal Scrollable Content -->
+            <div class="flex-1 overflow-y-auto p-6 space-y-5 bg-surface-950/60">
+              
+              <!-- Applicant & Policy Identity Card -->
+              <div class="p-4 bg-surface-900/90 border border-surface-800 rounded-xl flex flex-wrap items-center justify-between gap-4">
+                <div class="flex items-center gap-3">
+                  <div class="w-10 h-10 rounded-full bg-primary-500/20 border border-primary-500/40 text-primary-600 flex items-center justify-center font-bold text-sm">
+                    {{ getUserInitial(claim.userId) }}
+                  </div>
+                  <div>
+                    <div class="text-sm font-bold text-surface-100 flex items-center gap-2">
+                      <span>{{ getUserFullName(claim.userId) }}</span>
+                      <span class="px-2 py-0.2 bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold rounded">
+                        KYC VERIFIED
+                      </span>
+                    </div>
+                    <div class="text-xs text-surface-200 font-mono">{{ getUserEmail(claim.userId) }}</div>
+                  </div>
+                </div>
+
+                <div class="flex items-center gap-6 text-xs font-mono">
+                  <div class="text-right">
+                    <span class="text-surface-500 block text-[10px] uppercase font-bold tracking-wider">Policy Status</span>
+                    <span class="text-emerald-700 font-semibold flex items-center justify-end gap-1">
+                      <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                      COVERAGE ACTIVE
+                    </span>
+                  </div>
+                  <div class="text-right border-l border-surface-800 pl-4">
+                    <span class="text-surface-500 block text-[10px] uppercase font-bold tracking-wider">Waiting Period</span>
+                    <span class="text-surface-200 font-semibold flex items-center justify-end gap-1">
+                      <span>{{ getPolicy(claim)?.tenureYears || 5 }}-Yr Matured</span>
+                      <span class="material-symbols-outlined text-sm align-middle text-surface-200">check</span>
+                    </span>
+                  </div>
+                  <div class="text-right border-l border-surface-800 pl-4">
+                    <span class="text-surface-500 block text-[10px] uppercase font-bold tracking-wider">Max Coverage Cap</span>
+                    <span class="text-info-400 font-bold">{{ getPolicy(claim)?.coveragePercentage || 70 }}% Insured</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 4-Card Actuarial Loss & Valuation Metric Grid -->
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-3.5">
+                <div class="p-4 bg-surface-900/90 border border-surface-800 rounded-xl shadow-sm">
+                  <span class="text-[10px] text-surface-200 uppercase font-bold tracking-wider block">Pre-Crash Baseline</span>
+                  <div class="text-lg font-bold font-mono text-surface-100 mt-1">₹{{ formatCurrency(claim.baselineValue || claim.initialPortfolioValue || 15052) }}</div>
+                  <span class="text-[10px] text-surface-500 mt-0.5 block">Vested Policy Baseline</span>
+                </div>
+
+                <div class="p-4 bg-surface-900/90 border border-surface-800 rounded-xl shadow-sm">
+                  <span class="text-[10px] text-surface-200 uppercase font-bold tracking-wider block">Post-Crash Residual</span>
+                  <div class="text-lg font-bold font-mono text-rose-700 mt-1">₹{{ formatCurrency(claim.currentValue || claim.currentPortfolioValue || 767) }}</div>
+                  <span class="text-[10px] text-rose-700/90 font-medium mt-0.5 block">Current Valuation</span>
+                </div>
+
+                <div class="p-4 bg-surface-900/90 border border-rose-500/20 bg-rose-500/5 rounded-xl shadow-sm">
+                  <span class="text-[10px] text-rose-700 uppercase font-bold tracking-wider block">Validated Gross Loss</span>
+                  <div class="text-lg font-bold font-mono text-rose-700 mt-1">₹{{ formatCurrency(claim.grossLoss || claim.eligibleLoss || 14286) }}</div>
+                  <span class="text-[10px] text-rose-700/90 font-mono font-semibold mt-0.5 block">{{ getLossPercentage(claim) }}% Crash Loss</span>
+                </div>
+
+                <div class="p-4 bg-surface-900/90 border border-emerald-500/30 bg-emerald-500/5 rounded-xl shadow-sm">
+                  <span class="text-[10px] text-emerald-700 uppercase font-bold tracking-wider block">Requested Payout</span>
+                  <div class="text-lg font-bold font-mono text-emerald-700 mt-1">₹{{ formatCurrency(claim.payoutAmount || 10000) }}</div>
+                  <span class="text-[10px] text-surface-200 mt-0.5 block">Cap: ₹{{ formatCurrency(claim.policyLimit || 10537) }}</span>
+                </div>
+              </div>
+
+              <!-- Actuarial Loss & Coverage Threshold Audit Card -->
+              <div class="p-5 bg-surface-900/80 border border-surface-800 rounded-xl space-y-4">
+                <div class="flex items-center justify-between">
+                  <h3 class="text-xs uppercase tracking-wider font-bold text-surface-200 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-sm text-primary-600">verified_user</span>
+                    Actuarial Loss & Breach Threshold Audit
+                  </h3>
+                  <span class="px-2.5 py-0.5 rounded text-[11px] font-bold font-mono bg-emerald-500/15 text-emerald-700 border border-emerald-500/30 flex items-center gap-1">
+                    <span class="material-symbols-outlined text-xs">check_circle</span> {{ getPolicy(claim)?.insuredThresholdPct || 20 }}% Breach Validated
+                  </span>
+                </div>
+
+                <!-- Loss Meter Progress Bar -->
+                <div class="space-y-1.5 font-mono text-xs">
+                  <div class="flex justify-between text-[11px] text-surface-200">
+                    <span>Portfolio Loss Ratio: <strong class="text-rose-700 font-bold">{{ getLossPercentage(claim) }}%</strong></span>
+                    <span>Policy Trigger Threshold: <strong class="text-accent-700 font-bold">{{ getPolicy(claim)?.insuredThresholdPct || 20 }}%</strong></span>
+                  </div>
+                  <div class="w-full bg-surface-800 h-2.5 rounded-full overflow-hidden flex">
+                    <div class="bg-rose-500 h-full transition-all duration-500" [style.width.%]="getLossPercentage(claim)"></div>
+                    <div class="bg-emerald-500/40 h-full flex-1"></div>
+                  </div>
+                </div>
+
+                <!-- Compliance Checklist items -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2 text-xs">
+                  <div class="p-2.5 bg-surface-950/70 border border-surface-800/80 rounded-lg flex items-center gap-2">
+                    <span class="material-symbols-outlined text-emerald-700 text-sm shrink-0">check_circle</span>
+                    <span class="text-surface-200">{{ getPolicy(claim)?.tenureYears || 5 }}-Yr Waiting Period Satisfied</span>
+                  </div>
+                  <div class="p-2.5 bg-surface-950/70 border border-surface-800/80 rounded-lg flex items-center gap-2">
+                    <span class="material-symbols-outlined text-emerald-700 text-sm shrink-0">check_circle</span>
+                    <span class="text-surface-200">Crash Loss &gt; {{ getPolicy(claim)?.insuredThresholdPct || 20 }}% Floor Met</span>
+                  </div>
+                  <div class="p-2.5 bg-surface-950/70 border border-surface-800/80 rounded-lg flex items-center gap-2">
+                    <span class="material-symbols-outlined text-emerald-700 text-sm shrink-0">check_circle</span>
+                    <span class="text-surface-200">Payout Within {{ getPolicy(claim)?.coveragePercentage || 70 }}% Max Limit</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Payout Disbursement & Settlement SLA Notice -->
+              <div class="p-5 bg-emerald-500/5 border border-emerald-500/25 rounded-xl space-y-3">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2 text-emerald-700 font-bold text-xs uppercase tracking-wider">
+                    <span class="material-symbols-outlined text-base">account_balance_wallet</span>
+                    <span>Disbursement & Settlement SLA • Direct Credit</span>
+                  </div>
+                  <span class="text-[11px] font-mono text-emerald-700 font-bold px-2 py-0.5 bg-emerald-500/10 rounded">
+                    FAST SLA: 1 – 2 BUSINESS DAYS
+                  </span>
+                </div>
+                
+                <p class="text-xs text-surface-200 leading-relaxed">
+                  Upon analyst authorization, the approved settlement will be scheduled for direct transfer to the investor's recent payment method on file (UPI / Debit Card / NetBanking) within <strong>1–2 business days</strong> via Automated Clearing House (ACH/IMPS).
+                </p>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs border-t border-emerald-500/20 font-mono">
+                  <div>
+                    <span class="text-surface-200 block text-[10px] uppercase font-sans">Payment Method</span>
+                    <span class="text-surface-100 font-semibold">Recent Method on File (UPI / Card)</span>
+                  </div>
+                  <div>
+                    <span class="text-surface-200 block text-[10px] uppercase font-sans">Settlement Window</span>
+                    <span class="text-emerald-700 font-bold">1 – 2 Business Days</span>
+                  </div>
+                  <div>
+                    <span class="text-surface-200 block text-[10px] uppercase font-sans">Authorized Payout</span>
+                    <span class="text-emerald-700 font-bold text-sm">₹{{ formatCurrency(claim.payoutAmount || 10000) }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Analyst Adjudication Notes & Preset Chips -->
+              <div class="space-y-2.5" [formGroup]="reviewForm">
+                <div class="flex items-center justify-between">
+                  <label class="text-xs uppercase font-bold tracking-wider text-surface-200 flex items-center gap-1.5">
+                    <span class="material-symbols-outlined text-sm text-primary-600">notes</span>
+                    Analyst Adjudication Findings & Audit Notes
+                  </label>
+                  <span class="text-[10px] text-surface-200">Recorded permanently to policy claim audit trail</span>
+                </div>
+
+                <!-- Fast Presets -->
+                <div class="flex flex-wrap gap-1.5">
+                  <button type="button" (click)="setNotePreset('Market loss verified against exchange baseline. Threshold breach exceeds 20% minimum. Approved for payout.')" class="px-2.5 py-1 bg-surface-800 hover:bg-surface-700 text-surface-200 hover:text-surface-100 rounded-lg text-[11px] border border-surface-700/80 transition-colors">
+                    + Loss Verified & Approved
+                  </button>
+                  <button type="button" (click)="setNotePreset('Tranche waiting period confirmed mature. Deductible reconciled. Immediate disbursement authorized.')" class="px-2.5 py-1 bg-surface-800 hover:bg-surface-700 text-surface-200 hover:text-surface-100 rounded-lg text-[11px] border border-surface-700/80 transition-colors">
+                    + Maturity Confirmed
+                  </button>
+                  <button type="button" (click)="setNotePreset('Threshold breach validated. Payout authorized to recent payment method within 1-2 business days.')" class="px-2.5 py-1 bg-surface-800 hover:bg-surface-700 text-surface-200 hover:text-surface-100 rounded-lg text-[11px] border border-surface-700/80 transition-colors">
+                    + 1-2 Day SLA Confirmed
+                  </button>
+                  <button type="button" (click)="setNotePreset('Claim documentation incomplete or loss calculation discrepancies detected.')" class="px-2.5 py-1 bg-surface-800 hover:bg-surface-700 text-surface-200 hover:text-surface-100 rounded-lg text-[11px] border border-surface-700/80 transition-colors">
+                    + Discrepancy Flag
+                  </button>
+                </div>
+
+                <textarea formControlName="rejectionReason" class="w-full bg-surface-950 border border-surface-700 rounded-xl p-3.5 text-xs text-surface-200 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 transition-all outline-none min-h-[75px] resize-none" placeholder="Enter adjudication audit notes, exchange verification details, or reasons for rejection..."></textarea>
+              </div>
+
+            </div>
+
+            <!-- Modal Action Footer -->
+            <div class="p-4 border-t border-surface-800 bg-surface-900/90 flex flex-col sm:flex-row items-center sm:justify-between gap-3 rounded-b-2xl shrink-0 w-full">
+              <button type="button" (click)="closeModal()" class="btn-secondary text-xs px-4 py-2.5 w-full sm:w-auto order-3 sm:order-1">
+                Close
+              </button>
+              
+              <div class="flex flex-col sm:flex-row items-center gap-2.5 w-full sm:w-auto order-1 sm:order-2">
+                <button type="button" (click)="rejectClaim()" [disabled]="processing()" class="btn-danger text-xs px-4 py-2.5 flex items-center justify-center gap-1.5 font-semibold w-full sm:w-auto order-2 sm:order-1">
+                  <span class="material-symbols-outlined text-sm">cancel</span>
+                  <span>Reject Claim</span>
+                </button>
+
+                <button type="button" (click)="approveClaim()" [disabled]="processing()" class="btn-primary bg-emerald-600 hover:bg-emerald-500 text-xs px-5 py-2.5 font-bold shadow-lg shadow-emerald-600/25 flex items-center justify-center gap-1.5 w-full sm:w-auto order-1 sm:order-2">
+                  @if (processing()) {
+                    <span class="material-symbols-outlined text-sm animate-spin">progress_activity</span>
+                    <span>Authorizing Settlement...</span>
+                  } @else {
+                    <span class="material-symbols-outlined text-sm">verified</span>
+                    <span>Approve Claim & Authorize Settlement</span>
+                  }
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      }
+    </div>

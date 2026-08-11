@@ -1,0 +1,418 @@
+<div class="space-y-6 animate-fade-in relative">
+      <!-- Header -->
+      <div class="flex justify-between items-center">
+        <div>
+          <h1 class="text-2xl font-bold text-surface-100 flex items-center gap-3">
+            <span>Investor CRM</span>
+          </h1>
+          <p class="text-sm text-surface-200">Directory of retail and institutional investors, policies, and risk metrics.</p>
+        </div>
+        <button (click)="loadData()" [disabled]="loading()" class="btn-secondary text-xs flex items-center gap-2">
+          <span class="material-symbols-outlined align-middle text-sm">sync</span> {{ loading() ? 'Refreshing...' : 'Refresh CRM' }}
+        </button>
+      </div>
+
+      <!-- Top Summary Metrics Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="bg-white border border-surface-800 shadow-[0_4px_20px_rgb(0,0,0,0.03)] p-5 rounded-2xl flex flex-col justify-between">
+          <span class="text-[10px] uppercase font-bold tracking-widest text-surface-100 mb-2">Total Investors</span>
+          <div class="flex flex-col">
+            <span class="text-3xl font-black font-mono text-primary-600">{{ countInvestors() }}</span>
+            <span class="text-[10px] text-surface-200 mt-1 font-semibold uppercase tracking-wider">Registered Investors</span>
+          </div>
+        </div>
+        <div class="bg-white border border-emerald-200 shadow-[0_4px_20px_rgb(0,0,0,0.03)] p-5 rounded-2xl flex flex-col justify-between">
+          <span class="text-[10px] uppercase font-bold tracking-widest text-emerald-700 mb-2">KYC Verified</span>
+          <div class="flex flex-col">
+            <span class="text-3xl font-black font-mono text-emerald-700">{{ countVerified() }}</span>
+            <span class="text-[10px] text-emerald-700 mt-1 font-bold uppercase tracking-wider">Fully Compliant</span>
+          </div>
+        </div>
+        <div class="bg-white border border-sky-200 shadow-[0_4px_20px_rgb(0,0,0,0.03)] p-5 rounded-2xl flex flex-col justify-between">
+          <span class="text-[10px] uppercase font-bold tracking-widest text-sky-700 mb-2">Total Insured Value</span>
+          <div class="flex flex-col">
+            <span class="text-3xl font-black font-mono text-sky-700">₹{{ formatCurrency(totalInsuredValue()) }}</span>
+            <span class="text-[10px] text-sky-700 mt-1 font-bold uppercase tracking-wider">Active Protection</span>
+          </div>
+        </div>
+        <div class="bg-white border border-orange-200 shadow-[0_4px_20px_rgb(0,0,0,0.03)] p-5 rounded-2xl flex flex-col justify-between">
+          <span class="text-[10px] uppercase font-bold tracking-widest text-orange-600 mb-2">Active Policies</span>
+          <div class="flex flex-col">
+            <span class="text-3xl font-black font-mono text-orange-600">{{ totalActivePolicies() }}</span>
+            <span class="text-[10px] text-orange-600 mt-1 font-bold uppercase tracking-wider">Underwritten</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- CRM Table -->
+      <div class="bg-white border border-surface-800 shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-[24px] space-y-0 overflow-hidden">
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-surface-800 p-6 bg-[#f4f5f6]">
+          <h2 class="text-xl font-display font-bold text-surface-100">Investor Directory</h2>
+          
+          <div class="relative w-full md:w-72" [formGroup]="searchForm">
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-surface-200 text-[18px]">search</span>
+            <input type="text" formControlName="searchQuery" placeholder="Search name, email, phone, ID..." 
+                   class="w-full bg-white border border-surface-800 text-surface-100 text-xs pl-9 pr-4 py-2 rounded-full focus:outline-none focus:border-primary-600 focus:ring-1 focus:ring-primary-600 shadow-sm" />
+          </div>
+        </div>
+
+        <div class="w-full overflow-x-auto">
+          <table class="w-full text-left text-sm text-surface-200">
+            <thead>
+              <tr class="bg-[#f4f5f6] border-b border-surface-800">
+                <th class="py-4 px-6 font-bold text-[11px] uppercase tracking-wider text-surface-100 text-left">Investor Details</th>
+                <th class="py-4 px-6 font-bold text-[11px] uppercase tracking-wider text-surface-100 text-left">KYC Status</th>
+                <th class="py-4 px-6 font-bold text-[11px] uppercase tracking-wider text-surface-100 text-left">Account State</th>
+                <th class="py-4 px-6 font-bold text-[11px] uppercase tracking-wider text-surface-100 text-left">Policies & Coverage</th>
+                <th class="py-4 px-6 font-bold text-[11px] uppercase tracking-wider text-surface-100 text-center">Avg Risk</th>
+                <th class="py-4 px-6 font-bold text-[11px] uppercase tracking-wider text-surface-100 text-center">Claims</th>
+                <th class="py-4 px-6 font-bold text-[11px] uppercase tracking-wider text-surface-100 text-left">Registered</th>
+                <th class="py-4 px-6 font-bold text-[11px] uppercase tracking-wider text-surface-100 text-right">Action</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-surface-800/60 bg-white">
+              @if (loading()) {
+                <tr>
+                  <td colspan="8" class="p-8 text-center text-surface-200 text-sm font-bold">
+                    <span class="animate-pulse inline-block">Fetching investor directory data from backend...</span>
+                  </td>
+                </tr>
+              } @else if (filteredUsers().length === 0) {
+                <tr>
+                  <td colspan="8" class="p-8 text-center text-surface-200 text-sm font-bold bg-[#f4f5f6]/50">
+                    No investors found matching "{{ searchForm.value.searchQuery }}".
+                  </td>
+                </tr>
+              } @else {
+                @for (user of filteredUsers(); track user.userId || user.id) {
+                  <tr class="hover:bg-primary-50/30 transition-colors group cursor-pointer" (click)="openInvestorModal(user)">
+                    <!-- Investor & Contact -->
+                    <td class="py-4 px-6">
+                      <div class="flex items-center gap-2.5">
+                        <div class="w-8 h-8 rounded-full bg-primary-50 border border-primary-200 text-primary-700 flex items-center justify-center font-bold text-xs shrink-0 shadow-sm">
+                          {{ getInitial(user) }}
+                        </div>
+                        <div class="min-w-0">
+                          <p class="text-xs font-bold text-surface-100 truncate group-hover:text-primary-600 transition-colors">{{ getName(user) }}</p>
+                          <p class="text-[11px] text-surface-200 font-mono mt-0.5 truncate font-semibold">{{ user.email }}</p>
+                          @if (user.phoneNumber) {
+                            <p class="text-[10px] text-surface-500 font-mono mt-0.5 font-semibold">{{ user.phoneNumber }}</p>
+                          }
+                        </div>
+                      </div>
+                    </td>
+
+                    <!-- KYC Status -->
+                    <td class="py-4 px-6">
+                      <span [ngClass]="getKycBadgeClass(user.kycStatus)" class="text-[10px] uppercase font-black tracking-wider px-2.5 py-1 rounded-full shadow-sm">
+                        {{ user.kycStatus || 'NOT_SUBMITTED' }}
+                      </span>
+                    </td>
+
+                    <!-- Account State -->
+                    <td class="py-4 px-6">
+                      <div class="flex items-center gap-1.5">
+                        <div class="w-2.5 h-2.5 rounded-full shadow-sm" [ngClass]="user.isActive === false ? 'bg-rose-500' : 'bg-emerald-500'"></div>
+                        <span class="text-xs font-bold" [ngClass]="user.isActive === false ? 'text-rose-600' : 'text-surface-100'">
+                          {{ user.isActive === false ? 'Suspended' : 'Active' }}
+                        </span>
+                      </div>
+                    </td>
+
+                    <!-- Policies & Coverage -->
+                    <td class="py-4 px-6">
+                      @if (getUserPolicies(user.userId || user.id).length > 0) {
+                        <div>
+                          <div class="text-xs font-bold text-surface-100">
+                            {{ getUserPolicies(user.userId || user.id).length }} Policy(ies)
+                          </div>
+                          <div class="text-[11px] font-mono font-black text-sky-700 mt-0.5">
+                            ₹{{ formatCurrency(getUserInsuredValue(user.userId || user.id)) }} insured
+                          </div>
+                          <div class="text-[10px] font-mono font-bold text-surface-200">
+                            ₹{{ formatCurrency(getUserPremium(user.userId || user.id)) }}/yr
+                          </div>
+                        </div>
+                      } @else {
+                        <span class="text-xs text-surface-500 italic font-semibold">No Policies</span>
+                      }
+                    </td>
+
+                    <!-- Avg Risk Score -->
+                    <td class="py-4 px-6 text-center">
+                      @if (getUserRiskScore(user.userId || user.id) > 0) {
+                        <span class="text-[11px] font-mono font-black px-2.5 py-1 rounded-full shadow-sm" [class]="getUserRiskScore(user.userId || user.id) >= 500 ? 'bg-orange-100 text-orange-700 border border-orange-200' : 'bg-emerald-100 text-emerald-700 border border-emerald-200'">
+                          {{ getUserRiskScore(user.userId || user.id) }} / 1000
+                        </span>
+                      } @else {
+                        <span class="text-xs text-surface-500">—</span>
+                      }
+                    </td>
+
+                    <!-- Claims -->
+                    <td class="p-4 text-center">
+                      @if (getUserClaims(user.userId || user.id).length > 0) {
+                        <span class="text-xs font-mono font-semibold px-2 py-0.5 rounded bg-danger-500/10 text-danger-400 border border-danger-500/30">
+                          {{ getUserClaims(user.userId || user.id).length }} Claim(s)
+                        </span>
+                      } @else {
+                        <span class="text-xs text-surface-200 font-mono">0</span>
+                      }
+                    </td>
+
+                    <!-- Registered Date -->
+                    <td class="p-4 text-xs text-surface-200 font-mono">
+                      {{ (user.createdAt | date:'mediumDate') || '—' }}
+                    </td>
+
+                    <!-- Action -->
+                    <td class="p-4 text-right">
+                      <button (click)="openInvestorModal(user); $event.stopPropagation()" 
+                              class="text-xs font-semibold text-primary-600 hover:text-primary-600 bg-primary-500/10 hover:bg-primary-500/20 px-3 py-1.5 rounded-lg border border-primary-500/20 transition-all">
+                        View Details
+                      </button>
+                    </td>
+                  </tr>
+                }
+              }
+            </tbody>
+          </table>
+        </div>
+        <div class="p-4 border-t border-surface-800 bg-[#f4f5f6] flex justify-between items-center text-xs text-surface-200 font-bold">
+          <span>Showing {{ filteredUsers().length }} of {{ users().length }} investors</span>
+        </div>
+      </div>
+
+      <!-- Investor Deep-Dive Modal -->
+      @if (selectedInvestor()) {
+        <div class="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 sm:p-6 overflow-y-auto" (click)="closeInvestorModal()">
+          <div class="relative my-auto w-full max-w-4xl bg-[#f4f5f6] border border-surface-800 rounded-2xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.3)] flex flex-col max-h-[calc(100vh-3.5rem)] animate-scale-in overflow-hidden" (click)="$event.stopPropagation()">
+            
+            <!-- Modal Header with Executive Profile Banner -->
+            <div class="p-5 border-b border-surface-800 bg-white flex justify-between items-start shrink-0">
+              <div class="flex items-center gap-4">
+                <div class="w-14 h-14 rounded-2xl bg-[#f4f5f6] border border-surface-800 flex items-center justify-center font-black text-surface-100 text-xl shadow-sm shrink-0">
+                  {{ getInitial(selectedInvestor()) }}
+                </div>
+                <div>
+                  <div class="flex items-center gap-2.5 flex-wrap">
+                    <h3 class="text-xl font-bold text-surface-100 tracking-tight">
+                      {{ getName(selectedInvestor()) }}
+                    </h3>
+                    <span [ngClass]="getKycBadgeClass(selectedInvestor().kycStatus)" class="text-[10px] uppercase font-black tracking-wider px-2.5 py-1 rounded-full shadow-sm flex items-center gap-1">
+                      <span class="material-symbols-outlined text-[13px] align-middle">verified_user</span>
+                      {{ selectedInvestor().kycStatus || 'NOT_SUBMITTED' }}
+                    </span>
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold shadow-sm uppercase tracking-wider"
+                          [ngClass]="selectedInvestor().isActive === false ? 'bg-rose-100 text-rose-700 border border-rose-200' : 'bg-emerald-100 text-emerald-700 border border-emerald-200'">
+                      <span class="w-1.5 h-1.5 rounded-full" [ngClass]="selectedInvestor().isActive === false ? 'bg-rose-500' : 'bg-emerald-500'"></span>
+                      {{ selectedInvestor().isActive === false ? 'Suspended' : 'Active Account' }}
+                    </span>
+                  </div>
+                  <div class="flex items-center gap-3 text-xs text-surface-200 mt-1.5 font-mono font-bold">
+                    <span class="flex items-center gap-1 text-surface-200">
+                      <span class="material-symbols-outlined text-[13px] text-surface-500">mail</span> {{ selectedInvestor().email }}
+                    </span>
+                    <span class="text-surface-700">•</span>
+                    <span class="text-surface-200">UID: <span class="text-surface-200">{{ selectedInvestor().userId || selectedInvestor().id }}</span></span>
+                  </div>
+                </div>
+              </div>
+              <button (click)="closeInvestorModal()" class="w-8 h-8 rounded-lg bg-[#f4f5f6] border border-surface-800 hover:bg-surface-800 hover:text-white text-surface-200 flex items-center justify-center transition-colors shadow-sm">
+                <span class="material-symbols-outlined text-lg">close</span>
+              </button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="p-6 space-y-6 overflow-y-auto flex-1 bg-[#f4f5f6]">
+              
+              <!-- Quick Stats Banner -->
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div class="p-5 bg-white border border-surface-800 rounded-2xl shadow-sm flex flex-col justify-between">
+                  <div class="flex items-center justify-between text-surface-100 mb-2">
+                    <span class="text-[10px] uppercase font-bold tracking-widest">Active Policies</span>
+                    <span class="material-symbols-outlined text-[15px] text-surface-100">policy</span>
+                  </div>
+                  <div>
+                    <div class="text-3xl font-black font-mono text-surface-100">
+                      {{ getUserPolicies(selectedInvestor().userId || selectedInvestor().id).length }}
+                    </div>
+                    <div class="text-[10px] font-bold text-surface-200 mt-1 uppercase tracking-wider">Insurance Contracts</div>
+                  </div>
+                </div>
+
+                <div class="p-5 bg-white border border-emerald-200 rounded-2xl shadow-sm flex flex-col justify-between">
+                  <div class="flex items-center justify-between text-emerald-700 mb-2">
+                    <span class="text-[10px] uppercase font-bold tracking-widest">Total Coverage</span>
+                    <span class="material-symbols-outlined text-[15px] text-emerald-600">shield</span>
+                  </div>
+                  <div>
+                    <div class="text-3xl font-black font-mono text-emerald-700">
+                      ₹{{ formatCurrency(getUserInsuredValue(selectedInvestor().userId || selectedInvestor().id)) }}
+                    </div>
+                    <div class="text-[10px] font-bold text-emerald-700 mt-1 uppercase tracking-wider">Protected Portfolio</div>
+                  </div>
+                </div>
+
+                <div class="p-5 bg-white border border-sky-200 rounded-2xl shadow-sm flex flex-col justify-between">
+                  <div class="flex items-center justify-between text-sky-700 mb-2">
+                    <span class="text-[10px] uppercase font-bold tracking-widest">Annual Premium</span>
+                    <span class="material-symbols-outlined text-[15px] text-sky-600">payments</span>
+                  </div>
+                  <div>
+                    <div class="text-3xl font-black font-mono text-sky-700">
+                      ₹{{ formatCurrency(getUserPremium(selectedInvestor().userId || selectedInvestor().id)) }}
+                    </div>
+                    <div class="text-[10px] font-bold text-sky-700 mt-1 uppercase tracking-wider">Annual Underwriting</div>
+                  </div>
+                </div>
+
+                <div class="p-5 bg-white border border-orange-200 rounded-2xl shadow-sm flex flex-col justify-between">
+                  <div class="flex items-center justify-between text-orange-700 mb-2">
+                    <span class="text-[10px] uppercase font-bold tracking-widest">Actuarial Risk</span>
+                    <span class="material-symbols-outlined text-[15px] text-orange-600">analytics</span>
+                  </div>
+                  <div>
+                    <div class="text-3xl font-black font-mono text-orange-600">
+                      {{ getUserRiskScore(selectedInvestor().userId || selectedInvestor().id) > 0 ? getUserRiskScore(selectedInvestor().userId || selectedInvestor().id) + ' / 1000' : 'N/A' }}
+                    </div>
+                    <div class="text-[10px] font-bold text-orange-700 mt-1 uppercase tracking-wider">Weighted Score</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Profile Details Card -->
+              <div class="bg-white border border-surface-800 rounded-2xl p-6 shadow-sm">
+                <h4 class="text-xs uppercase tracking-wider font-bold text-surface-100 mb-4 flex items-center gap-2">
+                  <span class="material-symbols-outlined text-[15px]">badge</span>
+                  Account & Contact Information
+                </h4>
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-6 text-xs">
+                  <div>
+                    <span class="text-[10px] text-surface-500 uppercase block font-bold tracking-wider">First Name</span>
+                    <span class="text-surface-100 font-bold mt-1 block">{{ selectedInvestor().firstName || '—' }}</span>
+                  </div>
+                  <div>
+                    <span class="text-[10px] text-surface-500 uppercase block font-bold tracking-wider">Last Name</span>
+                    <span class="text-surface-100 font-bold mt-1 block">{{ selectedInvestor().lastName || '—' }}</span>
+                  </div>
+                  <div>
+                    <span class="text-[10px] text-surface-500 uppercase block font-bold tracking-wider">Phone Number</span>
+                    <span class="text-surface-100 font-mono font-bold mt-1 block">{{ selectedInvestor().phoneNumber || 'Not Provided' }}</span>
+                  </div>
+                  <div>
+                    <span class="text-[10px] text-surface-500 uppercase block font-bold tracking-wider">Email Verification</span>
+                    <span class="font-bold mt-1 inline-flex items-center gap-1" [ngClass]="selectedInvestor().isEmailVerified ? 'text-emerald-600' : 'text-orange-600'">
+                      <span class="material-symbols-outlined text-[13px]">{{ selectedInvestor().isEmailVerified ? 'check_circle' : 'schedule' }}</span>
+                      {{ selectedInvestor().isEmailVerified ? 'Verified' : 'Pending Verification' }}
+                    </span>
+                  </div>
+                  <div>
+                    <span class="text-[10px] text-surface-500 uppercase block font-bold tracking-wider">Registration Date</span>
+                    <span class="text-surface-100 font-mono font-bold mt-1 block">{{ (selectedInvestor().createdAt | date:'medium') || '—' }}</span>
+                  </div>
+                  <div>
+                    <span class="text-[10px] text-surface-500 uppercase block font-bold tracking-wider">Last Profile Update</span>
+                    <span class="text-surface-100 font-mono font-bold mt-1 block">{{ (selectedInvestor().updatedAt | date:'medium') || '—' }}</span>
+                  </div>
+                  <div>
+                    <span class="text-[10px] text-surface-500 uppercase block font-bold tracking-wider">Registered Through</span>
+                    <span class="text-surface-100 font-mono font-bold mt-1 block">{{ selectedInvestor().createdBy || 'Web Portal' }}</span>
+                  </div>
+                  <div>
+                    <span class="text-[10px] text-surface-500 uppercase block font-bold tracking-wider">Total Claims Filed</span>
+                    <span class="text-surface-100 font-bold mt-1 block">{{ getUserClaims(selectedInvestor().userId || selectedInvestor().id).length }} Claim(s)</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Policies Portfolio Section -->
+              <div class="bg-white border border-surface-800 rounded-2xl p-6 shadow-sm">
+                <div class="flex items-center justify-between mb-4">
+                  <h4 class="text-xs uppercase tracking-wider font-bold text-surface-100 flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[15px] text-emerald-600">verified</span>
+                    Policy Subscriptions ({{ getUserPolicies(selectedInvestor().userId || selectedInvestor().id).length }})
+                  </h4>
+                  <span class="text-surface-100 font-mono text-xs font-black">
+                    ₹{{ formatCurrency(getUserInsuredValue(selectedInvestor().userId || selectedInvestor().id)) }} Active Coverage
+                  </span>
+                </div>
+
+                @if (getUserPolicies(selectedInvestor().userId || selectedInvestor().id).length > 0) {
+                  <div class="space-y-3">
+                    @for (policy of getUserPolicies(selectedInvestor().userId || selectedInvestor().id); track policy.id) {
+                      <div class="p-4 bg-[#f4f5f6] border border-surface-800 rounded-xl flex items-center justify-between shadow-sm">
+                        <div>
+                          <div class="flex items-center gap-2">
+                            <span class="font-mono text-xs font-black text-surface-100">{{ policy.policyNumber || policy.id?.substring(0,8) }}</span>
+                            <span class="bg-emerald-100 text-emerald-700 border border-emerald-200 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm">{{ policy.status || policy.policyStatus || 'ACTIVE' }}</span>
+                          </div>
+                          <div class="text-[11px] text-surface-200 font-mono mt-1 font-semibold">
+                            Insured Value: <span class="text-surface-100 font-bold">₹{{ formatCurrency(policy.insuredValue || 0) }}</span> 
+                            <span class="text-surface-200 mx-1.5">•</span>
+                            Annual Premium: <span class="text-surface-100 font-bold">₹{{ formatCurrency(policy.annualPremium || 0) }}</span>
+                          </div>
+                        </div>
+                        <div class="text-right">
+                          <span class="text-[10px] text-surface-500 uppercase block font-bold tracking-wider">Risk Score</span>
+                          <span class="text-xs font-mono font-black mt-1 inline-block px-2.5 py-1 rounded-full shadow-sm" [class]="(policy.riskScore || 380) >= 500 ? 'bg-orange-100 text-orange-700 border border-orange-200' : 'bg-emerald-100 text-emerald-700 border border-emerald-200'">
+                            {{ policy.riskScore ?? 380 }} / 1000
+                          </span>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                } @else {
+                  <div class="p-8 bg-[#f4f5f6]/50 border border-dashed border-surface-800 rounded-xl text-center text-surface-500 text-xs font-bold">
+                    No active insurance policies under this investor account.
+                  </div>
+                }
+              </div>
+
+              <!-- Claims History Section -->
+              <div class="bg-white border border-surface-800 rounded-2xl p-6 shadow-sm">
+                <h4 class="text-xs uppercase tracking-wider font-bold text-surface-100 mb-4 flex items-center gap-2">
+                  <span class="material-symbols-outlined text-[15px] text-orange-600">receipt_long</span>
+                  Claims & Payout History ({{ getUserClaims(selectedInvestor().userId || selectedInvestor().id).length }})
+                </h4>
+
+                @if (getUserClaims(selectedInvestor().userId || selectedInvestor().id).length > 0) {
+                  <div class="space-y-3">
+                    @for (claim of getUserClaims(selectedInvestor().userId || selectedInvestor().id); track claim.id) {
+                      <div class="p-4 bg-[#f4f5f6] border border-surface-800 rounded-xl flex items-center justify-between shadow-sm">
+                        <div>
+                          <div class="flex items-center gap-2">
+                            <span class="font-mono text-xs font-black text-surface-100">Claim #{{ (claim.claimId || claim.id)?.substring(0,8) }}</span>
+                            <span class="text-[10px] px-2.5 py-0.5 rounded-full border border-orange-200 bg-orange-100 text-orange-700 font-bold uppercase tracking-wider shadow-sm">
+                              {{ claim.claimStatus || 'PENDING' }}
+                            </span>
+                          </div>
+                          <p class="text-[11px] text-surface-200 font-mono font-semibold mt-1">Associated Policy: <span class="font-bold text-surface-100">{{ claim.policyId?.substring(0,8) }}</span></p>
+                        </div>
+                        <div class="text-right">
+                          <span class="text-[10px] text-surface-500 uppercase block font-bold tracking-wider">Claim Amount</span>
+                          <span class="text-xs font-mono font-black text-surface-100 mt-1 block">₹{{ formatCurrency(claim.grossLoss || claim.actualLossAmount || 0) }}</span>
+                        </div>
+                      </div>
+                    }
+                  </div>
+                } @else {
+                  <div class="p-8 bg-[#f4f5f6]/50 border border-dashed border-surface-800 rounded-xl text-center text-surface-500 text-xs font-bold">
+                    Zero claims filed — exemplary risk and loss record.
+                  </div>
+                }
+              </div>
+
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="p-5 border-t border-surface-800 bg-white flex justify-end shrink-0">
+              <button (click)="closeInvestorModal()" class="bg-white border border-surface-800 text-surface-100 font-bold text-xs uppercase tracking-wider px-6 py-2.5 rounded-full shadow-sm hover:border-surface-200 hover:bg-surface-800 hover:text-white transition-all">
+                Done
+              </button>
+            </div>
+
+          </div>
+        </div>
+      }
+    </div>

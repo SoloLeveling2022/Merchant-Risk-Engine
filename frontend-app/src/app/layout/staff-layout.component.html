@@ -1,0 +1,152 @@
+<!-- Toast Notifications -->
+    <div class="fixed top-4 right-4 z-[200] flex flex-col gap-2 max-w-sm">
+      @for (toast of notificationService.toasts(); track toast.id) {
+        <div class="animate-slide-in card !p-3.5 flex items-start gap-3 border-l-4 shadow-2xl"
+             [class.border-l-emerald-500]="toast.type === 'SUCCESS'"
+             [class.border-l-rose-500]="toast.type === 'ERROR'"
+             [class.border-l-accent-500]="toast.type === 'WARNING'"
+             [class.border-l-sky-500]="toast.type === 'INFO'">
+          <span class="material-symbols-outlined text-xl shrink-0 mt-0.5"
+                [class.text-emerald-400]="toast.type === 'SUCCESS'"
+                [class.text-rose-400]="toast.type === 'ERROR'"
+                [class.text-accent-400]="toast.type === 'WARNING'"
+                [class.text-sky-400]="toast.type === 'INFO'">
+            {{ toast.type === 'SUCCESS' ? 'check_circle' : toast.type === 'ERROR' ? 'cancel' : toast.type === 'WARNING' ? 'warning' : 'info' }}
+          </span>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-semibold text-surface-100 truncate" [innerHTML]="toast.title"></p>
+            <p class="text-xs text-surface-200 mt-0.5 leading-relaxed" [innerHTML]="toast.message"></p>
+          </div>
+          <button (click)="notificationService.dismissToast(toast.id)"
+                  class="text-surface-500 hover:text-surface-200 text-sm leading-none shrink-0" title="Dismiss">
+            <span class="material-symbols-outlined text-base align-middle">close</span>
+          </button>
+        </div>
+      }
+    </div>
+
+    <div class="flex flex-col h-screen bg-surface-950 text-surface-100">
+      
+      <!-- Full Width Header -->
+      <header class="h-16 border-b border-surface-800 bg-surface-900/90 backdrop-blur-md flex items-center justify-between px-6 z-30 shrink-0">
+        <div class="flex items-center gap-4">
+          <button (click)="sidebarCollapsed.set(!sidebarCollapsed())" class="text-surface-200 hover:text-surface-100 transition-colors p-1 rounded-md hover:bg-surface-800">
+            <span class="material-symbols-outlined align-middle">menu</span>
+          </button>
+          
+          <div class="flex items-center gap-3 border-l border-surface-800 pl-4 ml-2">
+            <div>
+              <h1 class="font-bold text-surface-100 text-sm leading-tight">ShieldPort Admin</h1>
+              <p class="text-[10px] text-surface-200 font-mono tracking-wider">ADMINISTRATION</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-6">
+          <!-- Global Notification Bell -->
+          <div class="relative" #notificationBellContainer>
+            <button (click)="toggleNotifications($event)" class="relative p-2 text-surface-200 hover:text-surface-100 transition-colors rounded-full hover:bg-surface-800" title="Notifications">
+              <span class="text-xl"><span class="material-symbols-outlined align-middle">notifications</span></span>
+              @if (unreadCount() > 0) {
+                <span class="absolute top-0 right-0 inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold text-white bg-primary-500 border-2 border-surface-900 rounded-full animate-pulse">
+                  {{ unreadCount() }}
+                </span>
+              }
+            </button>
+            
+            <!-- Dropdown -->
+            @if (showNotifications()) {
+              <div class="absolute right-0 mt-2 w-80 bg-surface-800 border border-surface-700 rounded-xl shadow-2xl overflow-hidden origin-top-right animate-scale-in z-50">
+                <div class="p-3 border-b border-surface-700 flex justify-between items-center bg-surface-800">
+                  <h3 class="text-sm font-semibold text-surface-100">Notifications</h3>
+                  <button (click)="showNotifications.set(false)" class="text-surface-200 hover:text-surface-100 text-sm p-0.5 leading-none rounded hover:bg-surface-700 transition-colors" title="Close notifications"><span class="material-symbols-outlined text-base align-middle">close</span></button>
+                </div>
+                <div class="max-h-96 overflow-y-auto">
+                  @if (notificationService.notifications().length === 0) {
+                    <div class="p-4 text-center text-sm text-surface-200">No new notifications</div>
+                  }
+                  @for (notif of notificationService.notifications(); track notif.id) {
+                    <div class="p-3 border-b border-surface-700/50 hover:bg-surface-700 transition-colors cursor-pointer bg-surface-800">
+                      <div class="flex gap-2">
+                        <span class="text-lg">
+                          <span class="material-symbols-outlined align-middle">
+                            {{ notif.type === 'SUCCESS' ? 'check_circle' : notif.type === 'ERROR' ? 'cancel' : notif.type === 'WARNING' ? 'warning' : 'info' }}
+                          </span>
+                        </span>
+                        <div>
+                          <p class="text-sm font-medium text-surface-200" [innerHTML]="notif.title"></p>
+                          <p class="text-xs text-surface-200 mt-1" [innerHTML]="notif.message"></p>
+                          <p class="text-[10px] text-surface-500 mt-1">{{ notif.timestamp | date:'short' }}</p>
+                        </div>
+                      </div>
+                    </div>
+                  }
+                </div>
+              </div>
+            }
+          </div>
+          
+          <!-- Staff Badge -->
+          <div class="flex items-center gap-2">
+            <span class="text-xs text-surface-200">Status:</span>
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold tracking-wider bg-primary-500/10 text-primary-600 border border-primary-500/20">
+              ACTIVE
+            </span>
+          </div>
+        </div>
+      </header>
+
+      <div class="flex flex-1 min-h-0">
+        <!-- Staff Sidebar Below Header -->
+        <aside [class]="sidebarCollapsed() ? 'w-20' : 'w-64'" class="bg-surface-950 border-r border-surface-800 flex flex-col relative z-20 shadow-2xl transition-all duration-300 shrink-0">
+
+        <nav class="flex-1 p-4 space-y-2 overflow-y-auto bg-surface-950">
+          @for (item of visibleNavItems(); track item.route) {
+            <a [routerLink]="item.route"
+               routerLinkActive="bg-primary-500/10 text-primary-600 font-semibold border-r-2 border-primary-500 shadow-[inset_4px_0_0_0_rgba(115, 115, 115, 1)]"
+               class="flex items-center px-4 py-3 rounded-lg text-surface-200 hover:bg-surface-800/80 hover:text-surface-100 transition-all text-sm group"
+               [class.justify-center]="sidebarCollapsed()"
+               [class.gap-3]="!sidebarCollapsed()"
+               [title]="item.label">
+              @if (sidebarCollapsed()) {
+                <span class="text-lg group-hover:scale-110 transition-transform" [innerHTML]="item.icon"></span>
+              } @else {
+                <span class="font-medium truncate">{{ item.label }}</span>
+              }
+            </a>
+          }
+        </nav>
+
+        <div class="p-4 border-t border-surface-800 bg-surface-900/80">
+          <div class="flex items-center gap-3 mb-3" [class.justify-center]="sidebarCollapsed()">
+            <div class="w-8 h-8 shrink-0 rounded-full bg-surface-700 flex items-center justify-center text-sm font-semibold text-surface-200">
+              {{ userInitial() }}
+            </div>
+            @if (!sidebarCollapsed()) {
+              <div class="flex-1 min-w-0">
+                <p class="text-xs font-medium text-surface-200 truncate">{{ userName() }}</p>
+                <p class="text-[10px] text-surface-200 font-mono truncate">{{ roleName() }}</p>
+              </div>
+            }
+          </div>
+          <button (click)="authService.logout()" class="w-full btn-secondary text-xs py-2 hover:bg-primary-500/20 hover:text-primary-600 hover:border-primary-500/30 transition-colors flex items-center justify-center gap-2" [title]="'Logout'">
+            @if (sidebarCollapsed()) {
+              <span class="material-symbols-outlined text-sm">logout</span>
+            } @else {
+              <span>Logout</span>
+            }
+          </button>
+        </div>
+      </aside>
+
+      <!-- Main Content Area -->
+      <main class="flex-1 flex flex-col min-w-0 overflow-hidden relative bg-surface-950">
+        <div class="p-6 pb-0 shrink-0">
+          <h2 class="text-xl font-bold text-surface-100">{{ pageTitle() }}</h2>
+        </div>
+        <div class="flex-1 overflow-y-auto p-6 pt-4">
+          <router-outlet></router-outlet>
+        </div>
+      </main>
+    </div>
+  </div>

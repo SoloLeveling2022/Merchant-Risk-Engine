@@ -1,0 +1,417 @@
+<div class="space-y-6 animate-fade-in relative">
+      <div class="mb-10">
+        <h1 class="text-3xl font-display font-black text-surface-100 flex items-center gap-3 mb-2">
+          <div class="w-10 h-10 rounded-full bg-primary-500/10 flex items-center justify-center text-primary-600 shadow-inner">
+            <span class="material-symbols-outlined text-xl">query_stats</span>
+          </div>
+          Insurance Quotes & Risk Assessment
+        </h1>
+        <p class="text-sm text-surface-200 ml-1">Generate risk-adjusted coverage quotes with dynamic vesting tranches and formal binder terms</p>
+      </div>
+
+      <!-- Generate Quote -->
+      <div class="bg-white border border-surface-800 shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-[24px] overflow-hidden" [formGroup]="quotesForm">
+        <h2 class="text-xl font-display font-bold text-surface-100 p-6 border-b border-surface-800 bg-gradient-to-r from-[#f4f5f6] to-white">Select Portfolio to Insure</h2>
+        <div class="p-6 space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label class="block text-xs font-bold text-primary-700 uppercase tracking-widest mb-2">Select Portfolio</label>
+              <select formControlName="selectedPortfolioId" class="w-full bg-white border border-surface-800 text-surface-100 text-sm rounded-xl px-4 py-3 focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 shadow-sm transition-all appearance-none cursor-pointer">
+                <option value="">-- Select Portfolio --</option>
+                @for (p of portfolios(); track (p.id || p.portfolioId || $index)) {
+                  <option [value]="p.id || p.portfolioId">{{ p.portfolioName }} (₹{{ formatCurrency(p.totalInvestmentValue || p.totalValue || 0) }})</option>
+                }
+              </select>
+            </div>
+            <div>
+              <label class="flex justify-between items-end mb-2">
+                <span class="text-xs font-bold text-primary-700 uppercase tracking-widest block">Policy Tenure Horizon</span>
+                <span class="text-primary-700 font-black font-mono text-xs">{{ getTenureYears() }} Years</span>
+              </label>
+              <select formControlName="selectedTenure" class="w-full bg-white border border-surface-800 text-surface-100 text-sm rounded-xl px-4 py-3 focus:outline-none focus:border-primary-500 focus:ring-1 focus:ring-primary-500 shadow-sm transition-all appearance-none cursor-pointer">
+                <option [value]="3">3 Years (2-Yr Lock-in • Year 3 Claimable)</option>
+                <option [value]="5">5 Years (2-Yr Lock-in • Years 3–5 Claimable)</option>
+                <option [value]="7">7 Years (3-Yr Lock-in • Years 4–7 Claimable)</option>
+                <option [value]="10">10 Years (4-Yr Lock-in • Years 5–10 Claimable)</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Dynamic 40% Lock-in & Cliff Vesting Calculation -->
+          <div class="p-4 bg-[#f4f5f6] rounded-xl border border-surface-800 flex flex-wrap items-center justify-between gap-4 text-[11px] shadow-inner font-semibold">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-surface-200 text-base">schedule</span>
+              <span class="text-surface-200 uppercase tracking-wider">Policy Horizon: <strong class="text-surface-100 font-bold ml-1">{{ getTenureYears() }} Years</strong></span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-orange-600 text-base">lock</span>
+              <span class="text-surface-200 uppercase tracking-wider">Mandatory 40% Lock-in: <strong class="text-orange-600 font-bold ml-1">{{ getWaitingPeriodYears() }} Years</strong> (Claims Restricted)</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-emerald-600 text-base">check_circle</span>
+              <span class="text-surface-200 uppercase tracking-wider">Option A Cliff Vesting: <strong class="text-emerald-700 font-bold ml-1">100% Unlocked in Year {{ getWaitingPeriodYears() + 1 }}</strong></span>
+            </div>
+          </div>
+
+          <button (click)="generateQuote()" [disabled]="quotesForm.get('selectedPortfolioId')?.invalid || loading()" class="w-auto bg-surface-100 hover:bg-surface-200 text-white border border-surface-700 text-sm px-6 py-3 rounded-full font-bold shadow-md transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed mx-0 mt-2">
+            @if (loading()) { Evaluating Portfolio Risk... } @else { <span class="material-symbols-outlined text-lg align-middle">content_paste</span> Generate Quote & Legal Agreement }
+          </button>
+        </div>
+      </div>
+
+      <!-- Quote Result & Binder Agreement -->
+      @if (quote()) {
+        <div class="bg-white border border-primary-200 shadow-[0_8px_30px_rgb(0,0,0,0.06)] rounded-[24px] animate-slide-up space-y-0 overflow-hidden">
+          <div class="flex justify-between items-center border-b border-surface-800 p-6 bg-gradient-to-br from-primary-50/50 to-white">
+            <div>
+              <h2 class="text-2xl font-display font-black text-surface-100 mb-1">Instant Insurance Quote & Binder Terms</h2>
+              <p class="text-[11px] font-bold text-primary-700 uppercase tracking-widest">Underwritten under StockShield Actuarial Guidelines v2.4</p>
+            </div>
+            <span class="bg-primary-100 text-primary-700 border border-primary-200 px-4 py-1.5 rounded-full text-[11px] font-black uppercase tracking-wider shadow-sm">
+              Risk Tier: {{ getRiskTier(quote()?.riskScore) }}
+            </span>
+          </div>
+          
+          <div class="p-6 space-y-6">
+            @if (isHighRiskQuote()) {
+              <div class="bg-rose-50 border border-rose-200 rounded-xl p-5 text-left flex items-start gap-4 shadow-sm">
+                <span class="material-symbols-outlined text-rose-600 text-3xl shrink-0 mt-0.5">verified_user</span>
+                <div>
+                  <div class="flex items-center gap-3">
+                    <p class="text-[11px] text-rose-700 font-black uppercase tracking-widest">
+                      Underwriting Authorization Required (High Risk: {{ getRiskTier(quote()?.riskScore) }})
+                    </p>
+                    <span class="bg-rose-600 text-white text-[9px] font-bold px-2 py-0.5 rounded-full border border-rose-700 shadow-sm">LEVEL 4/5 MANDATE</span>
+                  </div>
+                  <p class="text-xs text-rose-900 mt-2 leading-relaxed">
+                    Your portfolio has been assigned an Actuarial Risk Score of <strong class="text-rose-700 font-black font-mono text-sm">{{ quote()?.riskScore ?? 0 }} / 1000</strong>. Portfolios evaluated in Level 4 or Level 5 exceed automated retail thresholds. Under platform reinsurance guidelines, coverage cannot be bound automatically and must be assessed and authorized by a licensed <strong class="font-bold">Underwriter</strong>.
+                  </p>
+                </div>
+              </div>
+            } @else {
+              <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-4 inline-flex flex-col text-left shadow-sm">
+                <p class="text-[11px] uppercase tracking-widest text-emerald-700 font-black flex items-center gap-2">
+                  <span class="material-symbols-outlined text-sm align-middle">bolt</span> Automated Underwriting Enabled
+                </p>
+                <p class="text-[11px] text-emerald-900 mt-1.5 font-medium max-w-sm">This initial quote has been pre-approved by our algorithmic engine. You can instantly bind coverage without waiting for manual underwriter interaction.</p>
+              </div>
+            }
+
+            <!-- Summary Metric Cards -->
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+              <div class="p-5 bg-white shadow-[0_4px_20px_rgb(0,0,0,0.03)] rounded-2xl border border-surface-800 flex flex-col justify-between">
+                <p class="text-[10px] uppercase font-bold tracking-widest text-surface-200">Portfolio Total Value</p>
+                <p class="text-2xl font-black font-mono text-surface-100 mt-2">₹{{ formatCurrency(quote()?.portfolioValue ?? 0) }}</p>
+              </div>
+              <div class="p-5 bg-white shadow-[0_4px_20px_rgb(0,0,0,0.03)] rounded-2xl border border-surface-800 flex flex-col justify-between">
+                <p class="text-[10px] uppercase font-bold tracking-widest text-surface-200">Portfolio Risk Score</p>
+                <div>
+                  <p class="text-2xl font-black font-mono mt-2" [class]="(quote()?.riskScore ?? 0) >= 500 ? 'text-rose-600' : 'text-emerald-700'">{{ quote()?.riskScore ?? 0 }}/1000</p>
+                  <p class="text-[10px] mt-1 font-bold uppercase tracking-wider" [class]="(quote()?.riskScore ?? 0) >= 500 ? 'text-rose-700' : 'text-emerald-700'">{{ getRiskTier(quote()?.riskScore) }}</p>
+                </div>
+              </div>
+              <div class="p-5 bg-white shadow-[0_4px_20px_rgb(0,0,0,0.03)] rounded-2xl border border-surface-800 flex flex-col justify-between">
+                <p class="text-[10px] uppercase font-bold tracking-widest text-surface-200">Max Coverage Cap %</p>
+                <p class="text-2xl font-black font-mono text-sky-700 mt-2">{{ (quote()?.coverageCapPercentage ?? quote()?.coveragePercentage ?? 80) }}%</p>
+              </div>
+              <div class="p-5 bg-white shadow-[0_4px_20px_rgb(0,0,0,0.03)] rounded-2xl border border-surface-800 flex flex-col justify-between">
+                <p class="text-[10px] uppercase font-bold tracking-widest text-surface-200">Insured Sum Cap</p>
+                <p class="text-2xl font-black font-mono text-emerald-700 mt-2">₹{{ formatCurrency(getInsuredSumCap(quote())) }}</p>
+              </div>
+              <div class="p-5 bg-white shadow-[0_4px_20px_rgb(0,0,0,0.03)] rounded-2xl border border-surface-800 flex flex-col justify-between">
+                <p class="text-[10px] uppercase font-bold tracking-widest text-surface-200">Deductible %</p>
+                <p class="text-2xl font-black font-mono text-orange-600 mt-2">{{ (quote()?.deductiblePercentage ?? 10) }}%</p>
+              </div>
+              <div class="p-5 bg-white shadow-[0_4px_20px_rgb(0,0,0,0.03)] rounded-2xl border border-surface-800 flex flex-col justify-between">
+                <p class="text-[10px] uppercase font-bold tracking-widest text-surface-200">Annual Insurance Premium</p>
+                <p class="text-2xl font-black font-mono text-rose-700 mt-2">₹{{ formatCurrency(getAnnualPremium(quote())) }}</p>
+              </div>
+            </div>
+
+            <!-- Detailed Agreement Terms & Regulations Document -->
+            <div class="p-6 bg-[#f4f5f6] rounded-xl border border-surface-800 space-y-4 shadow-inner">
+              <div class="flex items-center gap-3 border-b border-surface-800 pb-3">
+                <span class="w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center text-primary-600 border border-surface-800"><span class="material-symbols-outlined align-middle">receipt_long</span></span>
+                <h3 class="text-base font-bold text-surface-100">Insurance Policy Binder Terms & Regulations Agreement</h3>
+              </div>
+
+              <p class="text-xs text-surface-200 leading-relaxed font-semibold">
+                Please review the detailed terms, conditions, and coverage regulations for the underwritten policy below prior to binding your policy:
+              </p>
+
+              <ul class="space-y-4 text-[11px] text-surface-200 font-medium">
+                <li class="flex items-start gap-2.5">
+                  <span class="text-primary-600 font-black mt-0.5">•</span>
+                  <div>
+                    <strong class="text-surface-100 uppercase tracking-widest block mb-0.5">Portfolio & Asset Identification:</strong>
+                    This binder covers Portfolio ID <code class="text-primary-700 bg-primary-50 px-1 py-0.5 rounded border border-primary-200 font-mono">{{ quotesForm.value.selectedPortfolioId }}</code> with a total evaluated valuation of <strong class="text-surface-100 font-mono text-xs">₹{{ formatCurrency(quote()?.portfolioValue ?? 0) }}</strong>. Only assets present within this portfolio baseline are protected.
+                  </div>
+                </li>
+
+                <li class="flex items-start gap-2.5">
+                  <span class="text-primary-600 font-black mt-0.5">•</span>
+                  <div>
+                    <strong class="text-surface-100 uppercase tracking-widest block mb-0.5">Risk Assessment Score & Classification:</strong>
+                    Your portfolio has been assigned an Actuarial Risk Score of <span class="font-bold text-surface-100 bg-white px-1 py-0.5 rounded border shadow-sm" [class]="(quote()?.riskScore ?? 0) >= 500 ? 'text-rose-600 border-rose-200' : 'text-emerald-700 border-emerald-200'">{{ quote()?.riskScore ?? 0 }}/1000</span> (Classification: <strong class="text-primary-700">{{ getRiskTier(quote()?.riskScore) }}</strong>). The score is computed dynamically based on 6 weighted market indicators: Volatility (40%), Concentration (20%), Max Drawdown (15%), Liquidity (10%), Market Stress (10%), and Platform Exposure (5%).
+                  </div>
+                </li>
+
+                <li class="flex items-start gap-2.5">
+                  <span class="text-primary-600 font-black mt-0.5">•</span>
+                  <div>
+                    <strong class="text-surface-100 uppercase tracking-widest block mb-0.5">Insured Coverage Cap & Capital Allocation:</strong>
+                    The maximum capital protection provided under this policy is capped at <strong class="text-sky-700">{{ (quote()?.coverageCapPercentage ?? quote()?.coveragePercentage ?? 80) }}%</strong> of your portfolio value, granting a total Insured Sum Cap of <strong class="text-surface-100 font-mono text-xs">₹{{ formatCurrency(getInsuredSumCap(quote())) }}</strong>.
+                  </div>
+                </li>
+
+                <li class="flex items-start gap-2.5">
+                  <span class="text-primary-600 font-black mt-0.5">•</span>
+                  <div>
+                    <strong class="text-surface-100 uppercase tracking-widest block mb-0.5">Tenure Period & Tranche Vesting Regulations (Option A - Cliff Vesting):</strong>
+                    The policy carries a dynamic <strong class="text-surface-100">{{ getTenureYears() }}-Year ({{ getTenureYears() * 12 }} Months) Tenure Period</strong>. Coverage operates under a mandatory 40% ceiled lock-in period (<strong class="text-orange-600">{{ getWaitingPeriodYears() }} Years</strong>) where claiming is restricted (0% claimable). On completion of Year {{ getWaitingPeriodYears() }}, <strong class="text-emerald-700 underline">100% of the insured coverage cap unlocks immediately</strong> for the remainder of the tenure, provided all annual premiums are maintained.
+                  </div>
+                </li>
+
+                <li class="flex items-start gap-2.5">
+                  <span class="text-primary-600 font-black mt-0.5">•</span>
+                  <div>
+                    <strong class="text-surface-100 uppercase tracking-widest block mb-0.5">Loss Threshold Trigger & Deductible Condition:</strong>
+                    Claim eligibility is triggered only when cumulative market loss exceeds <strong class="text-surface-100">20.00%</strong> of baseline portfolio value (confirmed over 5 consecutive monitoring cycles). A mandatory deductible of <strong class="text-orange-600">{{ (quote()?.deductiblePercentage ?? 10) }}%</strong> is deducted from the net claim payout.
+                  </div>
+                </li>
+
+                <li class="flex items-start gap-2.5">
+                  <span class="text-primary-600 font-black mt-0.5">•</span>
+                  <div>
+                    <strong class="text-surface-100 uppercase tracking-widest block mb-0.5">Annual Premium Commitment:</strong>
+                    The annual premium required to maintain active risk coverage is <strong class="text-rose-700 font-mono text-xs">₹{{ formatCurrency(getAnnualPremium(quote())) }}</strong>. Premium must be paid upfront annually upon binding and subsequent policy renewals.
+                  </div>
+                </li>
+              </ul>
+
+              <!-- Agreement Checkbox -->
+              <div class="pt-4 border-t border-surface-800 flex items-start gap-3 mt-4" [formGroup]="quotesForm">
+                <input type="checkbox" id="termsAccepted" formControlName="termsAccepted" class="w-4 h-4 mt-0.5 accent-primary-600 rounded cursor-pointer" />
+                <div class="text-[11px] text-surface-200 font-semibold">
+                  <label for="termsAccepted" class="cursor-pointer">
+                    I have read, understood, and accept the
+                  </label>
+                  <button type="button" (click)="showTermsModal.set(true)" class="text-primary-600 hover:text-primary-700 underline font-bold inline-flex items-center gap-0.5 ml-1 transition-colors">
+                    <span>StockShield Policy Terms, Tenure Regulations & Deductible Conditions</span>
+                    <span class="material-symbols-outlined text-[13px]">info</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Risk Matrix Reference -->
+            <div class="p-5 bg-white rounded-xl border border-surface-800 shadow-sm">
+              <p class="text-[10px] font-bold text-surface-100 uppercase tracking-widest mb-4">Actuarial Risk Matrix Reference</p>
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-3 text-center text-xs">
+                @for (tier of riskMatrix; track tier.tierName) {
+                  <div class="p-4 rounded-xl border transition-all"
+                       [class]="isActiveTier(tier, quote()?.riskScore ?? 0) ? 'bg-primary-50 border-primary-200 shadow-sm' : 'bg-white border-surface-800'">
+                    <p class="font-black" [class]="isActiveTier(tier, quote()?.riskScore ?? 0) ? 'text-primary-700' : 'text-surface-200'">{{ tier.tierName }}</p>
+                    <p class="text-surface-200 font-mono text-[11px] mt-1.5 bg-surface-900 px-2 py-0.5 rounded-full inline-block border border-surface-800">Score: {{ tier.minScore }}–{{ tier.maxScore }}</p>
+                    <p class="text-primary-700 font-mono text-[10px] mt-2 font-bold tracking-tight">Prem: {{ tier.annualPremiumPercentage }}% | Cap: {{ tier.maxCoverageCapPercentage }}%</p>
+                  </div>
+                }
+              </div>
+            </div>
+
+            @if (isHighRiskQuote()) {
+              <button (click)="initiatePurchase()" [disabled]="purchasing() || quotesForm.get('termsAccepted')?.invalid" class="w-full text-sm py-4 bg-rose-600 hover:bg-rose-500 text-white font-bold rounded-full shadow-lg shadow-rose-600/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-all">
+                <span class="material-symbols-outlined text-lg">assignment_ind</span>
+                Submit Application for Underwriter Authorization
+              </button>
+            } @else {
+              <button (click)="initiatePurchase()" [disabled]="purchasing() || quotesForm.get('termsAccepted')?.invalid" class="w-full text-sm py-4 bg-surface-100 hover:bg-surface-200 text-white font-bold rounded-full shadow-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-all">
+                @if (purchasing()) {
+                  Processing Policy Purchase...
+                } @else {
+                  <span class="material-symbols-outlined align-middle text-lg">shield</span> Confirm & Bind Policy — Pay Annual Premium (₹{{ formatCurrency(getAnnualPremium(quote())) }})
+                }
+              </button>
+            }
+          </div>
+        </div>
+      }
+
+      @if (purchaseSuccess()) {
+        <div class="card border-success-500/30 text-center py-8 animate-slide-up">
+          <span class="text-5xl mb-4 block"><span class="material-symbols-outlined align-middle">celebration</span></span>
+          <h2 class="text-xl font-semibold text-success-500">Insurance Policy Issued!</h2>
+          <p class="text-surface-200 mt-2">Your protection period is active with standard tranche vesting schedule.</p>
+        </div>
+      }
+
+      <!-- High-Risk Policy Application Submitted Card -->
+      @if (submittedApplication(); as app) {
+        <div class="card border border-accent-500/40 bg-surface-900/90 shadow-2xl p-6 rounded-2xl space-y-5 animate-slide-up">
+          <div class="flex items-center justify-between border-b border-surface-800 pb-4">
+            <div class="flex items-center gap-3.5">
+              <div class="w-12 h-12 rounded-xl bg-accent-500/15 border border-accent-500/30 text-accent-700 flex items-center justify-center">
+                <span class="material-symbols-outlined text-2xl">pending_actions</span>
+              </div>
+              <div>
+                <div class="flex items-center gap-2">
+                  <h2 class="text-lg font-bold text-surface-100">Application Routed to Underwriting Desk</h2>
+                  <span class="bg-accent-500/20 text-accent-800 border border-accent-500/40 text-[10px] font-bold px-2 py-0.5 rounded">UNDERWRITER SIGN-OFF REQUIRED</span>
+                </div>
+                <p class="text-xs text-surface-200 mt-0.5">Application Ref: <span class="font-mono text-accent-700 font-semibold">{{ app.applicationId }}</span></p>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 rounded-xl bg-surface-950 border border-surface-800/80 text-xs">
+            <div>
+              <span class="text-surface-500 text-[10px] uppercase font-bold block">Evaluated Risk</span>
+              <span class="text-accent-700 font-mono font-bold text-sm mt-0.5 block">{{ app.riskScore }} / 1000</span>
+              <span class="text-[10px] text-surface-200 font-medium">{{ app.riskTier }}</span>
+            </div>
+            <div>
+              <span class="text-surface-500 text-[10px] uppercase font-bold block">Portfolio Valuation</span>
+              <span class="text-surface-100 font-mono font-bold text-sm mt-0.5 block">₹{{ formatCurrency(app.portfolioValue) }}</span>
+              <span class="text-[10px] text-surface-200">Total Assets</span>
+            </div>
+            <div>
+              <span class="text-surface-500 text-[10px] uppercase font-bold block">Annual Risk Premium</span>
+              <span class="text-emerald-400 font-mono font-bold text-sm mt-0.5 block">₹{{ formatCurrency(app.annualPremium) }}</span>
+              <span class="text-[10px] text-surface-200">{{ app.premiumPercentage }}% Rate</span>
+            </div>
+            <div>
+              <span class="text-surface-500 text-[10px] uppercase font-bold block">Insured Cap Limit</span>
+              <span class="text-info-400 font-mono font-bold text-sm mt-0.5 block">₹{{ formatCurrency(app.insuredValue) }}</span>
+              <span class="text-[10px] text-surface-200">{{ app.coveragePercentage }}% Cap</span>
+            </div>
+          </div>
+
+          <p class="text-xs text-surface-200 leading-relaxed bg-surface-950/50 p-3 rounded-lg border border-surface-800">
+            Your portfolio risk classification is in <strong>{{ app.riskTier }}</strong> (Actuarial Score &gt; 600/1000). A licensed Underwriter will assess your equity beta exposure and concentration indicators before granting policy authorization. You can track this review in your policies dashboard.
+          </p>
+
+          <div class="flex justify-between items-center pt-2">
+            <button (click)="submittedApplication.set(null)" class="btn-secondary text-xs">Submit Another Quote</button>
+            <a routerLink="/investor/policies" class="btn-primary text-xs flex items-center gap-1.5">
+              <span>View My Policies Status</span>
+              <span class="material-symbols-outlined text-xs">arrow_forward</span>
+            </a>
+          </div>
+        </div>
+      }
+
+      <!-- ONLY 1 ACTIVE POLICY PER PORTFOLIO MODAL -->
+      @if (existingPolicyModal(); as existingPol) {
+        <div class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 sm:p-6 overflow-y-auto" (click)="existingPolicyModal.set(null)">
+          <div class="relative my-auto w-full max-w-lg bg-surface-900 border border-surface-700/80 rounded-2xl p-6 space-y-4 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.85)] animate-scale-in text-left max-h-[calc(100vh-3.5rem)] overflow-y-auto" (click)="$event.stopPropagation()">
+            <div class="flex items-center gap-3 border-b border-surface-800 pb-3">
+              <span class="text-3xl p-2 bg-neutral-500/20 text-neutral-400 rounded-xl"><span class="material-symbols-outlined align-middle">shield</span></span>
+              <div>
+                <h2 class="text-lg font-bold text-neutral-300">Only 1 Active Policy Allowed Per Portfolio</h2>
+                <p class="text-xs text-surface-200">Policy #{{ existingPol.policyNumber || (existingPol.id || existingPol.policyId || '').substring(0, 8) }}</p>
+              </div>
+            </div>
+
+            <div class="p-4 bg-surface-950 rounded-xl border border-surface-800 space-y-2 text-xs">
+              <p class="text-surface-200 font-medium leading-relaxed">
+                Only one active insurance policy can exist per stock portfolio.
+              </p>
+              <p class="text-surface-200 leading-relaxed">
+                Any modifications to your stock quantities within this portfolio automatically generate <strong>Endorsement Tranches</strong> under your existing policy rather than creating a duplicate policy.
+              </p>
+            </div>
+
+            <div class="flex justify-end gap-3 pt-3 border-t border-surface-800">
+              <button (click)="existingPolicyModal.set(null)" class="btn-secondary text-xs">Close</button>
+              <a [routerLink]="['/investor/policies', (existingPol.id || existingPol.policyId)]" (click)="existingPolicyModal.set(null)" class="btn-primary text-xs bg-neutral-500 hover:bg-neutral-400 text-surface-950 font-bold px-4 py-2 flex items-center gap-1">
+                <span>View Active Policy Details</span>
+                <span class="material-symbols-outlined text-sm align-middle">arrow_forward</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- STOCKSHIELD TERMS & STATUTORY DISCLOSURE MODAL -->
+      @if (showTermsModal()) {
+        <div class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 sm:p-6 overflow-y-auto" (click)="showTermsModal.set(false)">
+          <div class="relative my-auto w-full max-w-xl bg-surface-900 border border-surface-700/80 rounded-2xl p-6 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.85)] animate-scale-in text-left max-h-[calc(100vh-3.5rem)] overflow-y-auto flex flex-col" (click)="$event.stopPropagation()">
+            
+            <!-- Header -->
+            <div class="flex justify-between items-start border-b border-surface-700/50 pb-4 shrink-0">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-primary-500/10 border border-primary-500/30 text-primary-600 flex items-center justify-center">
+                  <span class="material-symbols-outlined text-2xl">gavel</span>
+                </div>
+                <div>
+                  <h3 class="text-base font-bold text-surface-100">StockShield Policy Terms & Deductible Disclosure</h3>
+                  <p class="text-xs text-surface-200">Statutory conditions governing equity portfolio insurance</p>
+                </div>
+              </div>
+              <button (click)="showTermsModal.set(false)" class="text-surface-200 hover:text-surface-200 text-lg p-1 rounded-lg hover:bg-surface-800 transition-colors leading-none" title="Close Modal"><span class="material-symbols-outlined text-xl align-middle">close</span></button>
+            </div>
+
+            <!-- Content -->
+            <div class="space-y-4 my-4 flex-1 text-xs">
+              <div class="p-3.5 rounded-xl bg-surface-950/80 border border-surface-800 space-y-1.5">
+                <h4 class="font-bold text-primary-600 flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-base">timelapse</span>
+                  1. Mandatory 40% Ceiled Lock-in Period & Option A Cliff Vesting
+                </h4>
+                <p class="text-surface-200 leading-relaxed">
+                  Every policy carries a dynamic tenure ({{ getTenureYears() }} Years) with a mandatory 40% ceiled lock-in period ({{ getWaitingPeriodYears() }} Years). Under Option A (Cliff Vesting), 100% of the insured coverage cap unlocks at the start of Year {{ getWaitingPeriodYears() + 1 }}, provided all annual premiums are paid on schedule.
+                </p>
+              </div>
+
+              <div class="p-3.5 rounded-xl bg-surface-950/80 border border-surface-800 space-y-1.5">
+                <h4 class="font-bold text-accent-700 flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-base">trending_down</span>
+                  2. 20% Deductible / Market Crash Trigger
+                </h4>
+                <p class="text-surface-200 leading-relaxed">
+                  StockShield protects against severe systemic market drawdowns. Under platform actuarial rules, a claim is only admissible if total cumulative loss exceeds the <strong>20% deductible threshold</strong> from the insured baseline valuation. Losses under 20% are absorbed as normal market volatility.
+                </p>
+              </div>
+
+              <div class="p-3.5 rounded-xl bg-surface-950/80 border border-surface-800 space-y-1.5">
+                <h4 class="font-bold text-info-400 flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-base">balance</span>
+                  3. Dynamic Re-Underwriting & Endorsement Tranches
+                </h4>
+                <p class="text-surface-200 leading-relaxed">
+                  You are permitted to rebalance or update stock quantities in your insured portfolio. When quantities change, the platform automatically re-evaluates risk and creates an <strong>Endorsement Tranche</strong> so your policy coverage seamlessly mirrors your actual holdings.
+                </p>
+              </div>
+
+              <div class="p-3.5 rounded-xl bg-surface-950/80 border border-primary-500/30 bg-primary-500/5 space-y-1.5">
+                <h4 class="font-bold text-emerald-400 flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-base">payments</span>
+                  4. Direct Credit Settlement SLA (1–2 Days)
+                </h4>
+                <p class="text-surface-200 leading-relaxed">
+                  Upon loss validation and Claims Analyst approval, your eligible payout is credited within <strong>1–2 business days</strong> directly to your primary payment method on file via automated ACH/IMPS.
+                </p>
+              </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="border-t border-surface-700/50 pt-3 flex justify-end shrink-0">
+              <button (click)="showTermsModal.set(false)" class="btn-primary text-xs py-2 px-5">
+                I Understand & Agree
+              </button>
+            </div>
+
+          </div>
+        </div>
+      }
+
+      @if (showPaymentModal()) {
+        <app-payment-modal
+          [amount]="getAnnualPremium(quote())"
+          paymentType="INITIAL_PREMIUM"
+          [targetId]="quote()?.id || quote()?.quoteId || ''"
+          (paymentSuccess)="onPaymentSuccess($event)"
+          (paymentCancel)="onPaymentCancel()">
+        </app-payment-modal>
+      }
+    </div>

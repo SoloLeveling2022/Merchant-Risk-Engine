@@ -1,0 +1,63 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: insurance-core-service
+  r2dbc:
+    url: r2dbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:stock_insurance_db}
+    username: ${DB_USER:root}
+    password: ${DB_PASSWORD:mysql}
+    pool:
+      initial-size: 5
+      max-size: 20
+      max-idle-time: 30m
+  flyway:
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:stock_insurance_db}
+    user: ${DB_USER:root}
+    password: ${DB_PASSWORD:mysql}
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    schemas: insurance_core_schema
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USER:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
+
+app:
+  jwt:
+    secret: ${JWT_SECRET:MyVerySecureJWTSecretKeyForStockInsurancePlatform2027}
+    expiry-ms: 3600000
+    refresh-expiry-ms: 604800000
+    issuer: stock-insurance-platform
+  rabbitmq:
+    exchange: stock-insurance.events
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+
+logging:
+  level:
+    com.hasnika.insurance: DEBUG
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+  instance:
+    preferIpAddress: true
+
+
+
+
+
+
+

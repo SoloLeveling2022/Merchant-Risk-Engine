@@ -1,0 +1,129 @@
+<div class="space-y-6 animate-fade-in max-w-2xl mx-auto">
+      <!-- Header -->
+      <div>
+        <h1 class="text-2xl font-bold text-surface-100 flex items-center gap-3">
+          <span><span class="material-symbols-outlined align-middle">person_add</span> Create Core Team Member</span>
+        </h1>
+        <p class="text-sm text-surface-200">Register new internal staff accounts and assign platform roles.</p>
+      </div>
+
+      <div class="card">
+        @if (error()) {
+          <div class="mb-4 p-3 bg-danger-500/10 border border-danger-500/30 rounded-lg text-danger-500 text-sm">
+            {{ error() }}
+          </div>
+        }
+
+        <form [formGroup]="registerForm" (ngSubmit)="onCreateStaff()" class="space-y-4">
+          <div>
+            <label class="label">Full Name</label>
+            <input type="text" formControlName="fullName" class="input-field" placeholder="Jane Doe" />
+            @if (registerForm.get('fullName')?.invalid && registerForm.get('fullName')?.touched) {
+              <p class="text-xs text-danger-500 mt-1">Full name is required</p>
+            }
+          </div>
+
+          <div>
+            <label class="label">Email Address</label>
+            <input type="email" formControlName="email" class="input-field" placeholder="staff@stockshield.com" />
+            @if (registerForm.get('email')?.invalid && registerForm.get('email')?.touched) {
+              <p class="text-xs text-danger-500 mt-1">Valid email is required</p>
+            }
+          </div>
+
+          <div>
+            <label class="label">Temporary Password</label>
+            <input type="password" formControlName="password" class="input-field" placeholder="••••••••" />
+            @if (registerForm.get('password')?.invalid && registerForm.get('password')?.touched) {
+              <p class="text-xs text-danger-500 mt-1">Password must be at least 6 characters</p>
+            }
+          </div>
+
+          <div>
+            <label class="label">Platform Role</label>
+            <select formControlName="role" class="input-field bg-surface-900">
+              <option value="ROLE_UNDERWRITER">Underwriter</option>
+              <option value="ROLE_CLAIMS_ANALYST">Claims Analyst</option>
+              <option value="ROLE_COMPLIANCE">Compliance Officer</option>
+              <option value="ROLE_ADMIN">System Administrator</option>
+            </select>
+          </div>
+
+          <div class="pt-4 mt-4 border-t border-surface-800">
+            <button type="submit" [disabled]="loading() || registerForm.invalid" class="btn-primary w-full flex justify-center items-center gap-2">
+              @if (loading()) {
+                <span class="animate-spin"><span class="material-symbols-outlined align-middle">hourglass_empty</span></span> Creating Staff Account...
+              } @else {
+                <span class="material-symbols-outlined align-middle">person_add</span> Create Account
+              }
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Core Staff Account Provisioned Pop-Up Modal -->
+      @if (createdStaffModal(); as staff) {
+        <div class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 sm:p-6 overflow-y-auto" (click)="createdStaffModal.set(null)">
+          <div class="relative my-auto w-full max-w-lg bg-surface-900 border border-surface-700/80 rounded-2xl p-6 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.85)] animate-scale-in text-left max-h-[calc(100vh-3.5rem)] overflow-y-auto flex flex-col" (click)="$event.stopPropagation()">
+            
+            <!-- Modal Header -->
+            <div class="flex justify-between items-start border-b border-surface-700/50 pb-4 shrink-0">
+              <div class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center">
+                  <span class="material-symbols-outlined text-2xl">verified_user</span>
+                </div>
+                <div>
+                  <h3 class="text-lg font-bold text-surface-100">Core Staff Account Provisioned</h3>
+                  <p class="text-xs text-surface-200">Account credentials and platform security access</p>
+                </div>
+              </div>
+              <button (click)="createdStaffModal.set(null)" class="text-surface-200 hover:text-surface-200 text-lg p-1 rounded-lg hover:bg-surface-800 transition-colors leading-none" title="Close Modal"><span class="material-symbols-outlined text-xl align-middle">close</span></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="space-y-4 my-4 flex-1 text-xs">
+              <div class="p-4 rounded-xl bg-surface-950/80 border border-surface-800 space-y-3">
+                <div class="flex justify-between items-center pb-2 border-b border-surface-800/80">
+                  <span class="text-surface-200">Full Name</span>
+                  <span class="text-surface-100 font-bold text-sm">{{ staff.fullName }}</span>
+                </div>
+                <div class="flex justify-between items-center pb-2 border-b border-surface-800/80">
+                  <span class="text-surface-200">Assigned Platform Role</span>
+                  <span class="badge" [class]="getRoleBadgeClass(staff.role)">
+                    {{ formatRoleName(staff.role) }}
+                  </span>
+                </div>
+                <div class="flex justify-between items-center pb-2 border-b border-surface-800/80">
+                  <span class="text-surface-200">Login Email</span>
+                  <span class="text-primary-600 font-mono font-semibold">{{ staff.email }}</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="text-surface-200">Temporary Password</span>
+                  <span class="text-accent-400 font-mono font-semibold">{{ staff.password }}</span>
+                </div>
+              </div>
+
+              <!-- Security Warning -->
+              <div class="p-3.5 rounded-xl border border-warning-500/30 bg-warning-500/5 text-surface-200 flex items-start gap-2.5">
+                <span class="material-symbols-outlined text-warning-400 text-lg shrink-0 mt-0.5">lock_reset</span>
+                <p class="text-[11px] text-surface-200 leading-relaxed">
+                  Please securely deliver these temporary credentials to the team member. Staff members should update their temporary password immediately upon initial portal login.
+                </p>
+              </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="border-t border-surface-700/50 pt-3 flex justify-between items-center shrink-0">
+              <button (click)="copyCredentials(staff)" class="btn-secondary text-xs flex items-center gap-1.5 py-2 px-3 text-primary-600 border-primary-500/40 hover:bg-primary-500/10">
+                <span class="material-symbols-outlined text-sm">{{ copiedCredentials() ? 'done' : 'content_copy' }}</span>
+                <span>{{ copiedCredentials() ? 'Credentials Copied!' : 'Copy Credentials' }}</span>
+              </button>
+              <button (click)="createdStaffModal.set(null)" class="btn-primary text-xs py-2 px-5">
+                Done
+              </button>
+            </div>
+
+          </div>
+        </div>
+      }
+    </div>

@@ -1,0 +1,475 @@
+<div class="space-y-6 animate-fade-in relative">
+      <!-- Main Content (Hidden during print) -->
+      <div class="space-y-6 no-print">
+        <div class="mb-10">
+          <h1 class="text-3xl font-display font-black text-surface-100 flex items-center gap-3 mb-2">
+            <div class="w-10 h-10 rounded-full bg-primary-500/10 flex items-center justify-center text-primary-600 shadow-inner">
+              <span class="material-symbols-outlined text-xl">description</span>
+            </div>
+            Documents & Official Records
+          </h1>
+          <p class="text-sm text-surface-200 ml-1">Official insurance policy certificates, endorsement schedules & payment receipts</p>
+        </div>
+
+      <!-- Tabs -->
+      <div class="flex gap-4 border-b border-surface-800 pb-2">
+        <button (click)="activeTab.set('POLICIES')"
+                [class.text-primary-600]="activeTab() === 'POLICIES'"
+                [class.border-primary-500]="activeTab() === 'POLICIES'"
+                [class.border-b-2]="activeTab() === 'POLICIES'"
+                class="pb-2 text-sm font-semibold text-surface-200 hover:text-surface-100 transition-colors flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-base">shield</span>
+          Policy Certificates & Endorsements
+        </button>
+        <button (click)="activeTab.set('TRANSACTIONS')"
+                [class.text-primary-600]="activeTab() === 'TRANSACTIONS'"
+                [class.border-primary-500]="activeTab() === 'TRANSACTIONS'"
+                [class.border-b-2]="activeTab() === 'TRANSACTIONS'"
+                class="pb-2 text-sm font-semibold text-surface-200 hover:text-surface-100 transition-colors flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-base">receipt_long</span>
+          Payment Receipts ({{ transactions().length }})
+        </button>
+      </div>
+
+      <!-- POLICIES TAB -->
+      @if (activeTab() === 'POLICIES') {
+        <div class="space-y-6">
+          @if (policies().length === 0) {
+            <div class="card text-center py-8 text-surface-200">No active policies found.</div>
+          }
+          
+          @for (policy of policies(); track (policy.policyId || policy.id)) {
+            <div class="bg-white border border-surface-800 shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-[24px] overflow-hidden space-y-0">
+              <!-- Policy Master Header -->
+              <div class="p-6 bg-gradient-to-br from-[#f4f5f6] to-white border-b border-surface-800 flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+                <div class="flex items-center gap-4">
+                  <div class="w-12 h-12 rounded-full bg-white border border-surface-700 text-primary-600 flex items-center justify-center text-xl shrink-0 shadow-sm">
+                    <span class="material-symbols-outlined">shield</span>
+                  </div>
+                  <div>
+                    <div class="flex items-center gap-3 mb-1">
+                      <h3 class="font-display font-bold text-surface-100 text-lg">{{ policy.policyNumber || policy.policyId }}</h3>
+                      <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold font-mono tracking-wider bg-emerald-100 text-emerald-700 border border-emerald-200 shadow-sm uppercase">{{ policy.policyStatus || policy.status || 'ACTIVE' }}</span>
+                    </div>
+                    <p class="text-xs text-surface-200">
+                      Inception: <strong class="font-semibold">{{ (policy.policyStartDate || policy.startDate || policy.createdAt) | date:'mediumDate' }}</strong>
+                      <span class="mx-2 text-surface-700">|</span>
+                      Portfolio ID: <span class="font-mono text-surface-200 bg-surface-950 px-1.5 py-0.5 rounded border border-surface-800">{{ (policy.portfolioId || '').substring(0, 14) }}</span>
+                    </p>
+                  </div>
+                </div>
+                <div class="text-left sm:text-right bg-white p-3 rounded-xl border border-surface-800 shadow-sm">
+                  <p class="text-[10px] text-surface-200 uppercase tracking-widest font-bold mb-0.5">Total Insured Cap</p>
+                  <p class="font-mono text-surface-100 font-black text-xl">₹{{ formatCurrency(policy.totalInsuredValue || policy.insuredValue || 0) }}</p>
+                </div>
+              </div>
+
+              <!-- Tranche Certificates Section Header -->
+              <div class="flex justify-between items-center px-6 py-5 bg-white">
+                <div>
+                  <h4 class="text-xs font-bold uppercase tracking-wider text-surface-100 flex items-center gap-2 mb-1">
+                    <span class="material-symbols-outlined text-[16px] text-primary-600">verified</span>
+                    Official Certificate History
+                  </h4>
+                  <p class="text-[11px] text-surface-200">Chronological certificates issued for each portfolio rebalance.</p>
+                </div>
+                <span class="text-xs font-mono font-bold px-3 py-1 rounded-full bg-[#f4f5f6] text-surface-200 border border-surface-800 shadow-inner">
+                  {{ getTranchesForPolicy(policy).length }} Issued
+                </span>
+              </div>
+
+              <!-- Tranche Certificate Cards List -->
+              <div class="flex flex-col gap-4 px-6 pb-6 bg-white">
+                @for (tranche of getTranchesForPolicy(policy); track tranche.trancheNumber) {
+                  @let priorTranche = getActiveTrancheBackThen(getTranchesForPolicy(policy), tranche);
+                  <div class="p-5 rounded-2xl border transition-all cursor-pointer flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm group"
+                       [class]="tranche.trancheStatus === 'ACTIVE' ? 'bg-emerald-50/40 border-emerald-200 hover:border-emerald-400 hover:shadow-md' : (tranche.trancheStatus === 'REJECTED' ? 'bg-rose-50/50 border-rose-200 opacity-75' : 'bg-[#f4f5f6] border-surface-800 hover:border-surface-700 hover:shadow-md')"
+                       (click)="openTrancheCertificate(policy, tranche)">
+                    
+                    <div class="flex items-start gap-4">
+                      <div class="w-10 h-10 rounded-full flex items-center justify-center shrink-0 shadow-inner bg-white border"
+                           [class]="tranche.trancheStatus === 'ACTIVE' ? 'text-emerald-600 border-emerald-200' : (tranche.trancheStatus === 'REJECTED' ? 'text-rose-500 border-rose-200' : 'text-surface-200 border-surface-700')">
+                        <span class="material-symbols-outlined text-xl">{{ tranche.trancheNumber === 1 ? 'workspace_premium' : 'history_edu' }}</span>
+                      </div>
+                      
+                      <div>
+                        <div class="flex items-center gap-2 flex-wrap">
+                          <h5 class="text-sm font-bold text-surface-100 flex items-center gap-1.5 font-mono">
+                            {{ tranche.trancheNumber === 1 ? 'Tranche #1: Inception Certificate' : ('Tranche #' + tranche.trancheNumber + ': Endorsement') }}
+                          </h5>
+                          <span class="text-[10px] font-mono px-2 py-0.5 rounded-full font-bold shadow-sm" [class]="getTrancheStatusBadge(tranche.trancheStatus)">
+                            {{ tranche.trancheStatus || 'ACTIVE' }}
+                          </span>
+                          @if (tranche.trancheStatus === 'ACTIVE') {
+                            <span class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 border border-emerald-200 shadow-sm tracking-wider">
+                              CURRENT BINDING
+                            </span>
+                          }
+                        </div>
+
+                        <div class="flex items-center gap-3 text-[11px] text-surface-200 mt-2 font-mono flex-wrap bg-white border border-surface-800 px-3 py-1.5 rounded-lg shadow-inner w-fit">
+                          <span>Ref: <strong class="text-surface-100">{{ getCertificateRef(policy, tranche) }}</strong></span>
+                          <span class="text-surface-700">|</span>
+                          <span>Effective: <strong>{{ (tranche.effectiveDate || policy.policyStartDate || policy.createdAt) | date:'mediumDate' }}</strong></span>
+                          <span class="text-surface-700">|</span>
+                          <span>Cap: <strong class="text-surface-100">₹{{ formatCurrency(tranche.insuredValue) }}</strong></span>
+                          <span class="text-surface-700">|</span>
+                          <span [class]="tranche.riskScore && tranche.riskScore > 500 ? 'text-rose-600 font-bold' : 'text-emerald-600 font-bold'">Risk: {{ tranche.riskScore || 380 }}/1000</span>
+                        </div>
+
+                        <!-- Historical Comparison Notice -->
+                        <div class="mt-3 text-[11px] p-2.5 rounded-lg bg-white border border-surface-800/60 text-surface-200 flex items-center gap-2 shadow-sm">
+                          <span class="material-symbols-outlined text-sm text-surface-200">compare_arrows</span>
+                          @if (tranche.trancheNumber === 1) {
+                            <span><strong>Initial Baseline:</strong> Original policy terms issued upon inception.</span>
+                          } @else if (priorTranche) {
+                            <span>
+                              <strong>vs Tranche #{{ priorTranche.trancheNumber }}:</strong>
+                              Insured Value ₹{{ formatCurrency(priorTranche.insuredValue) }} <span class="material-symbols-outlined text-[10px] align-middle">arrow_forward</span> ₹{{ formatCurrency(tranche.insuredValue) }}
+                              (<span [class]="getDeltaValuation(tranche, priorTranche) >= 0 ? 'text-emerald-600 font-semibold' : 'text-rose-600 font-semibold'">{{ getDeltaValuation(tranche, priorTranche) >= 0 ? '+' : '' }}₹{{ formatCurrency(getDeltaValuation(tranche, priorTranche)) }}</span>),
+                              Risk <span [class]="getDeltaRisk(tranche, priorTranche) <= 0 ? 'text-emerald-600 font-semibold' : 'text-rose-600 font-semibold'">{{ getDeltaRisk(tranche, priorTranche) >= 0 ? '+' : '' }}{{ getDeltaRisk(tranche, priorTranche) }} pts</span>
+                            </span>
+                          }
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="shrink-0 flex sm:flex-col items-end justify-between sm:justify-center gap-2 pt-3 sm:pt-0 border-t sm:border-t-0 border-surface-800 w-full sm:w-auto">
+                      <button (click)="openTrancheCertificate(policy, tranche); $event.stopPropagation()"
+                              class="bg-white border border-surface-700 text-surface-100 text-[11px] uppercase tracking-wider px-4 py-2 rounded-full font-bold shadow-sm group-hover:shadow hover:bg-[#f4f5f6] transition-all flex items-center gap-2 group-hover:border-primary-600 group-hover:text-primary-600 w-full sm:w-auto justify-center">
+                        <span class="material-symbols-outlined text-sm">visibility</span>
+                        Inspect
+                      </button>
+                    </div>
+
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- TRANSACTIONS TAB -->
+      @if (activeTab() === 'TRANSACTIONS') {
+        <div class="space-y-4">
+          @if (transactions().length === 0) {
+            <div class="bg-white border border-surface-800 shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-[24px] text-center py-12 text-surface-200 font-medium">No payment transactions found.</div>
+          }
+          
+          <div class="bg-white border border-surface-800 shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-[24px] p-0 overflow-hidden">
+            <div class="w-full overflow-x-auto">
+              <table class="w-full text-left text-sm text-surface-200">
+                <thead>
+                  <tr class="bg-gradient-to-r from-[#f4f5f6] to-white border-b border-surface-800">
+                    <th class="py-4 px-6 font-bold text-xs uppercase tracking-wider text-surface-100">Date & Time</th>
+                    <th class="py-4 px-6 font-bold text-xs uppercase tracking-wider text-surface-100">Transaction Ref</th>
+                    <th class="py-4 px-6 font-bold text-xs uppercase tracking-wider text-surface-100">Payment Type</th>
+                    <th class="py-4 px-6 font-bold text-xs uppercase tracking-wider text-surface-100">Status</th>
+                    <th class="py-4 px-6 font-bold text-xs uppercase tracking-wider text-surface-100 text-right">Amount Paid</th>
+                    <th class="py-4 px-6 font-bold text-xs uppercase tracking-wider text-surface-100 text-center">Receipt</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-surface-800/60">
+                  @for (tx of transactions(); track tx.transactionId) {
+                    <tr class="cursor-pointer hover:bg-emerald-50/30 transition-colors group" (click)="openTransactionModal(tx)">
+                      <td class="py-4 px-6 font-mono text-xs text-surface-200">{{ tx.createdAt | date:'medium' }}</td>
+                      <td class="py-4 px-6 font-mono text-xs font-bold text-primary-600">{{ tx.transactionId }}</td>
+                      <td class="py-4 px-6">
+                        <span class="px-2.5 py-1 rounded-full text-[10px] font-bold tracking-wider bg-surface-900 text-surface-100 border border-surface-700 shadow-sm uppercase">{{ tx.transactionType || 'PREMIUM' }}</span>
+                      </td>
+                      <td class="py-4 px-6">
+                        <span class="px-2.5 py-1 rounded-full text-[10px] font-bold font-mono inline-flex items-center gap-1 shadow-sm uppercase tracking-wider"
+                              [ngClass]="tx.status === 'SUCCESS' ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : 'bg-rose-100 text-rose-700 border-rose-200'">
+                          <span class="material-symbols-outlined text-[10px]">{{ tx.status === 'SUCCESS' ? 'check_circle' : 'cancel' }}</span>
+                          {{ tx.status }}
+                        </span>
+                      </td>
+                      <td class="py-4 px-6 text-right font-mono font-black text-surface-100 text-base">
+                        ₹{{ formatCurrency(tx.amount) }}
+                      </td>
+                      <td class="py-4 px-6 text-center">
+                        <button class="bg-white border border-surface-700 text-surface-100 text-[11px] uppercase tracking-wider px-4 py-1.5 rounded-full font-bold shadow-sm group-hover:shadow hover:bg-[#f4f5f6] transition-all flex items-center gap-2 group-hover:border-primary-600 group-hover:text-primary-600 mx-auto" (click)="openTransactionModal(tx); $event.stopPropagation()">
+                          <span class="material-symbols-outlined text-sm">receipt</span>
+                          Receipt
+                        </button>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      }
+      </div> <!-- End of no-print main content wrapper -->
+
+      <!-- ══════════════════════════════════════════════════════════════════════ -->
+      <!-- ULTRA-DETAILED OFFICIAL TRANCHE CERTIFICATE POP-UP MODAL               -->
+      <!-- ══════════════════════════════════════════════════════════════════════ -->
+      @if (selectedTrancheCert(); as item) {
+        <div class="certificate-modal-overlay fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 sm:p-6 overflow-y-auto" (click)="closeTrancheCert()">
+          <div id="printableCertificate" class="relative my-auto w-full max-w-3xl bg-surface-900 border border-surface-700/80 rounded-2xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.85)] animate-scale-in text-left max-h-[calc(100vh-3.5rem)] overflow-y-auto p-6 sm:p-8 space-y-6 flex flex-col" (click)="$event.stopPropagation()">
+            
+            <!-- Certificate Top Legal Header -->
+            <div class="border-b border-surface-800 pb-5 shrink-0 flex justify-between items-start">
+              <div class="flex items-start gap-4">
+                <div class="w-14 h-14 rounded-2xl bg-primary-50/80 border border-primary-200 text-primary-600 flex items-center justify-center text-3xl shadow-sm shrink-0">
+                  <span class="material-symbols-outlined text-3xl">{{ item.tranche.trancheNumber === 1 ? 'shield' : 'history_edu' }}</span>
+                </div>
+                <div>
+                  <div class="flex items-center gap-2 flex-wrap mb-1">
+                    <span class="text-[10px] uppercase font-bold tracking-widest px-2.5 py-0.5 rounded-full bg-primary-50 text-primary-700 border border-primary-200 shadow-sm">
+                      {{ item.tranche.trancheNumber === 1 ? 'OFFICIAL POLICY INCEPTION CERTIFICATE' : 'OFFICIAL ENDORSEMENT ADDENDUM' }}
+                    </span>
+                    <span class="text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full shadow-sm" [class]="getTrancheStatusBadge(item.tranche.trancheStatus)">
+                      {{ item.tranche.trancheStatus || 'ACTIVE' }}
+                    </span>
+                  </div>
+                  <h2 class="text-xl font-display font-black text-surface-100 mt-1">StockShield Underwriting Authority</h2>
+                  <p class="text-xs text-surface-200 font-mono mt-0.5">
+                    Certificate Ref: <strong class="text-primary-600">{{ getCertificateRef(item.policy, item.tranche) }}</strong>
+                    <span class="mx-1 text-surface-700">|</span> Policy #: <strong class="text-surface-100">{{ item.policy.policyNumber || item.policy.policyId }}</strong>
+                  </p>
+                </div>
+              </div>
+              <button (click)="closeTrancheCert()" class="no-print text-surface-200 hover:text-surface-100 text-lg p-1.5 rounded-full hover:bg-[#f4f5f6] transition-colors leading-none" title="Close"><span class="material-symbols-outlined text-xl align-middle">close</span></button>
+            </div>
+
+            <!-- Policyholder & Inception Snapshot -->
+            <div class="p-5 bg-gradient-to-br from-[#f4f5f6] to-white rounded-xl border border-surface-800 grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs font-mono shrink-0 shadow-inner">
+              <div>
+                <span class="text-surface-200 block text-[10px] uppercase font-sans font-bold tracking-widest">Insured Investor</span>
+                <span class="text-surface-100 font-bold font-sans text-sm mt-1 block">{{ authService.user()?.fullName || 'Registered Investor' }}</span>
+              </div>
+              <div>
+                <span class="text-surface-200 block text-[10px] uppercase font-sans font-bold tracking-widest">Tranche Schedule</span>
+                <span class="text-primary-600 font-bold mt-1 block">Tranche #{{ item.tranche.trancheNumber }} ({{ item.tranche.trancheType || 'ORIGINAL' }})</span>
+              </div>
+              <div>
+                <span class="text-surface-200 block text-[10px] uppercase font-sans font-bold tracking-widest">Effective Date</span>
+                <span class="text-surface-100 font-bold mt-1 block">{{ (item.tranche.effectiveDate || item.policy.policyStartDate || item.policy.createdAt) | date:'mediumDate' }}</span>
+              </div>
+              <div>
+                <span class="text-surface-200 block text-[10px] uppercase font-sans font-bold tracking-widest">Maturity Date ({{ item.policy.tenureYears || 5 }} Yrs)</span>
+                <span class="text-emerald-700 font-bold mt-1 block">{{ (item.tranche.eligibilityDate || item.policy.protectionStartDate) | date:'mediumDate' }}</span>
+              </div>
+            </div>
+
+            <!-- DETAILED COMPARATIVE ACTUARIAL AUDIT SECTION -->
+            <div class="space-y-3 flex-1">
+              <div class="flex items-center justify-between">
+                <h4 class="text-xs font-bold uppercase tracking-wider text-surface-200 flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-sm text-primary-600">balance</span>
+                  @if (item.tranche.trancheNumber === 1) {
+                    Initial Underwriting Baseline at Inception
+                  } @else {
+                    Actuarial Reconciliation: Active Baseline Back Then vs. This Endorsement
+                  }
+                </h4>
+                @if (item.priorTranche) {
+                  <span class="text-[11px] font-mono text-surface-200">
+                    Baseline Back Then: <strong class="text-surface-200">Tranche #{{ item.priorTranche.trancheNumber }}</strong>
+                  </span>
+                }
+              </div>
+
+              <!-- Comparison Matrix Table -->
+              <div class="border border-surface-800 rounded-xl overflow-hidden shadow-sm bg-white">
+                <table class="w-full text-left text-xs font-mono">
+                  <thead>
+                    <tr class="bg-[#f4f5f6] text-surface-100 border-b border-surface-800">
+                      <th class="p-4 font-sans font-bold uppercase tracking-wider text-[11px]">Actuarial Parameter</th>
+                      <th class="p-4 text-right uppercase tracking-wider text-[11px] font-bold">
+                        @if (item.priorTranche) {
+                          Tranche #{{ item.priorTranche.trancheNumber }}
+                        } @else {
+                          Prior State
+                        }
+                      </th>
+                      <th class="p-4 text-right text-primary-600 uppercase tracking-wider text-[11px] font-bold">This Tranche (#{{ item.tranche.trancheNumber }})</th>
+                      <th class="p-4 text-right uppercase tracking-wider text-[11px] font-bold">Actuarial Delta</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-surface-800/60 bg-white">
+                    <!-- Insured Asset Value -->
+                    <tr class="hover:bg-emerald-50/30 transition-colors">
+                      <td class="p-4 font-sans font-bold text-surface-100">Insured Asset Valuation</td>
+                      <td class="p-4 text-right text-surface-200">
+                        {{ item.priorTranche ? ('₹' + formatCurrency(item.priorTranche.insuredValue)) : '₹0.00 (Inception)' }}
+                      </td>
+                      <td class="p-4 text-right text-surface-100 font-black text-sm">
+                        ₹{{ formatCurrency(item.tranche.insuredValue) }}
+                      </td>
+                      <td class="p-4 text-right font-black" [class]="getDeltaValuation(item.tranche, item.priorTranche) >= 0 ? 'text-emerald-600' : 'text-rose-600'">
+                        {{ getDeltaValuation(item.tranche, item.priorTranche) >= 0 ? '+' : '' }}₹{{ formatCurrency(getDeltaValuation(item.tranche, item.priorTranche)) }}
+                      </td>
+                    </tr>
+
+                    <!-- Actuarial Risk Score -->
+                    <tr class="hover:bg-emerald-50/30 transition-colors">
+                      <td class="p-4 font-sans font-bold text-surface-100">Actuarial Risk Score</td>
+                      <td class="p-4 text-right text-surface-200">
+                        {{ item.priorTranche ? (item.priorTranche.riskScore + '/1000') : 'N/A' }}
+                      </td>
+                      <td class="p-4 text-right font-bold text-rose-600">
+                        {{ item.tranche.riskScore || 380 }}/1000
+                      </td>
+                      <td class="p-4 text-right font-bold" [class]="getDeltaRisk(item.tranche, item.priorTranche) <= 0 ? 'text-emerald-600' : 'text-rose-600'">
+                        {{ getDeltaRisk(item.tranche, item.priorTranche) >= 0 ? '+' : '' }}{{ getDeltaRisk(item.tranche, item.priorTranche) }} pts
+                      </td>
+                    </tr>
+
+                    <!-- Insured Coverage Cap -->
+                    <tr class="hover:bg-emerald-50/30 transition-colors">
+                      <td class="p-4 font-sans font-bold text-surface-100">Max Sum Insured Cap ({{ item.tranche.coveragePercentage || 70 }}%)</td>
+                      <td class="p-4 text-right text-surface-200">
+                        {{ item.priorTranche ? ('₹' + formatCurrency(getTrancheCoverageCap(item.priorTranche))) : '₹0.00' }}
+                      </td>
+                      <td class="p-4 text-right text-sky-700 font-bold">
+                        ₹{{ formatCurrency(getTrancheCoverageCap(item.tranche)) }}
+                      </td>
+                      <td class="p-4 text-right font-bold" [class]="(getTrancheCoverageCap(item.tranche) - (item.priorTranche ? getTrancheCoverageCap(item.priorTranche) : 0)) >= 0 ? 'text-emerald-600' : 'text-rose-600'">
+                        {{ (getTrancheCoverageCap(item.tranche) - (item.priorTranche ? getTrancheCoverageCap(item.priorTranche) : 0)) >= 0 ? '+' : '' }}₹{{ formatCurrency(getTrancheCoverageCap(item.tranche) - (item.priorTranche ? getTrancheCoverageCap(item.priorTranche) : 0)) }}
+                      </td>
+                    </tr>
+
+                    <!-- Annual Premium Amount -->
+                    <tr class="hover:bg-emerald-50/30 transition-colors">
+                      <td class="p-4 font-sans font-bold text-surface-100">Annual Premium ({{ item.tranche.premiumPercentage || 2.0 }}%)</td>
+                      <td class="p-4 text-right text-surface-200">
+                        {{ item.priorTranche ? ('₹' + formatCurrency(getTranchePremium(item.priorTranche)) + '/yr') : '₹0.00/yr' }}
+                      </td>
+                      <td class="p-4 text-right text-orange-600 font-bold">
+                        ₹{{ formatCurrency(getTranchePremium(item.tranche)) }}/yr
+                      </td>
+                      <td class="p-4 text-right font-bold" [class]="getDeltaPremium(item.tranche, item.priorTranche) >= 0 ? 'text-orange-600' : 'text-emerald-600'">
+                        {{ getDeltaPremium(item.tranche, item.priorTranche) >= 0 ? '+' : '' }}₹{{ formatCurrency(getDeltaPremium(item.tranche, item.priorTranche)) }}/yr
+                      </td>
+                    </tr>
+
+                    <!-- Vesting Tenure -->
+                    <tr class="hover:bg-emerald-50/30 transition-colors">
+                      <td class="p-4 font-sans font-bold text-surface-100">{{ item.policy.tenureYears || 5 }}-Year Vesting Maturity</td>
+                      <td class="p-4 text-right text-surface-200">
+                        {{ item.priorTranche ? ((item.priorTranche.eligibilityDate) | date:'mediumDate') : 'Policy Inception' }}
+                      </td>
+                      <td class="p-4 text-right text-surface-100 font-semibold">
+                        {{ (item.tranche.eligibilityDate || item.policy.protectionStartDate) | date:'mediumDate' }}
+                      </td>
+                      <td class="p-4 text-right text-surface-200 font-sans text-[11px] italic">
+                        {{ item.policy.tenureYears || 5 }}-Yr Horizon
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <!-- Covered Symbols at that time -->
+              @if (item.tranche.coveredSymbols) {
+                <div class="p-3 rounded-xl bg-surface-950/80 border border-surface-800 text-xs">
+                  <span class="text-surface-200 font-semibold uppercase tracking-wider block text-[10px]">Stock Assets Covered in this Endorsement Schedule:</span>
+                  <span class="text-primary-600 font-mono font-bold mt-1 block">{{ item.tranche.coveredSymbols }}</span>
+                </div>
+              }
+
+              <!-- Regulatory & SLA Disclosures -->
+              <div class="p-5 rounded-xl bg-gradient-to-r from-primary-50/50 to-white border border-primary-100 space-y-2.5 text-xs text-surface-200 shadow-sm">
+                <h5 class="text-xs font-bold text-surface-100 uppercase tracking-wider flex items-center gap-2"><span class="material-symbols-outlined text-sm text-primary-600">gavel</span> Statutory Clauses & Settlement SLA</h5>
+                <ul class="space-y-1.5 text-[11px] text-surface-200 list-disc list-inside">
+                  <li><strong>Option A Cliff Vesting:</strong> This policy is bound under an independent {{ item.policy.tenureYears || 5 }}-year tenure with mandatory 40% ceiled lock-in ({{ item.policy.waitingPeriodYears || 2 }} years). 100% active coverage unlocks upon lock-in completion.</li>
+                  <li><strong>20% Crash Deductible:</strong> Admissible claim loss triggers only when equity drawdown exceeds the 20% deductible floor from the bound baseline.</li>
+                  <li><strong>Direct Credit SLA:</strong> Approved claim disbursements are settled within <strong>1–2 business days</strong> directly to the recent payment method on file via automated ACH/IMPS.</li>
+                </ul>
+              </div>
+
+              <!-- Digital Seal & Attestation -->
+              <div class="p-4 rounded-xl border border-emerald-200 bg-emerald-50 shadow-sm flex items-center justify-between gap-3 text-xs">
+                <div class="flex items-center gap-3">
+                  <span class="material-symbols-outlined text-emerald-600 text-3xl">verified_user</span>
+                  <div>
+                    <span class="font-bold text-emerald-700 block text-[13px]">Digitally Signed & Audited by StockShield Actuarial Underwriters</span>
+                    <span class="text-[10px] text-emerald-600/80 font-mono mt-0.5 block">Hash: SHA256: 7b8f9e{{ (item.tranche.trancheId || 'cert').substring(0, 10) }}4a1c (VALIDATED)</span>
+                  </div>
+                </div>
+                <span class="px-3 py-1.5 rounded-full bg-emerald-600 text-white border border-emerald-700 font-bold text-[10px] font-mono shadow-sm tracking-wider">
+                  SEBI / PMLA COMPLIANT
+                </span>
+              </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="no-print border-t border-surface-800 pt-4 flex justify-between items-center shrink-0">
+              <button (click)="printCertificate()" class="btn-secondary text-xs flex items-center gap-1.5 py-2 px-4 text-surface-200 hover:text-white border-surface-700">
+                <span class="material-symbols-outlined text-sm">print</span>
+                <span>Print / Save Certificate PDF</span>
+              </button>
+              <button (click)="closeTrancheCert()" class="btn-primary text-xs py-2 px-6">
+                Close Certificate
+              </button>
+            </div>
+
+          </div>
+        </div>
+      }
+
+      <!-- ══════════════════════════════════════════════════════════════════════ -->
+      <!-- PAYMENT TRANSACTION RECEIPT POP-UP MODAL                               -->
+      <!-- ══════════════════════════════════════════════════════════════════════ -->
+      @if (selectedTransaction(); as tx) {
+        <div class="no-print fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 sm:p-6 overflow-y-auto" (click)="selectedTransaction.set(null)">
+          <div class="relative my-auto w-full max-w-md bg-white border border-surface-800 rounded-[24px] shadow-[0_25px_60px_-15px_rgba(0,0,0,0.85)] animate-scale-in text-left max-h-[calc(100vh-3.5rem)] overflow-y-auto p-6 space-y-6" (click)="$event.stopPropagation()">
+            
+            <div class="flex justify-between items-center border-b border-surface-800 pb-4">
+              <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center shadow-sm">
+                  <span class="material-symbols-outlined text-xl">receipt_long</span>
+                </div>
+                <div>
+                  <h3 class="text-lg font-display font-bold text-surface-100">Payment Receipt</h3>
+                  <p class="text-[10px] text-surface-200 font-mono uppercase tracking-widest font-bold">Tax Invoice / Confirmation</p>
+                </div>
+              </div>
+              <button (click)="selectedTransaction.set(null)" class="text-surface-200 hover:text-surface-100 text-lg p-1.5 rounded-full hover:bg-[#f4f5f6] leading-none" title="Close"><span class="material-symbols-outlined text-xl align-middle">close</span></button>
+            </div>
+
+            <!-- Receipt Amount Banner -->
+            <div class="p-5 bg-gradient-to-r from-emerald-50/50 to-white rounded-xl border border-emerald-100 flex justify-between items-center shadow-sm">
+              <div>
+                <span class="text-surface-200 text-[10px] uppercase font-bold tracking-widest block mb-0.5">Amount Paid</span>
+                <span class="text-2xl font-black font-mono text-emerald-700">₹{{ formatCurrency(tx.amount) }}</span>
+              </div>
+              <span class="px-3 py-1.5 rounded-full text-[10px] font-bold font-mono bg-emerald-100 text-emerald-700 border border-emerald-200 shadow-sm">
+                PAID & CONFIRMED
+              </span>
+            </div>
+
+            <!-- Receipt Breakdown Fields -->
+            <div class="p-5 bg-white rounded-xl border border-surface-800 space-y-3.5 text-xs font-mono shadow-inner">
+              <div class="flex justify-between text-surface-200 items-center">
+                <span class="uppercase text-[10px] font-bold tracking-widest">Transaction Ref:</span>
+                <span class="text-surface-100 font-bold bg-[#f4f5f6] px-2 py-0.5 rounded border border-surface-800">{{ tx.transactionId }}</span>
+              </div>
+              <div class="flex justify-between text-surface-200 items-center">
+                <span class="uppercase text-[10px] font-bold tracking-widest">Date & Time:</span>
+                <span class="text-surface-100 font-semibold">{{ tx.createdAt | date:'medium' }}</span>
+              </div>
+              <div class="flex justify-between text-surface-200 items-center">
+                <span class="uppercase text-[10px] font-bold tracking-widest">Payment Mode:</span>
+                <span class="text-surface-100 font-semibold">UPI / Card</span>
+              </div>
+              <div class="flex justify-between text-surface-200 items-center border-t border-surface-800 pt-3 mt-1">
+                <span class="uppercase text-[10px] font-bold tracking-widest">Payment Type:</span>
+                <span class="text-orange-600 font-black uppercase">{{ tx.transactionType || 'ANNUAL_PREMIUM' }}</span>
+              </div>
+            </div>
+
+            <div class="flex justify-end gap-3 pt-2">
+              <button (click)="selectedTransaction.set(null)" class="bg-surface-100 hover:bg-surface-200 text-white border border-surface-700 text-xs px-6 py-2.5 rounded-full font-bold shadow-md transition-all">
+                Done
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+    </div>

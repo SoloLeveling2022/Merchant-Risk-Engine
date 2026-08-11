@@ -1,0 +1,127 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "cli": {
+    "packageManager": "npm",
+    "analytics": "20537e51-7fb0-44f2-a0e8-92ae199dcdfa"
+  },
+  "newProjectRoot": "projects",
+  "projects": {
+    "frontend-app": {
+      "projectType": "application",
+      "schematics": {},
+      "root": "",
+      "sourceRoot": "src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:application",
+          "options": {
+            "browser": "src/main.ts",
+            "polyfills": [
+              "zone.js"
+            ],
+            "tsConfig": "tsconfig.app.json",
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "public"
+              }
+            ],
+            "styles": [
+              "src/styles.css"
+            ]
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2MB",
+                  "maximumError": "5MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kB",
+                  "maximumError": "10kB"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "development": {
+              "optimization": false,
+              "extractLicenses": false,
+              "sourceMap": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular/build:dev-server",
+          "options": {
+            "proxyConfig": "proxy.conf.json"
+          },
+          "configurations": {
+            "production": {
+              "buildTarget": "frontend-app:build:production"
+            },
+            "development": {
+              "buildTarget": "frontend-app:build:development"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "extract-i18n": {
+          "builder": "@angular/build:extract-i18n"
+        },
+        "test": {
+          "builder": "@angular/build:karma",
+          "options": {
+            "codeCoverageExclude": [
+              "src/app/pages/underwriter/**/*.ts",
+              "src/app/pages/landing/**/*.ts",
+              "src/app/pages/register/**/*.ts",
+              "src/app/pages/admin/**/*.ts",
+              "src/app/pages/claims-analyst/**/*.ts",
+              "src/app/pages/compliance/**/*.ts",
+              "src/app/pages/kyc/**/*.ts",
+              "src/app/pages/staff/**/*.ts",
+              "src/app/pages/unauthorized/**/*.ts",
+              "src/app/pages/investor/dashboard/**/*.ts",
+              "src/app/pages/investor/documents/**/*.ts",
+              "src/app/pages/investor/policies/**/*.ts",
+              
+              "src/app/pages/investor/quotes/**/*.ts",
+              "src/app/pages/investor/portfolio/portfolio.component.ts",
+              "src/app/pages/investor/claims/claims.component.ts",
+              "src/app/shared/api/src/underwriting-queue.service.ts",
+              "src/app/shared/auth/src/auth.interceptor.ts",
+              "src/app/shared/auth/src/guards.ts",
+              "src/app/shared/notifications/src/notification.service.ts",
+              "src/app/store/**/*.ts",
+              "src/app/layout/**/*.ts",
+              "src/app/app.config.ts",
+              "src/app/app.routes.ts",
+              "src/main.ts",
+              "src/styles.css"
+            ],
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ],
+            "tsConfig": "tsconfig.spec.json",
+            "assets": [
+              {
+                "glob": "**/*",
+                "input": "public"
+              }
+            ],
+            "styles": [
+              "src/styles.css"
+            ]
+          }
+        }
+      }
+    }
+  }
+}

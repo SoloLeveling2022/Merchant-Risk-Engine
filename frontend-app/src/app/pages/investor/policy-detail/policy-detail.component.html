@@ -1,0 +1,663 @@
+<div class="space-y-6 animate-fade-in relative">
+
+      <!-- Top Navigation & Header -->
+      <div class="flex justify-between items-center">
+        <div>
+          <a routerLink="/investor/policies" class="text-xs text-primary-600 hover:text-primary-600 font-medium flex items-center gap-1 mb-1">
+            <span class="material-symbols-outlined text-sm align-middle">arrow_back</span> Back to Active Policies
+          </a>
+          <h1 class="text-2xl font-bold text-surface-100 flex items-center gap-3">
+            <span><span class="material-symbols-outlined align-middle">shield</span> Policy Details & Coverage Tranches</span>
+          </h1>
+          <p class="text-sm text-surface-200">Policy #{{ policy()?.policyNumber || (policy()?.id || policy()?.policyId || '').substring(0, 8) }}</p>
+        </div>
+        <div class="flex gap-2">
+          <a routerLink="/investor/portfolio" class="btn-primary text-sm bg-neutral-600 hover:bg-neutral-500 flex items-center gap-1">
+            <span class="material-symbols-outlined text-sm align-middle">edit</span>
+            <span>Edit Portfolio</span>
+          </a>
+        </div>
+      </div>
+
+      @if (loading()) {
+        <div class="card text-center py-12">
+          <p class="text-surface-200 animate-pulse">Loading policy actuarial details and tranche timeline...</p>
+        </div>
+      } @else if (!policy()) {
+        <div class="card text-center py-12">
+          <span class="text-5xl mb-4 block"><span class="material-symbols-outlined align-middle">warning</span></span>
+          <h2 class="text-xl font-semibold text-surface-200">Policy Not Found</h2>
+          <p class="text-surface-500 mt-2">The requested policy details could not be loaded.</p>
+          <a routerLink="/investor/policies" class="btn-primary mt-4 inline-block">Return to Policies</a>
+        </div>
+      } @else {
+
+        <!-- PENDING ENDORSEMENT ALERT BANNER -->
+        @if (getPendingTranche(); as pendingTranche) {
+          @if (isUnderwriterGated()) {
+            <!-- UNDERWRITING REVIEW REQUIRED BANNER (RISK >= 500) -->
+            <div class="card border-2 border-accent-500/50 bg-accent-500/10 p-5 rounded-2xl shadow-2xl space-y-3">
+              <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div class="flex items-center gap-3">
+                  <span class="text-3xl p-2 bg-accent-500/20 rounded-xl text-accent-800">
+                    <span class="material-symbols-outlined align-middle">hourglass_top</span>
+                  </span>
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <h3 class="text-lg font-bold text-accent-900">New Endorsement Under Review</h3>
+                      <span class="px-2 py-0.5 rounded-full text-[10px] bg-accent-500/30 text-accent-900 border border-accent-500/40 font-mono font-bold">
+                        RISK {{ pendingTranche.riskScore }}/1000 (HIGH RISK)
+                      </span>
+                    </div>
+                    <p class="text-xs text-accent-800 mt-1">
+                      Your new endorsement is under review. You will see the updated terms once our underwriting team confirms it. Thank you!
+                    </p>
+                  </div>
+                </div>
+                <div class="shrink-0 flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-500/15 text-emerald-700 border border-emerald-500/30 text-xs font-semibold">
+                  <span class="material-symbols-outlined text-sm">shield</span>
+                  <span>Current Active Policy in Action</span>
+                </div>
+              </div>
+
+              @if (pendingTranche.coveredSymbols) {
+                <div class="mt-2 bg-surface-950 p-3 rounded-lg border border-surface-800 flex items-center justify-between text-xs font-mono">
+                  <span class="text-surface-100 font-semibold uppercase">Pending Portfolio Stock Assets:</span>
+                  <span class="text-accent-900 font-bold bg-accent-500/20 px-3 py-1 rounded border border-accent-500/40">
+                    {{ pendingTranche.coveredSymbols }}
+                  </span>
+                </div>
+              }
+            </div>
+          } @else {
+            <!-- STANDARD / APPROVED ENDORSEMENT PROPOSAL BANNER -->
+            <div class="card border-2 border-neutral-500/40 bg-gradient-to-r from-neutral-500/10 via-surface-900 to-neutral-500/20 p-5 rounded-2xl shadow-2xl animate-pulse space-y-3">
+              <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div class="flex items-center gap-3">
+                  <span class="text-3xl p-2 bg-neutral-500/20 rounded-xl text-neutral-800"><span class="material-symbols-outlined align-middle">notifications</span></span>
+                  <div>
+                    <div class="flex items-center gap-2">
+                      <h3 class="text-lg font-bold text-neutral-900">New Coverage Change Requires Your Approval</h3>
+                      <span class="px-2 py-0.5 rounded-full text-[10px] bg-neutral-500/20 text-neutral-800 border border-neutral-500/40 font-bold font-mono">ENDORSEMENT PROPOSAL</span>
+                    </div>
+                    <p class="text-xs text-neutral-700 mt-0.5">
+                      Portfolio quantity update detected. Additional exposure of
+                      <strong class="text-neutral-900 font-mono">₹{{ formatCurrency(getExposureDelta(pendingTranche)) }}</strong> is awaiting your explicit review and acceptance.
+                    </p>
+                  </div>
+                </div>
+                <button (click)="scrollToComparison()" class="btn-primary bg-neutral-800 hover:bg-neutral-700 text-white font-bold text-xs px-4 py-2.5 whitespace-nowrap shadow-lg flex items-center gap-1.5">
+                  <span class="material-symbols-outlined align-middle">search</span>
+                  <span>Review Endorsement Proposal</span>
+                  <span class="material-symbols-outlined text-sm align-middle">arrow_forward</span>
+                </button>
+              </div>
+
+              <!-- Changed Stock Assets Highlight -->
+              @if (pendingTranche.coveredSymbols) {
+                <div class="mt-2 bg-surface-950 p-3 rounded-lg border border-neutral-500/30 flex items-center justify-between text-xs font-mono">
+                  <span class="text-neutral-700 font-semibold uppercase">Changed Stock Asset(s) in Portfolio:</span>
+                  <span class="text-neutral-900 font-bold bg-neutral-500/20 px-3 py-1 rounded border border-neutral-500/40">
+                    {{ pendingTranche.coveredSymbols }}
+                  </span>
+                </div>
+              }
+            </div>
+          }
+        }
+
+        <!-- CURRENT ACTIVE POLICY METRICS CARDS -->
+        <div class="space-y-2">
+          <div class="flex justify-between items-center">
+            <span class="text-xs font-bold uppercase tracking-wider text-surface-200 flex items-center gap-1.5">
+              <span><span class="material-symbols-outlined align-middle">lock</span></span> CURRENT ACTIVE INSURED METRICS
+            </span>
+            @if (getPendingTranche()) {
+              <span class="text-[11px] text-neutral-400 font-mono">Showing bound terms (unaffected prior to endorsement acceptance)</span>
+            }
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="bg-white border border-surface-800 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-5 rounded-2xl flex flex-col justify-between">
+              <span class="text-[10px] font-bold uppercase tracking-widest text-surface-200">Active Insured Value</span>
+              <div>
+                <span class="text-surface-100 text-2xl font-black font-mono block mt-2">₹{{ formatCurrency(getActiveInsuredValue()) }}</span>
+                <span class="text-[11px] text-surface-200 mt-1 block">Bound Portfolio Exposure</span>
+              </div>
+            </div>
+            <div class="bg-white border border-surface-800 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-5 rounded-2xl flex flex-col justify-between">
+              <span class="text-[10px] font-bold uppercase tracking-widest text-surface-200">Total Insured Cap</span>
+              <div>
+                <span class="text-emerald-700 text-2xl font-black font-mono block mt-2">₹{{ formatCurrency(getActiveInsuredCap()) }}</span>
+                <span class="text-[11px] text-surface-200 mt-1 block">{{ getActiveCoveragePercentage() }}% Coverage Protection</span>
+              </div>
+            </div>
+            <div class="bg-white border border-surface-800 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-5 rounded-2xl flex flex-col justify-between">
+              <span class="text-[10px] font-bold uppercase tracking-widest text-surface-200">Remaining Claimable</span>
+              <div>
+                <span class="text-surface-100 text-2xl font-black font-mono block mt-2">₹{{ formatCurrency(getRemainingClaimableCoverage()) }}</span>
+                <span class="text-[11px] mt-1 block font-semibold" [class]="getTotalClaimsPaid() > 0 ? 'text-rose-600' : 'text-emerald-600'">
+                  @if (getTotalClaimsPaid() > 0) {
+                    -₹{{ formatCurrency(getTotalClaimsPaid()) }} Settled Claims
+                  } @else {
+                    100% Limit Available
+                  }
+                </span>
+              </div>
+            </div>
+            <div class="bg-white border border-surface-800 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-5 rounded-2xl flex flex-col justify-between">
+              <span class="text-[10px] font-bold uppercase tracking-widest text-surface-200">Annual Insurance Premium</span>
+              <div>
+                <span class="text-emerald-700 text-2xl font-black font-mono block mt-2">₹{{ formatCurrency(getActivePremiumAmount()) }}</span>
+                <span class="text-[11px] text-surface-200 mt-1 block">{{ getActivePremiumPercentage() }}% Rate on Full Cap</span>
+              </div>
+            </div>
+            <div class="bg-white border border-surface-800 shadow-[0_8px_30px_rgb(0,0,0,0.04)] p-5 rounded-2xl flex flex-col justify-between">
+              <span class="text-[10px] font-bold uppercase tracking-widest text-surface-200">Actuarial Risk Score</span>
+              <div>
+                <span class="text-2xl font-black font-mono block mt-2" [class]="getActiveRiskScore() >= 500 ? 'text-rose-600' : 'text-emerald-700'">{{ getActiveRiskScore() }}/1000</span>
+                <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold mt-1 shadow-sm uppercase tracking-wider" [class]="getActiveRiskScore() >= 500 ? 'bg-rose-100 text-rose-700 border border-rose-200' : 'bg-emerald-100 text-emerald-700 border border-emerald-200'">{{ getRiskTierName(getActiveRiskScore()) }}</span>
+              </div>
+            </div>
+          </div>
+          @if (getTotalClaimsPaid() > 0) {
+            <div class="p-3 bg-surface-950 rounded-xl border border-primary-500/25 flex items-center justify-between text-xs">
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary-600 text-sm">info</span>
+                <span class="text-surface-200">
+                  <strong>Coverage Active:</strong> Available claim balance is <strong class="text-emerald-400 font-mono">₹{{ formatCurrency(getRemainingClaimableCoverage()) }}</strong> (depleted by ₹{{ formatCurrency(getTotalClaimsPaid()) }} in paid claims).
+                </span>
+              </div>
+              <span class="text-neutral-400 font-mono text-[11px]">
+                Annual premium is calculated on full active cap (₹{{ formatCurrency(getActiveInsuredCap()) }}).
+              </span>
+            </div>
+          }
+        </div>
+
+        <!-- BEFORE VS PROPOSED ENDORSEMENT SPLIT-SCREEN COMPARISON OR UNDER REVIEW HOLD SECTION -->
+        @if (getPendingTranche(); as pendingTranche) {
+          @if (isUnderwriterGated()) {
+            <!-- UNDER REVIEW HOLD CARD: Hide Accept/Reject until Underwriter confirms -->
+            <div id="comparisonSection" class="card border border-accent-500/40 bg-surface-900/90 p-6 rounded-2xl shadow-xl space-y-4">
+              <div class="flex items-center gap-3 border-b border-surface-800 pb-4">
+                <div class="w-10 h-10 rounded-xl bg-accent-500/20 text-accent-400 flex items-center justify-center text-xl shrink-0">
+                  <span class="material-symbols-outlined">verified_user</span>
+                </div>
+                <div>
+                  <h3 class="text-base font-bold text-surface-100">Actuarial Underwriter Confirmation Pending</h3>
+                  <p class="text-xs text-surface-200">The recent portfolio revision increased the actuarial risk score to <strong class="text-accent-400 font-mono">{{ pendingTranche.riskScore }}/1000</strong> (High-Risk Threshold ≥ 500).</p>
+                </div>
+              </div>
+              <p class="text-sm text-surface-200 leading-relaxed">
+                new endorsement is underreview and you will see teh updated endorsement once our team confirms it, Thank you!
+              </p>
+              <div class="p-3 bg-surface-950 rounded-xl border border-surface-800 flex flex-col sm:flex-row justify-between items-center gap-3 text-xs">
+                <span class="text-surface-200 flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-emerald-400 text-sm">shield</span>
+                  Current active policy remains in full force.
+                </span>
+                <div class="flex items-center gap-3 flex-wrap">
+                  <span class="text-accent-400 font-bold font-mono flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-accent-400 animate-pulse"></span>
+                    Awaiting Underwriter Review
+                  </span>
+                </div>
+              </div>
+            </div>
+          } @else {
+            <div id="comparisonSection" class="card border border-neutral-500/40 bg-surface-900/90 space-y-6 shadow-2xl">
+              <div class="border-b border-surface-800 pb-4 flex justify-between items-center">
+                <div>
+                  <h2 class="text-xl font-bold text-neutral-900 flex items-center gap-2">
+                    <span class="material-symbols-outlined">compare_arrows</span> Endorsement Proposal: Before vs. Proposed Upgrade
+                  </h2>
+                  <p class="text-xs text-neutral-700">Review line-by-line differences before approving the new coverage tranche endorsement.</p>
+                </div>
+                <span class="px-3 py-1 rounded-full text-xs font-mono font-bold bg-neutral-500/20 text-neutral-800 border border-neutral-500/40">
+                  STATUS: PENDING ACCEPTANCE
+                </span>
+              </div>
+
+            <!-- Synchronized Split-Screen Side-by-Side Comparison Container -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 relative">
+              
+              <!-- LEFT COLUMN: CURRENT ACTIVE POLICY -->
+              <div class="bg-surface-950/70 rounded-xl p-5 border border-surface-800 space-y-4">
+                <div class="flex justify-between items-center border-b border-surface-800 pb-2">
+                  <h3 class="text-sm font-bold text-surface-100 uppercase tracking-wider flex items-center gap-2">
+                    
+                    Current Active Policy
+                  </h3>
+                  <span class="text-xs font-mono text-neutral-600 font-semibold">Active Bound</span>
+                </div>
+
+                <div class="space-y-3 text-sm">
+                  <div class="flex justify-between items-center py-2 border-b border-surface-900">
+                    <span class="text-surface-200">Insured Portfolio Value</span>
+                    <span class="font-mono font-bold text-surface-100">₹{{ formatCurrency(getActiveInsuredValue()) }}</span>
+                  </div>
+                  <div class="flex justify-between items-center py-2 border-b border-surface-900">
+                    <span class="text-surface-200">Actuarial Risk Score</span>
+                    <span class="font-mono font-bold text-surface-200">{{ getActiveRiskScore() }}/1000</span>
+                  </div>
+                  <div class="flex justify-between items-center py-2 border-b border-surface-900">
+                    <span class="text-surface-200">Coverage Percentage</span>
+                    <span class="font-mono text-info-400 font-semibold">{{ getActiveCoveragePercentage() }}%</span>
+                  </div>
+                  <div class="flex justify-between items-center py-2 border-b border-surface-900">
+                    <span class="text-surface-200">Insured Coverage Cap</span>
+                    <span class="font-mono font-bold text-success-400">₹{{ formatCurrency(getActiveInsuredCap()) }}</span>
+                  </div>
+                  <div class="flex justify-between items-center py-2 border-b border-surface-900">
+                    <span class="text-surface-200">Annual Premium Rate</span>
+                    <span class="font-mono text-warning-400">{{ getActivePremiumPercentage() }}%</span>
+                  </div>
+                  <div class="flex justify-between items-center py-2">
+                    <span class="text-surface-200">Annual Premium Amount</span>
+                    <span class="font-mono font-bold text-warning-400">₹{{ formatCurrency(getActivePremiumAmount()) }}</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- RIGHT COLUMN: PROPOSED ENDORSEMENT UPGRADE -->
+              <div class="bg-neutral-50/50 rounded-xl p-5 border border-neutral-500/40 space-y-4 shadow-lg">
+                <div class="flex justify-between items-center border-b border-neutral-500/30 pb-2">
+                  <h3 class="text-sm font-bold text-neutral-900 uppercase tracking-wider flex items-center gap-2">
+                    
+                    Proposed Policy Upgrade
+                  </h3>
+                  <span class="text-xs font-mono text-neutral-800 font-semibold">Tranche #{{ pendingTranche.trancheNumber }} Proposed</span>
+                </div>
+
+                <div class="space-y-3 text-sm">
+                  <div class="flex justify-between items-center py-2 border-b border-neutral-200">
+                    <span class="text-neutral-700">New Portfolio Total Value</span>
+                    <div class="text-right">
+                      <span class="font-mono font-bold text-neutral-900">₹{{ formatCurrency(pendingTranche.insuredValue) }}</span>
+                      <span class="block text-[11px] text-neutral-600 font-mono">({{ formatCurrencyDelta(getExposureDelta(pendingTranche)) }})</span>
+                    </div>
+                  </div>
+                  <div class="flex justify-between items-center py-2 border-b border-neutral-200">
+                    <span class="text-neutral-700">Proposed Risk Score</span>
+                    <div class="text-right">
+                      <span class="font-mono font-bold text-neutral-900">{{ pendingTranche.riskScore || 320 }}/1000</span>
+                      <span class="block text-[11px] text-neutral-600 font-mono">(Delta: {{ formatDelta((pendingTranche.riskScore || 320) - getActiveRiskScore()) }} pts)</span>
+                    </div>
+                  </div>
+                  <div class="flex justify-between items-center py-2 border-b border-neutral-200">
+                    <span class="text-neutral-700">Coverage Percentage</span>
+                    <span class="font-mono text-info-600 font-semibold">{{ getTrancheCoveragePercentage(pendingTranche) }}%</span>
+                  </div>
+                  <div class="flex justify-between items-center py-2 border-b border-neutral-200">
+                    <span class="text-neutral-700">Proposed Insured Cap</span>
+                    <div class="text-right">
+                      <span class="font-mono font-bold text-success-600">₹{{ formatCurrency(getProposedInsuredCap(pendingTranche)) }}</span>
+                      <span class="block text-[11px] text-success-500 font-mono">({{ formatCurrencyDelta(getProposedInsuredCap(pendingTranche) - getActiveInsuredCap()) }})</span>
+                    </div>
+                  </div>
+                  <div class="flex justify-between items-center py-2 border-b border-neutral-200">
+                    <span class="text-neutral-700">Annual Premium Rate</span>
+                    <span class="font-mono text-warning-600">{{ getTranchePremiumPercentage(pendingTranche) }}%</span>
+                  </div>
+                  <div class="flex justify-between items-center py-2">
+                    <span class="text-neutral-700">Proposed Annual Premium</span>
+                    <div class="text-right">
+                      <span class="font-mono font-bold text-warning-600">₹{{ formatCurrency(getProposedPremiumAmount(pendingTranche)) }}</span>
+                      <span class="block text-[11px] text-neutral-600 font-mono font-bold">({{ formatCurrencyDelta(getPremiumDelta(pendingTranche)) }})</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- PROPOSED TRANCHE METRICS DETAILS BOX -->
+            <div class="bg-surface-950 p-4 rounded-xl border border-surface-800 space-y-3 text-xs font-mono">
+              <div class="flex justify-between items-center border-b border-surface-800 pb-2">
+                <span class="text-surface-100 font-bold uppercase">Proposed Tranche #{{ pendingTranche.trancheNumber }} Specifications</span>
+                <span class="text-neutral-700 font-bold">TYPE: ENDORSEMENT</span>
+              </div>
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-surface-200">
+                <div>
+                  <span class="block text-[10px] uppercase">Additional Insured Exposure</span>
+                  <span class="text-surface-100 font-bold text-sm">₹{{ formatCurrency(getExposureDelta(pendingTranche)) }}</span>
+                </div>
+                <div>
+                  <span class="block text-[10px] uppercase">Effective Date</span>
+                  <span class="text-surface-200 font-bold text-sm">{{ (pendingTranche.effectiveDate || todayStr) | date:'mediumDate' }}</span>
+                </div>
+                <div>
+                  <span class="block text-[10px] uppercase">Independent Waiting Period</span>
+                  <span class="text-warning-600 font-bold text-sm">{{ getLockInYears() }} Years</span>
+                </div>
+                <div>
+                  <span class="block text-[10px] uppercase">Tranche Maturity Date</span>
+                  <span class="text-success-600 font-bold text-sm">{{ (pendingTranche.eligibilityDate || getLockInDate()) | date:'mediumDate' }}</span>
+                </div>
+              </div>
+
+              @if (pendingTranche.coveredSymbols) {
+                <div class="pt-2 border-t border-surface-800 flex justify-between items-center">
+                  <span class="text-surface-200">Changed Stock Assets:</span>
+                  <span class="text-neutral-900 font-bold">{{ pendingTranche.coveredSymbols }}</span>
+                </div>
+              }
+            </div>
+
+            <!-- INVESTOR ACCEPTANCE & BINDING FORM -->
+            <div class="bg-surface-900 p-5 rounded-xl border border-surface-800 space-y-4">
+              <div class="space-y-2">
+                <h4 class="text-sm font-bold text-surface-100 flex items-center gap-2">
+                  <span><span class="material-symbols-outlined align-middle">receipt_long</span></span> Endorsement Terms & Regulations Agreement
+                </h4>
+                <ul class="text-xs text-surface-200 space-y-1.5 list-disc pl-5">
+                  <li>Newly added stock shares will become covered under policy protection upon acceptance.</li>
+                  <li>A new endorsement tranche (Tranche #{{ pendingTranche.trancheNumber }}) will be created with its own <strong>independent {{ getLockInYears() }}-year lock-in period</strong>.</li>
+                  <li>Annual premium will adjust from ₹{{ formatCurrency(getActivePremiumAmount()) }} to ₹{{ formatCurrency(getProposedPremiumAmount(pendingTranche)) }} ({{ formatCurrencyDelta(getPremiumDelta(pendingTranche)) }}/yr) calculated on the full active cap.</li>
+                  <li>Existing Tranche #1 protection terms remain intact and unchanged.</li>
+                </ul>
+              </div>
+
+              <label class="flex items-start gap-3 cursor-pointer p-3 bg-surface-950 rounded-lg border border-surface-800 hover:border-surface-700 transition-colors" [formGroup]="policyForm">
+                <input type="checkbox" formControlName="termsAccepted" class="mt-0.5 rounded border-surface-700 text-primary-500 focus:ring-primary-500 w-4 h-4">
+                <span class="text-xs text-surface-200 font-medium leading-relaxed">
+                  I have read, understood, and accept the endorsement terms and premium adjustment for Tranche #{{ pendingTranche.trancheNumber }}.
+                </span>
+              </label>
+
+              <!-- Buttons -->
+              <div class="flex flex-col sm:flex-row justify-end gap-3 pt-2">
+                <button (click)="confirmRejectModal.set(true)" [disabled]="actionLoading()"
+                        class="btn-secondary text-xs text-danger-400 hover:bg-danger-500/10 border border-danger-500/30 px-5 py-2.5">
+                  <span class="material-symbols-outlined align-middle">cancel</span> Reject Endorsement
+                </button>
+                <button (click)="acceptEndorsement(pendingTranche)" [disabled]="policyForm.get('termsAccepted')?.invalid || actionLoading()"
+                        class="btn-primary text-xs bg-neutral-600 hover:bg-neutral-500 disabled:opacity-50 disabled:cursor-not-allowed font-bold px-6 py-2.5 shadow-lg">
+                  @if (actionLoading()) { Binding Endorsement... } @else { <span class="material-symbols-outlined align-middle">check_circle</span> Accept & Bind Coverage }
+                </button>
+              </div>
+            </div>
+          </div>
+        }
+      }
+
+        <!-- DYNAMIC TENURE & OPTION A CLIFF VESTING CARD -->
+        <div class="bg-white border border-surface-800 shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-[24px] p-6 space-y-5">
+          <div class="flex justify-between items-center border-b border-surface-800 pb-4">
+            <div>
+              <h2 class="text-xl font-display font-bold text-surface-100">{{ getTenureYears() }}-Year Policy Tenure & Cliff Vesting Schedule</h2>
+              <p class="text-xs text-surface-200 mt-0.5">Claims unlocked after mandatory 40% lock-in ({{ getLockInYears() }} years ceiled). 100% active coverage cap available upon cliff unlock.</p>
+            </div>
+            <span class="px-3 py-1 rounded-full text-[11px] font-bold font-mono tracking-wider shadow-sm uppercase border"
+                  [class]="policy()?.status === 'ACTIVE' || policy()?.policyStatus === 'ACTIVE' ? 'bg-emerald-100 text-emerald-700 border-emerald-200' : 'bg-surface-100 text-surface-700 border-surface-200'">
+              {{ policy()?.status || policy()?.policyStatus || 'COVERAGE_ACTIVE' }}
+            </span>
+          </div>
+
+          <div class="p-5 bg-[#f4f5f6] rounded-xl border border-surface-800 space-y-4 shadow-inner">
+            <div class="flex justify-between items-center text-xs font-semibold">
+              <span class="text-surface-100 font-bold uppercase tracking-wider">Lock-in & Vesting Progression Status</span>
+              <span [class]="isLockInCompleted() ? 'text-emerald-700 bg-emerald-100 px-3 py-1 rounded-full' : 'text-orange-600 bg-orange-100 px-3 py-1 rounded-full'" class="font-bold border" [class]="isLockInCompleted() ? 'border-emerald-200' : 'border-orange-200'">
+                @if (isLockInCompleted()) { <span class="material-symbols-outlined align-middle text-sm mr-1">check_circle</span> 100% Cliff Vested / Claim Eligible } @else { {{getTimeRemaining()}} }
+              </span>
+            </div>
+            <div class="w-full bg-surface-800/50 h-3 rounded-full overflow-hidden border border-surface-700/30">
+              <div class="bg-gradient-to-r from-emerald-400 to-emerald-600 h-full transition-all duration-500 rounded-full"
+                   [style.width.%]="getVestingProgress()"></div>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 text-center text-xs font-mono pt-3 border-t border-surface-800/60 gap-4">
+              <div>
+                <span class="text-surface-200 block text-[10px] uppercase font-bold tracking-widest mb-1">Policy Start Date</span>
+                <span class="text-surface-100 font-bold bg-white px-2 py-0.5 rounded border border-surface-800 shadow-sm">{{ (policy()?.policyStartDate || policy()?.createdAt) | date:'mediumDate' }}</span>
+              </div>
+              <div>
+                <span class="text-surface-200 block text-[10px] uppercase font-bold tracking-widest mb-1">40% Lock-in Period</span>
+                <span class="text-orange-600 font-bold bg-white px-2 py-0.5 rounded border border-surface-800 shadow-sm">{{ getLockInYears() }} Years (Cliff)</span>
+              </div>
+              <div>
+                <span class="text-surface-200 block text-[10px] uppercase font-bold tracking-widest mb-1">Vested Coverage</span>
+                <span [class]="isLockInCompleted() ? 'text-emerald-700' : 'text-orange-600'" class="font-bold bg-white px-2 py-0.5 rounded border border-surface-800 shadow-sm">
+                  {{ isLockInCompleted() ? '100% (Fully Unlocked)' : '0% (Locked in Cliff)' }}
+                </span>
+              </div>
+              <div>
+                <span class="text-surface-200 block text-[10px] uppercase font-bold tracking-widest mb-1">Lock-in Unlock Date</span>
+                <span class="text-emerald-700 font-bold bg-white px-2 py-0.5 rounded border border-surface-800 shadow-sm">{{ getLockInDate() | date:'mediumDate' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- POLICY AGREEMENT: PENALTY & CANCELLATION -->
+        <div class="bg-white border border-surface-800 shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-[24px] p-6 space-y-4">
+          <h2 class="text-xl font-display font-bold text-rose-700 flex items-center gap-2 border-b border-surface-800 pb-4">
+            <span><span class="material-symbols-outlined align-middle">receipt_long</span></span> Policy Agreement: Premium Deadlines & Penalties
+          </h2>
+          <div class="bg-rose-50 p-5 rounded-xl border border-rose-200 text-xs text-rose-900 space-y-2.5 shadow-sm">
+            <p><strong class="text-rose-700 uppercase tracking-widest font-black mr-1">1. Payment Deadline:</strong> Annual premiums must be paid by the exact Due Date. A <strong class="text-rose-700 font-black">3-day grace period</strong> is provided.</p>
+            <p><strong class="text-rose-700 uppercase tracking-widest font-black mr-1">2. Daily Penalty:</strong> If the premium remains unpaid 3 days after the Due Date, a strict <strong class="text-rose-700 font-black underline">3% penalty per day</strong> is applied continuously to the outstanding balance.</p>
+            <p><strong class="text-rose-700 uppercase tracking-widest font-black mr-1">3. Auto-Cancellation:</strong> If the delay reaches exactly <strong class="text-rose-700 font-black">30 days</strong>, the policy will be forcefully <strong class="text-rose-700 font-black uppercase">CANCELLED AND REJECTED</strong>.</p>
+            <p><strong class="text-rose-700 uppercase tracking-widest font-black mr-1">4. Notifications:</strong> A final system notification will be dispatched on the prior day (Day 29) before termination.</p>
+          </div>
+        </div>
+
+        <!-- COVERAGE TRANCHES BREAKDOWN TABLE -->
+        <div class="bg-white border border-surface-800 shadow-[0_8px_30px_rgb(0,0,0,0.04)] rounded-[24px] p-0 overflow-hidden space-y-0">
+          <div class="flex justify-between items-center p-6 border-b border-surface-800">
+            <div>
+              <h2 class="text-xl font-display font-bold text-surface-100 flex items-center gap-2">
+                <span><span class="material-symbols-outlined align-middle">bar_chart</span></span> Coverage Tranches & Portfolio Endorsements
+              </h2>
+              <p class="text-xs text-surface-200 mt-1">Click on any tranche row item or "Inspect Details" to view full actuarial breakdown & {{ getTenureYears() }}-year timeline</p>
+            </div>
+            <span class="text-xs text-surface-100 font-mono font-bold bg-[#f4f5f6] px-3 py-1 rounded-full border border-surface-800 shadow-sm">Total Tranches: {{ getTranches().length }}</span>
+          </div>
+
+          <div class="w-full overflow-x-auto">
+            <table class="w-full text-left text-sm text-surface-200">
+              <thead>
+                <tr class="bg-gradient-to-r from-[#f4f5f6] to-white border-b border-surface-800">
+                  <th class="py-4 px-6 font-bold text-[11px] uppercase tracking-wider text-surface-100 text-left">Tranche #</th>
+                  <th class="py-4 px-6 font-bold text-[11px] uppercase tracking-wider text-surface-100 text-left">Type</th>
+                  <th class="py-4 px-6 font-bold text-[11px] uppercase tracking-wider text-surface-100 text-left">Effective Date</th>
+                  <th class="py-4 px-6 font-bold text-[11px] uppercase tracking-wider text-surface-100 text-right">Insured Value</th>
+                  <th class="py-4 px-6 font-bold text-[11px] uppercase tracking-wider text-surface-100 text-right">Risk Score</th>
+                  <th class="py-4 px-6 font-bold text-[11px] uppercase tracking-wider text-surface-100 text-right">Coverage %</th>
+                  <th class="py-4 px-6 font-bold text-[11px] uppercase tracking-wider text-surface-100 text-right">Annual Prem %</th>
+                  <th class="py-4 px-6 font-bold text-[11px] uppercase tracking-wider text-surface-100 text-left">Unlock Date ({{ getLockInYears() }} Yrs)</th>
+                  <th class="py-4 px-6 font-bold text-[11px] uppercase tracking-wider text-surface-100 text-center">Status</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-surface-800/60">
+                @for (tranche of getTranches(); track (tranche.trancheId || tranche.trancheNumber || $index)) {
+                  <tr (click)="openTrancheModal(tranche)" class="cursor-pointer hover:bg-emerald-50/30 transition-colors group">
+                    <td class="py-4 px-6 font-mono font-bold text-primary-600 text-xs">
+                      Tranche #{{ tranche.trancheNumber }}
+                    </td>
+                    <td class="py-4 px-6">
+                      <span class="px-2.5 py-1 rounded-full text-[10px] font-bold font-mono tracking-wider shadow-sm uppercase border whitespace-nowrap"
+                            [class]="tranche.trancheType === 'ENDORSEMENT' ? 'bg-sky-50 text-sky-700 border-sky-200' : 'bg-primary-50 text-primary-700 border-primary-200'">
+                        {{ tranche.trancheType || 'ORIGINAL' }}
+                      </span>
+                    </td>
+                    <td class="py-4 px-6 font-mono text-xs text-surface-200">
+                      {{ (tranche.effectiveDate || policy()?.policyStartDate || policy()?.createdAt) | date:'shortDate' }}
+                    </td>
+                    <td class="py-4 px-6 text-right font-mono font-black text-surface-100 text-sm">
+                      ₹{{ formatCurrency(tranche.insuredValue || policy()?.insuredValue || 0) }}
+                    </td>
+                    <td class="py-4 px-6 text-right font-mono text-surface-200">
+                      <span [class]="(tranche.riskScore || policy()?.riskScore || 380) >= 500 ? 'text-rose-600 font-bold' : 'text-emerald-700 font-bold'">{{ tranche.riskScore || policy()?.riskScore || 380 }}/1000</span>
+                    </td>
+                    <td class="py-4 px-6 text-right font-mono text-emerald-700 font-bold">
+                      {{ getTrancheCoveragePercentage(tranche) }}%
+                    </td>
+                    <td class="py-4 px-6 text-right font-mono text-orange-600 font-bold">
+                      {{ getTranchePremiumPercentage(tranche) }}%
+                    </td>
+                    <td class="py-4 px-6 font-mono text-xs text-surface-200">
+                      {{ (tranche.eligibilityDate || policy()?.protectionStartDate) | date:'shortDate' }}
+                    </td>
+                    <td class="py-4 px-6 text-center">
+                      <span class="px-2.5 py-1 rounded-full text-[10px] font-bold font-mono tracking-wider shadow-sm uppercase border whitespace-nowrap"
+                            [class]="(tranche.trancheStatus || tranche.status || 'ACTIVE') === 'SUPERSEDED' || formatTrancheStatus(tranche).includes('SUPERSEDED') ? 'bg-[#f4f5f6] text-surface-500 border-surface-300' : 'bg-emerald-100 text-emerald-700 border-emerald-200'">
+                        {{ formatTrancheStatus(tranche) }}
+                      </span>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      }
+
+      <!-- INTERACTIVE TRANCHE DETAIL INSPECTION MODAL -->
+      @if (selectedTrancheForModal(); as tranche) {
+        <div class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 sm:p-6 overflow-y-auto" (click)="selectedTrancheForModal.set(null)">
+          <div class="relative my-auto w-full max-w-xl bg-surface-900 border border-surface-700/80 rounded-2xl p-6 space-y-5 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.85)] animate-scale-in text-left max-h-[calc(100vh-3.5rem)] overflow-y-auto" (click)="$event.stopPropagation()">
+            <div class="flex justify-between items-center border-b border-surface-800 pb-3">
+              <div>
+                <h3 class="text-lg font-bold text-surface-100 flex items-center gap-2">
+                  <span><span class="material-symbols-outlined align-middle">bar_chart</span></span> Detailed Tranche #{{ tranche.trancheNumber }} Specifications
+                </h3>
+                <p class="text-xs text-neutral-300 font-mono">Type: {{ tranche.trancheType || 'ORIGINAL' }} — Status: {{ formatTrancheStatus(tranche) }}</p>
+              </div>
+              <button (click)="selectedTrancheForModal.set(null)" class="text-surface-200 hover:text-surface-100 text-lg p-1 leading-none" title="Close"><span class="material-symbols-outlined text-xl align-middle">close</span></button>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4 text-xs font-mono">
+              <div class="bg-surface-950 p-3 rounded-lg border border-surface-800">
+                <span class="text-surface-200 block text-[10px]">INSURED VALUE</span>
+                <span class="text-surface-100 font-bold text-sm">₹{{ formatCurrency(tranche.insuredValue || policy()?.insuredValue || 0) }}</span>
+              </div>
+              <div class="bg-surface-950 p-3 rounded-lg border border-surface-800">
+                <span class="text-surface-200 block text-[10px]">ACTUARIAL RISK SCORE</span>
+                <span class="text-neutral-400 font-bold text-sm">{{ tranche.riskScore || policy()?.riskScore || 380 }}/1000</span>
+              </div>
+              <div class="bg-surface-950 p-3 rounded-lg border border-surface-800">
+                <span class="text-surface-200 block text-[10px]">COVERAGE RATE</span>
+                <span class="text-info-400 font-bold text-sm">{{ getTrancheCoveragePercentage(tranche) }}%</span>
+              </div>
+              <div class="bg-surface-950 p-3 rounded-lg border border-surface-800">
+                <span class="text-surface-200 block text-[10px]">ANNUAL PREMIUM RATE</span>
+                <span class="text-warning-400 font-bold text-sm">{{ getTranchePremiumPercentage(tranche) }}%</span>
+              </div>
+            </div>
+
+            <!-- Dynamic Vesting Timeline -->
+            <div class="bg-surface-950 p-4 rounded-xl border border-surface-800 space-y-2">
+              <div class="flex justify-between text-xs font-semibold">
+                <span class="text-surface-200 uppercase">{{ getTenureYears() }}-Year Independent Timeline • 40% Lock-in</span>
+                <span class="text-neutral-400 font-mono font-bold">{{ getLockInDate() | date:'mediumDate' }}</span>
+              </div>
+              <div class="w-full bg-surface-800 h-2.5 rounded-full overflow-hidden">
+                <div class="bg-gradient-to-r from-primary-500 via-neutral-500 to-neutral-500 h-full transition-all duration-500" [style.width.%]="getVestingProgress()"></div>
+              </div>
+              <div class="flex justify-between text-[10px] text-surface-200 font-mono pt-1">
+                <span>Effective Date: {{ (tranche.effectiveDate || policy()?.policyStartDate || policy()?.createdAt) | date:'mediumDate' }}</span>
+                <span>Unlock Date: {{ getLockInDate() | date:'mediumDate' }}</span>
+              </div>
+            </div>
+
+            <!-- Historical Comparison With Active Tranche Back Then -->
+            @let priorTranche = getActiveTrancheBackThen(tranche);
+            @if (priorTranche) {
+              <div class="p-3.5 rounded-xl bg-surface-950 border border-primary-500/30 space-y-2">
+                <div class="flex items-center justify-between text-xs">
+                  <span class="font-bold text-primary-600 flex items-center gap-1.5 uppercase tracking-wider text-[11px]">
+                    <span class="material-symbols-outlined text-sm">compare_arrows</span>
+                    Compared to Active State Back Then (Tranche #{{ priorTranche.trancheNumber }})
+                  </span>
+                  <span class="text-[10px] font-mono text-surface-200">Baseline at Issuance</span>
+                </div>
+                
+                <div class="grid grid-cols-3 gap-2 text-xs font-mono text-center pt-1 border-t border-surface-800">
+                  <div class="p-2 rounded bg-surface-900 border border-surface-800/80">
+                    <span class="text-[10px] text-surface-200 uppercase block">Insured Asset</span>
+                    <span class="text-surface-100 font-bold">₹{{ formatCurrency(tranche.insuredValue) }}</span>
+                    <span class="text-[10px] block" [class]="(tranche.insuredValue || 0) >= (priorTranche.insuredValue || 0) ? 'text-emerald-400' : 'text-danger-400'">
+                      {{ formatCurrencyDelta((tranche.insuredValue || 0) - (priorTranche.insuredValue || 0)) }}
+                    </span>
+                  </div>
+                  <div class="p-2 rounded bg-surface-900 border border-surface-800/80">
+                    <span class="text-[10px] text-surface-200 uppercase block">Risk Score</span>
+                    <span class="text-accent-400 font-bold">{{ tranche.riskScore || 380 }}</span>
+                    <span class="text-[10px] block" [class]="(tranche.riskScore || 380) <= (priorTranche.riskScore || 380) ? 'text-emerald-400' : 'text-danger-400'">
+                      {{ formatDelta((tranche.riskScore || 380) - (priorTranche.riskScore || 380)) }} pts
+                    </span>
+                  </div>
+                  <div class="p-2 rounded bg-surface-900 border border-surface-800/80">
+                    <span class="text-[10px] text-surface-200 uppercase block">Annual Prem</span>
+                    <span class="text-warning-400 font-bold">₹{{ formatCurrency(getTranchePremium(tranche)) }}</span>
+                    <span class="text-[10px] block" [class]="getTranchePremium(tranche) >= getTranchePremium(priorTranche) ? 'text-warning-400' : 'text-emerald-400'">
+                      {{ formatCurrencyDelta(getTranchePremium(tranche) - getTranchePremium(priorTranche)) }}/yr
+                    </span>
+                  </div>
+                </div>
+              </div>
+            } @else {
+              <div class="p-3 rounded-xl bg-surface-950 border border-surface-800 text-xs text-surface-200 flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary-600 text-base">workspace_premium</span>
+                <span><strong>Policy Inception Baseline:</strong> Tranche #1 represents original terms bound upon policy creation.</span>
+              </div>
+            }
+
+            <div class="flex justify-between items-center pt-2">
+              <a routerLink="/investor/documents" (click)="selectedTrancheForModal.set(null)" class="btn-secondary text-xs flex items-center gap-1.5 text-primary-600 border-primary-500/30 hover:bg-primary-500/10">
+                <span class="material-symbols-outlined text-sm">description</span>
+                <span>View Official Certificate in Records</span>
+              </a>
+              <button (click)="selectedTrancheForModal.set(null)" class="btn-primary text-xs px-5 py-2">
+                Close Inspection Modal
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- REJECT CONFIRMATION MODAL -->
+      @if (confirmRejectModal() && getPendingTranche(); as pendingTranche) {
+        <div class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 sm:p-6 overflow-y-auto" (click)="confirmRejectModal.set(false)">
+          <div class="relative my-auto w-full max-w-md bg-surface-900 border border-danger-500/40 rounded-2xl p-6 space-y-5 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.85)] animate-scale-in text-left max-h-[calc(100vh-3.5rem)] overflow-y-auto" (click)="$event.stopPropagation()">
+            <div class="flex items-center gap-3 border-b border-surface-800 pb-3">
+              <span class="text-2xl p-2 bg-danger-500/10 text-danger-400 rounded-full"><span class="material-symbols-outlined align-middle">warning</span></span>
+              <div>
+                <h3 class="text-lg font-bold text-surface-100">Reject Endorsement Proposal?</h3>
+                <p class="text-xs text-danger-400 font-medium">Tranche #{{ pendingTranche.trancheNumber }} will be cancelled</p>
+              </div>
+            </div>
+
+            <p class="text-xs text-surface-200 leading-relaxed">
+              Newly added stock shares will remain in your portfolio but <strong>WILL NOT</strong> be added to insured coverage.
+              Your existing active policy terms will remain completely unchanged.
+            </p>
+
+            <div class="flex justify-end gap-3 pt-2">
+              <button (click)="confirmRejectModal.set(false)" class="btn-secondary text-xs px-4 py-2">
+                Cancel
+              </button>
+              <button (click)="rejectEndorsement(pendingTranche)" [disabled]="actionLoading()"
+                      class="btn-primary text-xs bg-danger-600 hover:bg-danger-500 font-bold px-5 py-2">
+                @if (actionLoading()) { Rejecting... } @else { Yes, Reject Endorsement }
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+
+    
+
+
+      <!-- ENDORSEMENT PAYMENT MODAL -->
+      @if (showEndorsementPayment()) {
+        <div class="fixed inset-0 z-[110] flex items-center justify-center bg-black/80 backdrop-blur-md">
+          <app-payment-modal 
+            [amount]="endorsementDeltaPremium()"
+            [targetId]="'ENDORSEMENT'"
+            [paymentType]="'RENEWAL_PREMIUM'"
+            (paymentSuccess)="onPaymentSuccess($event)"
+            (paymentCancel)="onPaymentCancel()">
+          </app-payment-modal>
+        </div>
+      }
+</div>

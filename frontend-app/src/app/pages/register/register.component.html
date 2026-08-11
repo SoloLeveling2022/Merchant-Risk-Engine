@@ -1,0 +1,55 @@
+<div class="min-h-screen bg-surface-950 flex flex-col items-center justify-center p-4 relative">
+      <!-- Back to Home Button -->
+      <a routerLink="/" class="absolute top-6 left-6 md:top-12 md:left-12 flex items-center gap-2 text-surface-200 hover:text-surface-100 transition-colors">
+        <span class="material-symbols-outlined text-xl">arrow_back</span>
+        <span class="font-medium">Back to Home</span>
+      </a>
+
+      <div class="w-full max-w-md mt-12">
+        <div class="text-center mb-8">
+          <h1 class="text-3xl font-bold bg-gradient-to-r from-primary-400 to-primary-600 bg-clip-text text-transparent">StockShield</h1>
+          <p class="text-surface-200 mt-2">Create your account</p>
+        </div>
+
+        <div class="card">
+          <h2 class="text-xl font-semibold text-surface-100 mb-6">Register</h2>
+
+          @if (error()) {
+            <div class="mb-4 p-3 bg-danger-500/10 border border-danger-500/30 rounded-lg text-danger-500 text-sm">{{ error() }}</div>
+          }
+
+          <form [formGroup]="registerForm" (ngSubmit)="onRegister()" class="space-y-4">
+            <div>
+              <label class="label">Full Name</label>
+              <input type="text" formControlName="fullName" class="input-field" placeholder="John Doe" />
+              @if (registerForm.get('fullName')?.invalid && registerForm.get('fullName')?.touched) {
+                <p class="text-xs text-danger-500 mt-1">Full name is required</p>
+              }
+            </div>
+            <div>
+              <label class="label">Email Address</label>
+              <input type="email" formControlName="email" class="input-field" placeholder="john&#64;example.com" />
+              @if (registerForm.get('email')?.invalid && registerForm.get('email')?.touched) {
+                <p class="text-xs text-danger-500 mt-1">Valid email is required</p>
+              }
+            </div>
+            <div>
+              <label class="label">Password</label>
+              <input type="password" formControlName="password" class="input-field" placeholder="••••••••" />
+              @if (registerForm.get('password')?.invalid && registerForm.get('password')?.touched) {
+                <p class="text-xs text-danger-500 mt-1">Password must be at least 6 characters</p>
+              }
+            </div>
+            <button type="submit" [disabled]="loading() || registerForm.invalid" class="btn-primary w-full">
+              {{ loading() ? 'Creating account...' : 'Create Account' }}
+            </button>
+          </form>
+
+          <div class="mt-6 text-center">
+            <p class="text-surface-200 text-sm">
+              Already have an account? <a routerLink="/auth/login" class="text-primary-600 hover:text-primary-600 font-medium">Sign In</a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>

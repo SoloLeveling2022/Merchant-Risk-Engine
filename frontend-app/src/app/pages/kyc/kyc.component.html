@@ -1,0 +1,170 @@
+<div class="max-w-xl mx-auto space-y-6 animate-fade-in">
+      <div class="card space-y-4">
+        <div class="flex justify-between items-center border-b border-surface-800 pb-4">
+          <div>
+            <h2 class="card-header border-none !mb-0">Identity Verification (KYC)</h2>
+            <p class="text-xs text-surface-200 mt-1">Submit your PAN and Aadhaar details for compliance verification.</p>
+          </div>
+          <span [class]="getBadgeClass(kycStatus())" [innerHTML]="formatStatus(kycStatus())">
+          </span>
+        </div>
+
+        @if (kycStatus() === 'PENDING' || kycStatus() === 'SUBMITTED' || kycStatus() === 'MANUAL_REVIEW') {
+          <!-- Pending Compliance Approval Screen -->
+          <div class="p-5 rounded-xl bg-neutral-500/10 border border-neutral-500/30 text-neutral-300 space-y-4">
+            <div class="flex items-center gap-3">
+              <span class="text-3xl"><span class="material-symbols-outlined align-middle">hourglass_empty</span></span>
+              <div>
+                <h3 class="font-bold text-base text-surface-100">Verification Pending Compliance Approval</h3>
+                <p class="text-xs text-neutral-400 font-medium">Application Under Manual Review</p>
+              </div>
+            </div>
+
+            <p class="text-xs text-surface-200 leading-relaxed">
+              Your KYC verification details (PAN) have been received. Under platform compliance regulations, your application is currently <strong>PENDING approval by our backend compliance team</strong>.
+            </p>
+
+            <div class="bg-surface-950/80 rounded-lg p-3.5 space-y-2 border border-surface-800 text-xs font-mono">
+              <div class="flex justify-between text-surface-200">
+                <span>Submitted Name:</span>
+                <span class="text-surface-200 font-semibold">{{ authService.user()?.fullName || 'Investor' }}</span>
+              </div>
+              <div class="flex justify-between text-surface-200">
+                <span>PAN Number:</span>
+                <span class="text-primary-600">{{ panNumber ? maskPan(panNumber) : 'Submitted' }}</span>
+              </div>
+              <div class="flex justify-between text-surface-200">
+                <span>Review Status:</span>
+                <span class="text-neutral-400 font-semibold"><span class="material-symbols-outlined align-middle">hourglass_empty</span> Pending Compliance Officer Approval</span>
+              </div>
+            </div>
+
+            <div class="flex gap-3 pt-2">
+              <button (click)="goToDashboard()" class="btn-primary flex-1">Go to Investor Dashboard</button>
+              <button (click)="checkStatus()" [disabled]="checkingStatus()" class="px-4 py-2 bg-surface-800 hover:bg-surface-700 text-surface-200 rounded-lg text-xs font-medium transition-colors">
+                @if (checkingStatus()) { Refreshing... } @else { <span class="material-symbols-outlined align-middle">sync</span> Refresh Status }
+              </button>
+            </div>
+          </div>
+        } @else if (kycStatus() === 'APPROVED' || kycStatus() === 'VERIFIED') {
+          <!-- Approved Screen -->
+          <div class="p-5 rounded-xl bg-success-500/10 border border-success-500/30 text-success-400 space-y-4">
+            <div class="flex items-center gap-3">
+              <span class="text-3xl"><span class="material-symbols-outlined align-middle">check_circle</span></span>
+              <div>
+                <h3 class="font-bold text-base text-surface-100">KYC Verification Approved</h3>
+                <p class="text-xs text-success-400 font-medium">Compliance Verification Complete</p>
+              </div>
+            </div>
+            <p class="text-xs text-surface-200">Your identity documents have been verified and approved by compliance. You have full access to portfolio insurance features.</p>
+            <button (click)="goToDashboard()" class="btn-primary w-full">Go to Investor Dashboard</button>
+          </div>
+        } @else {
+          <!-- Submission Form -->
+          <form [formGroup]="kycForm" (ngSubmit)="onSubmit()" class="card space-y-6">
+            @if (kycStatus() === 'REJECTED') {
+              <div class="bg-danger-500/10 border border-danger-500/20 p-4 rounded-xl flex items-start gap-3">
+                <span class="text-xl"><span class="material-symbols-outlined align-middle">warning</span></span>
+                <div>
+                  <h3 class="text-sm font-bold text-danger-400">Application Rejected</h3>
+                  <p class="text-xs text-danger-300 mt-1">Your previous KYC submission was rejected by compliance. Please ensure your PAN details match your official documents and submit again.</p>
+                </div>
+              </div>
+            }
+
+            <div class="bg-surface-800 border border-surface-700 p-4 rounded-xl flex justify-between items-center">
+              <div>
+                <h3 class="text-sm font-semibold text-surface-200">Required Documentation</h3>
+                <ul class="text-xs text-surface-200 space-y-1 list-disc list-inside mt-1">
+                  <li>Valid PAN Card</li>
+                </ul>
+              </div>
+              <button type="button" (click)="showKycGuidelinesModal.set(true)" class="btn-secondary text-xs text-info-400 border-info-500/30 hover:bg-info-500/10 flex items-center gap-1 py-1.5 px-3">
+                <span class="material-symbols-outlined text-sm">info</span> Compliance Guidelines
+              </button>
+            </div>
+
+            @if (kycStatus() === 'NOT_SUBMITTED' || kycStatus() === 'REJECTED') {
+              <div>
+                <label class="label">PAN Number</label>
+                <input type="text" formControlName="panNumber" class="input-field uppercase" placeholder="ABCDE1234F" />
+                @if (kycForm.get('panNumber')?.invalid && kycForm.get('panNumber')?.touched) {
+                  <p class="text-xs text-danger-500 mt-1">Valid PAN Number is required</p>
+                }
+              </div>
+            }
+
+            @if (error()) {
+              <div class="text-xs text-danger-500 bg-danger-500/10 p-2.5 rounded-lg border border-danger-500/20">{{ error() }}</div>
+            }
+
+            <button type="submit" [disabled]="loading() || kycForm.invalid" class="btn-primary w-full py-2.5">
+              @if (loading()) { Submitting Application... } @else { <span class="material-symbols-outlined align-middle">edit_document</span> Submit Verification for Compliance Review }
+            </button>
+          </form>
+        }
+      </div>
+
+      <!-- KYC Regulatory Guidelines Pop-Up Modal -->
+      @if (showKycGuidelinesModal()) {
+        <div class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 sm:p-6 overflow-y-auto" (click)="showKycGuidelinesModal.set(false)">
+          <div class="relative my-auto w-full max-w-lg bg-surface-900 border border-surface-700/80 rounded-2xl p-6 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.85)] animate-scale-in text-left max-h-[calc(100vh-3.5rem)] overflow-y-auto flex flex-col" (click)="$event.stopPropagation()">
+            
+            <!-- Modal Header -->
+            <div class="flex justify-between items-start border-b border-surface-700/50 pb-4 shrink-0">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-info-500/15 border border-info-500/30 text-info-400 flex items-center justify-center">
+                  <span class="material-symbols-outlined text-2xl">verified_user</span>
+                </div>
+                <div>
+                  <h3 class="text-base font-bold text-surface-100">KYC Regulatory & Statutory Guidelines</h3>
+                  <p class="text-xs text-surface-200">SEBI & PMLA Compliance Protocols</p>
+                </div>
+              </div>
+              <button (click)="showKycGuidelinesModal.set(false)" class="text-surface-200 hover:text-surface-200 text-lg p-1 rounded-lg hover:bg-surface-800 transition-colors leading-none" title="Close Modal"><span class="material-symbols-outlined text-xl align-middle">close</span></button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="space-y-4 my-4 flex-1 text-xs">
+              <div class="p-3.5 rounded-xl bg-surface-950/80 border border-surface-800 space-y-1.5">
+                <h4 class="font-bold text-surface-200 flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-info-400 text-base">id_card</span>
+                  1. PAN Verification Mandate
+                </h4>
+                <p class="text-surface-200 leading-relaxed">
+                  Permanent Account Number (PAN) is mandatory under SEBI (Investment Advisers & Risk Management) regulations to authenticate beneficial ownership of equity portfolios before insurance underwriting.
+                </p>
+              </div>
+
+              <div class="p-3.5 rounded-xl bg-surface-950/80 border border-surface-800 space-y-1.5">
+                <h4 class="font-bold text-surface-200 flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-primary-600 text-base">gavel</span>
+                  2. Manual Compliance Officer Review
+                </h4>
+                <p class="text-surface-200 leading-relaxed">
+                  Submitted PAN records are cross-checked by certified Compliance Officers against official databases. Review typically completes within <strong>24 business hours</strong>.
+                </p>
+              </div>
+
+              <div class="p-3.5 rounded-xl bg-surface-950/80 border border-surface-800 space-y-1.5">
+                <h4 class="font-bold text-surface-200 flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-emerald-400 text-base">security</span>
+                  3. AES-256 Data Protection & Encryption
+                </h4>
+                <p class="text-surface-200 leading-relaxed">
+                  Your identity identifiers are encrypted at rest with AES-256 and never shared with unauthorized external entities. Verified KYC is required for policy issuance and claim payout settlement.
+                </p>
+              </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="border-t border-surface-700/50 pt-3 flex justify-end shrink-0">
+              <button (click)="showKycGuidelinesModal.set(false)" class="btn-primary text-xs py-2 px-5">
+                Understood
+              </button>
+            </div>
+
+          </div>
+        </div>
+      }
+    </div>

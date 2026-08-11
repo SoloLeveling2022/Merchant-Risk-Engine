@@ -1,0 +1,45 @@
+<div class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 sm:p-6 overflow-y-auto" (click)="close()">
+      <div class="relative my-auto w-full max-w-lg bg-surface-900 border border-surface-700/80 rounded-2xl p-6 shadow-[0_25px_60px_-15px_rgba(0,0,0,0.85)] animate-scale-in text-left max-h-[calc(100vh-3.5rem)] overflow-y-auto" (click)="$event.stopPropagation()">
+        
+        <div class="flex justify-between items-center mb-6">
+          <div class="flex items-center gap-2">
+            <div class="w-8 h-8 rounded-lg bg-danger-500/20 flex items-center justify-center text-sm shadow">
+              <span class="material-symbols-outlined align-middle">edit_document</span>
+            </div>
+            <h2 class="text-lg font-bold text-surface-100">File a Loss Claim</h2>
+          </div>
+          <button (click)="close()" class="text-surface-200 hover:text-surface-100 text-lg p-1 leading-none" title="Close"><span class="material-symbols-outlined text-xl align-middle">close</span></button>
+        </div>
+
+        <div class="bg-surface-950 p-4 rounded-xl border border-surface-800 mb-6 flex flex-col items-center">
+          <span class="text-surface-200 text-xs font-medium mb-1">Max Eligible Payout</span>
+          <span class="text-2xl font-bold font-mono text-success-400">₹{{ formatCurrency(maxPayout) }}</span>
+          <span class="text-[10px] text-surface-500 mt-1">Based on policy coverage limit</span>
+        </div>
+
+        <div class="space-y-4" [formGroup]="claimForm">
+          <div>
+            <label class="label text-sm">Requested Claim Amount (₹)</label>
+            <div class="relative">
+              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-surface-200 text-sm">₹</span>
+              <input type="number" formControlName="claimAmount" class="input-field pl-8 font-mono text-sm" placeholder="Enter amount..." [max]="maxPayout">
+            </div>
+            @if (claimForm.value.claimAmount > maxPayout) {
+              <p class="text-xs text-danger-400 mt-1">Amount cannot exceed max eligible payout (₹{{ formatCurrency(maxPayout) }}).</p>
+            }
+          </div>
+          
+          <div>
+            <label class="label text-sm">Market Crash Reason / Description</label>
+            <textarea formControlName="crashReason" class="input-field text-sm min-h-[100px] resize-none" placeholder="Please describe the market events leading to this loss claim..."></textarea>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-3 mt-8">
+          <button (click)="close()" class="btn-secondary text-sm py-2.5 px-6">Cancel</button>
+          <button (click)="submit()" [disabled]="!isValid()" class="btn-primary bg-danger-600 hover:bg-danger-500 text-sm py-2.5 px-6 shadow-lg">
+            Submit Claim Request
+          </button>
+        </div>
+      </div>
+    </div>
