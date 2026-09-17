@@ -1,14 +1,12 @@
-package com.hasnika.insurance.eureka;
+package com.fintech.merchantrisk.eureka;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class EurekaServerApplicationTests {
 
     @Test
     void contextLoads() {
-        // Test that the Spring context loads successfully
     }
-
 }
