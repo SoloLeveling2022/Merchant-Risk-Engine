@@ -1,82 +1,63 @@
 server:
-  port: 9070
+  port: 8080
 
 spring:
   application:
     name: api-gateway
+  data:
+    redis:
+      host: localhost
+      port: 6379
   cloud:
     gateway:
-      globalcors:
-        cors-configurations:
-          '[/**]':
-            allowedOrigins: "*"
-            allowedMethods: "*"
-            allowedHeaders: "*"
+      server:
+        webflux:
+          trusted-proxies: "^10\\..*|^172\\.(1[6-9]|2[0-9]|3[0-1])\\..*|^192\\.168\\..*|^127\\.0\\.0\\.1$"
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials, RETAIN_UNIQUE
       routes:
-        # Auth Service
-        - id: auth-service
-          uri: lb://identity-service
+        - id: merchant-identity-route
+          uri: lb://MERCHANT-IDENTITY-SERVICE
           predicates:
-            - Path=/api/v1/auth/**
-          filters:
-            - StripPrefix=0
+            - Path=/api/v1/auth/**, /api/v1/merchants/**, /.well-known/jwks.json
 
-        # Portfolio Service
-        - id: portfolio-service
-          uri: lb://portfolio-market-service
+        - id: merchant-velocity-route
+          uri: lb://MERCHANT-VELOCITY-SERVICE
           predicates:
-            - Path=/api/v1/portfolios/**
-          filters:
-            - StripPrefix=0
+            - Path=/api/v1/velocity/**
+          metadata:
+            response-timeout: -1
 
-        # Insurance Core Service
-        - id: insurance-core-service
-          uri: lb://insurance-core-service
+        - id: reserve-underwriting-route
+          uri: lb://RESERVE-UNDERWRITING-SERVICE
           predicates:
-            - Path=/api/v1/underwriting/**,/api/v1/policies/**,/api/v1/endorsements/**
-          filters:
-            - StripPrefix=0
+            - Path=/api/v1/underwriting/**
+          metadata:
+            response-timeout: -1
 
-        # Claims & Finance Service
-        - id: claims-finance-service
-          uri: lb://claims-finance-service
+        - id: dispute-settlement-route
+          uri: lb://DISPUTE-SETTLEMENT-SERVICE
           predicates:
-            - Path=/api/v1/claims/**,/api/v1/payments/**
-          filters:
-            - StripPrefix=0
+            - Path=/api/v1/disputes/**, /api/v1/ledger/**
 
-        # Platform Ops / Audit Service
-        - id: platform-ops-service
-          uri: lb://platform-ops-service
+        - id: platform-ops-route
+          uri: lb://PLATFORM-OPS-SERVICE
           predicates:
-            - Path=/api/v1/audit/**,/api/notifications/**
-          filters:
-            - StripPrefix=0
-
-app:
-  jwt:
-    secret: ${JWT_SECRET:MyVerySecureJWTSecretKeyForStockInsurancePlatform2027}
-    expiry-ms: 3600000
-
-  public-paths: /api/v1/auth/register,/api/v1/auth/login,/api/v1/auth/refresh,/api/v1/auth/seed-users,/actuator/health,/actuator/info,/api/v1/auth/users,/api/v1/portfolios/,/api/v1/policies/,/api/v1/claims/,/api/v1/underwriting/,/api/notifications/,/api/v1/notifications/
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info,metrics
-  endpoint:
-    health:
-      show-details: always
-
-logging:
-  level:
-    com.hasnika.insurance: DEBUG
-    org.springframework.cloud.gateway: INFO
+            - Path=/api/v1/ops/**
+          metadata:
+            response-timeout: -1
 
 eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
   instance:
-    preferIpAddress: true
+    prefer-ip-address: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,gateway,prometheus
