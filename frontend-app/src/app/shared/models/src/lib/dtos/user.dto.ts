@@ -1,23 +1,30 @@
-export type UserRole = 'ROLE_INVESTOR' | 'ROLE_UNDERWRITER' | 'ROLE_CLAIMS_ANALYST' | 'ROLE_COMPLIANCE' | 'ROLE_COMPLIANCE_OFFICER' | 'ROLE_ADMIN';
+export type UserRole = 
+  | 'ROLE_MERCHANT_OWNER' 
+  | 'ROLE_MERCHANT_FINANCE' 
+  | 'ROLE_RISK_ANALYST' 
+  | 'ROLE_RISK_ADMIN' 
+  | 'ROLE_INVESTOR' 
+  | 'ROLE_UNDERWRITER' 
+  | 'ROLE_CLAIMS_ANALYST' 
+  | 'ROLE_COMPLIANCE' 
+  | 'ROLE_ADMIN';
 
-export type KycStatus = 'NOT_SUBMITTED' | 'PENDING' | 'VERIFIED' | 'APPROVED' | 'REJECTED' | 'SUBMITTED';
+export type KycStatus = 'NOT_SUBMITTED' | 'PENDING' | 'VERIFIED' | 'APPROVED' | 'REJECTED' | 'SUBMITTED' | 'RESTRICTED';
 
 export interface UserDTO {
   id: string;
+  merchantId?: string;
   userId?: string;
   email: string;
   fullName: string;
-  firstName?: string;
-  lastName?: string;
-  phoneNumber?: string;
+  mid?: string;
+  mcc?: string;
+  billingDescriptorPrefix?: string;
   role: UserRole;
   kycStatus: KycStatus;
   isActive?: boolean;
-  isEmailVerified?: boolean;
   createdAt?: string;
   updatedAt?: string;
-  createdBy?: string;
-  updatedBy?: string;
 }
 
 export interface AuthResponseDTO {

@@ -6,3 +6,4 @@ export * from './lib/dtos/claim.dto';
 export * from './lib/dtos/audit.dto';
 export * from './lib/dtos/notification.dto';
 export * from './lib/dtos/underwriting.dto';
+export * from './lib/dtos/merchant-risk.dto';
