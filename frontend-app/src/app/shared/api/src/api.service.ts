@@ -206,4 +206,60 @@ export class ApiService {
   logAudit(log: any): Observable<any> {
     return this.http.post(`${this.BASE}/audit/log`, log);
   }
+
+  // ─── Merchant Risk Engine Endpoints ──────
+  getVelocityRatios(merchantId: string): Observable<any> {
+    return this.http.get<any>(`${this.BASE}/velocity/merchants/${merchantId}/ratios`);
+  }
+
+  ingestTelemetry(telemetry: any): Observable<any> {
+    return this.http.post<any>(`${this.BASE}/velocity/ingest`, telemetry);
+  }
+
+  onboardRiskProfile(profile: any): Observable<any> {
+    return this.http.post<any>(`${this.BASE}/underwriting/profiles`, profile);
+  }
+
+  lockTranche(req: any): Observable<any> {
+    return this.http.post<any>(`${this.BASE}/underwriting/tranches/lock`, req);
+  }
+
+  drawdownTranchesFifo(req: any): Observable<any> {
+    return this.http.post<any>(`${this.BASE}/underwriting/tranches/drawdown-fifo`, req);
+  }
+
+  releaseMaturedTranches(asOfDate?: string): Observable<any> {
+    return this.http.post<any>(`${this.BASE}/underwriting/tranches/release-matured`, { asOfDate });
+  }
+
+  captureSettlement(req: any): Observable<any> {
+    return this.http.post<any>(`${this.BASE}/ledger/captures`, req);
+  }
+
+  ingestDispute(req: any): Observable<any> {
+    return this.http.post<any>(`${this.BASE}/disputes/ingest`, req);
+  }
+
+  arbitrateDispute(disputeId: string, outcome: string, notes?: string): Observable<any> {
+    return this.http.post<any>(`${this.BASE}/disputes/${disputeId}/arbitrate`, { outcome, notes });
+  }
+
+  getTrialBalance(merchantId: string): Observable<any> {
+    return this.http.get<any>(`${this.BASE}/ledger/merchants/${merchantId}/trial-balance`);
+  }
+
+  getPortfolioVampHealth(region?: string, month?: string): Observable<any> {
+    const params: any = {};
+    if (region) params.region = region;
+    if (month) params.month = month;
+    return this.http.get<any>(`${this.BASE}/ops/portfolio/vamp-health`, { params });
+  }
+
+  getEcpStatus(merchantId: string): Observable<any> {
+    return this.http.get<any>(`${this.BASE}/ops/merchants/${merchantId}/ecp-status`);
+  }
+
+  recordOpsOverride(merchantId: string, override: any): Observable<any> {
+    return this.http.post<any>(`${this.BASE}/ops/merchants/${merchantId}/override`, override);
+  }
 }
