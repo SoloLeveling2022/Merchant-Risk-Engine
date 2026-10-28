@@ -14,9 +14,9 @@
         <nav [class.bg-white/70]="isScrolled" [class.backdrop-blur-2xl]="isScrolled" [class.shadow-sm]="isScrolled" [class.py-3]="isScrolled" [class.py-5]="!isScrolled" class="sticky top-0 w-full z-50 flex items-center justify-between px-6 md:px-10 transition-all duration-500 border-b border-transparent" [class.border-white/20]="isScrolled">
           <a routerLink="/" class="flex items-center gap-3 cursor-pointer group">
             <div class="w-10 h-10 rounded-full bg-surface-100 flex items-center justify-center text-lime-500 border border-lime-500 group-hover:scale-105 transition-transform">
-              <span class="material-symbols-outlined text-2xl">shield</span>
+              <span class="material-symbols-outlined text-2xl">account_balance</span>
             </div>
-            <span class="font-display font-black text-2xl tracking-tight text-surface-100 leading-none">StockShield</span>
+            <span class="font-display font-black text-2xl tracking-tight text-surface-100 leading-none">Merchant Risk Engine</span>
           </a>
 
           <div class="hidden lg:flex items-center bg-white shadow-sm rounded-full px-2 py-1.5 border border-surface-700/50">
@@ -33,7 +33,7 @@
               Sign In
             </a>
             <a routerLink="/register" class="bg-surface-100 text-white px-5 py-2.5 rounded-full text-sm font-bold hover:bg-surface-200 transition-all duration-300 hover:scale-105 active:scale-95 hover:shadow-[0_8px_30px_rgb(0,61,45,0.2)] flex items-center gap-2 group shadow-lg cursor-pointer">
-              Get insured
+              Onboard KYB
               <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
             </a>
           </div>
@@ -42,10 +42,10 @@
         <!-- 1. Hero Section -->
         <main class="flex flex-col items-center justify-center px-6 pt-20 pb-12 relative z-10 text-center animate-slide-up">
           <h1 class="font-display text-5xl md:text-7xl lg:text-[6.5rem] text-surface-100 leading-[1.05] tracking-tight max-w-5xl mx-auto">
-            Empower your portfolio with <i class="font-serif italic text-surface-400 font-normal">intelligent</i> protection.
+            Quantitative Merchant Risk &amp; <i class="font-serif italic text-surface-400 font-normal">Automated</i> Dispute Settlement.
           </h1>
           <p class="mt-8 text-xl md:text-2xl text-surface-200 font-serif italic max-w-2xl mx-auto">
-            Dynamic stock insurance designed for modern investors.
+            Dynamic rolling reserves, Visa VAMP (150 bps) compliance, and zero-sum double-entry ledgering.
           </p>
           
           <div class="mt-12 relative flex flex-col items-center group cursor-pointer" (click)="scrollToSection('what-is')">
@@ -56,13 +56,13 @@
           </div>
         </main>
 
-        <!-- 2. What Is StockShield -->
+        <!-- 2. What Is Merchant Risk Engine -->
         <section id="what-is" class="py-24 w-full relative z-10 scroll-mt-24 bg-center bg-cover border-y border-surface-700" style="background-image: url('https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?q=80&w=2070&auto=format&fit=crop');">
           <div class="absolute inset-0 bg-[#003d2d]/60 backdrop-blur-[1px]"></div>
           <div class="px-6 md:px-10 max-w-[65rem] mx-auto text-center relative z-20">
-            <h2 class="font-display text-4xl md:text-5xl text-white leading-tight">What is StockShield?</h2>
+            <h2 class="font-display text-4xl md:text-5xl text-white leading-tight">What is Merchant Risk Engine?</h2>
             <p class="mt-6 text-xl text-lime-100 max-w-3xl mx-auto font-serif italic leading-relaxed">
-              StockShield is a revolutionary platform bridging the gap between actuarial science and personal investing. We evaluate your unique portfolio exposure and provide tailor-made downside protection policies to safeguard your wealth from unpredictable market events.
+              A tier-1 payment processor risk and rolling reserve engine pairing Adyen-style MPL exposure-coverage underwriting with a zero-sum R2DBC PostgreSQL double-entry ledger. Real-time telemetry evaluates Visa VAMP and Mastercard ECP thresholds over non-blocking reactive Netty event loops.
             </p>
           </div>
         </section>
