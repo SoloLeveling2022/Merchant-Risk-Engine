@@ -1,20 +1,23 @@
-<div class="min-h-screen flex items-center justify-center bg-surface-950 px-4 py-12">
-  <div class="w-full max-w-md">
+<div class="min-h-screen flex items-center justify-center bg-surface-950 px-4 py-12 relative overflow-hidden">
+  <!-- Soft ambient background vignette gradient -->
+  <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-[500px] bg-gradient-to-b from-primary-100/40 via-frost-200/20 to-transparent blur-3xl pointer-events-none"></div>
+
+  <div class="w-full max-w-md relative z-10">
     <!-- Header -->
     <div class="text-center mb-8">
-      <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary-50 border border-primary-200 text-primary-600 mb-4 shadow-sm">
+      <div class="inline-flex items-center justify-center w-14 h-14 rounded-3xl bg-surface-800 border border-surface-700/80 text-primary-800 mb-4 shadow-pill">
         <span class="material-symbols-outlined text-3xl">shield</span>
       </div>
       <h1 class="text-2xl font-extrabold text-surface-100 tracking-tight font-display">Merchant Risk Engine</h1>
-      <p class="text-sm text-surface-300 mt-1">European-grade Rolling Reserve & Dispute Settlement Platform</p>
+      <p class="text-sm text-surface-300 mt-1">Rolling Reserve Escrow &amp; Dispute Settlement Platform</p>
     </div>
 
     <!-- Card -->
-    <div class="card p-8 md:p-9 border border-surface-700 bg-white rounded-3xl shadow-card">
+    <div class="card p-8 md:p-9 border border-surface-700 bg-white rounded-4xl shadow-card">
       <h2 class="text-lg font-bold text-surface-100 mb-6 font-display">Sign In to Platform</h2>
 
       @if (error()) {
-        <div class="mb-5 p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2.5">
+        <div class="mb-5 p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2.5">
           <span class="material-symbols-outlined text-base">error</span>
           <span>{{ error() }}</span>
         </div>
@@ -24,17 +27,17 @@
         <div>
           <label class="block text-xs font-mono uppercase text-surface-400 font-semibold mb-1.5">Corporate Email Address</label>
           <input type="email" formControlName="email" placeholder="merchant@acme-corp.com"
-                 class="w-full bg-white border border-surface-700 rounded-xl px-4 py-2.5 text-sm text-surface-100 placeholder:text-surface-400 focus:outline-none focus:border-primary-600 focus:ring-2 focus:ring-primary-100 transition-all" />
+                 class="w-full bg-white border border-surface-700 rounded-2xl px-4 py-3 text-sm text-surface-100 placeholder:text-surface-400 focus:outline-none focus:border-primary-700 focus:ring-2 focus:ring-primary-200/50 transition-all shadow-sm" />
         </div>
 
         <div>
           <label class="block text-xs font-mono uppercase text-surface-400 font-semibold mb-1.5">Password</label>
           <input type="password" formControlName="password" placeholder="••••••••"
-                 class="w-full bg-white border border-surface-700 rounded-xl px-4 py-2.5 text-sm text-surface-100 placeholder:text-surface-400 focus:outline-none focus:border-primary-600 focus:ring-2 focus:ring-primary-100 transition-all" />
+                 class="w-full bg-white border border-surface-700 rounded-2xl px-4 py-3 text-sm text-surface-100 placeholder:text-surface-400 focus:outline-none focus:border-primary-700 focus:ring-2 focus:ring-primary-200/50 transition-all shadow-sm" />
         </div>
 
         <button type="submit" [disabled]="loading()"
-                class="w-full btn-primary py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 mt-2 shadow-sm">
+                class="w-full btn-primary py-3.5 rounded-2xl font-semibold text-sm flex items-center justify-center gap-2 mt-2 shadow-dusk">
           @if (loading()) {
             <span class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
           }
@@ -45,7 +48,7 @@
       <div class="mt-6 text-center">
         <p class="text-surface-300 text-sm">
           New Merchant?
-          <a routerLink="/auth/register" class="text-primary-600 hover:text-primary-700 font-semibold">Register for KYB</a>
+          <a routerLink="/auth/register" class="text-primary-800 hover:text-primary-900 font-bold ml-1">Register for KYB</a>
         </p>
       </div>
 
@@ -54,23 +57,23 @@
         <p class="text-xs text-surface-400 mb-3 text-center font-mono font-medium">Quick Demo Sign-In (Select Role)</p>
         <div class="grid grid-cols-2 gap-2">
           <button (click)="quickLogin('merchant@acme-corp.com', 'password', 'ROLE_MERCHANT_OWNER')"
-                  class="btn-secondary text-xs py-2.5 px-3 flex items-center justify-center gap-1.5 hover:border-mint-300 hover:bg-mint-50/50">
+                  class="btn-secondary !py-2.5 !px-3 !rounded-2xl text-xs flex items-center justify-center gap-1.5 hover:border-surface-600">
             <span class="material-symbols-outlined text-sm text-mint-600">storefront</span>
             <span class="font-medium text-surface-200">Merchant Owner</span>
           </button>
           <button (click)="quickLogin('finance@acme-corp.com', 'password', 'ROLE_MERCHANT_FINANCE')"
-                  class="btn-secondary text-xs py-2.5 px-3 flex items-center justify-center gap-1.5 hover:border-primary-300 hover:bg-primary-50/50">
-            <span class="material-symbols-outlined text-sm text-primary-600">account_balance</span>
+                  class="btn-secondary !py-2.5 !px-3 !rounded-2xl text-xs flex items-center justify-center gap-1.5 hover:border-surface-600">
+            <span class="material-symbols-outlined text-sm text-primary-800">account_balance</span>
             <span class="font-medium text-surface-200">Merchant Finance</span>
           </button>
           <button (click)="quickLogin('analyst@riskops.com', 'password', 'ROLE_RISK_ANALYST')"
-                  class="btn-secondary text-xs py-2.5 px-3 flex items-center justify-center gap-1.5 hover:border-amber-300 hover:bg-amber-50/50">
+                  class="btn-secondary !py-2.5 !px-3 !rounded-2xl text-xs flex items-center justify-center gap-1.5 hover:border-surface-600">
             <span class="material-symbols-outlined text-sm text-amber-600">radar</span>
             <span class="font-medium text-surface-200">Risk Analyst</span>
           </button>
           <button (click)="quickLogin('admin@riskops.com', 'password', 'ROLE_RISK_ADMIN')"
-                  class="btn-secondary text-xs py-2.5 px-3 flex items-center justify-center gap-1.5 hover:border-navy-300 hover:bg-navy-50/50">
-            <span class="material-symbols-outlined text-sm text-navy-800">admin_panel_settings</span>
+                  class="btn-secondary !py-2.5 !px-3 !rounded-2xl text-xs flex items-center justify-center gap-1.5 hover:border-surface-600">
+            <span class="material-symbols-outlined text-sm text-navy-900">admin_panel_settings</span>
             <span class="font-medium text-surface-200">Risk Admin</span>
           </button>
         </div>

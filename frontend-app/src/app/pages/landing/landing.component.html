@@ -1,18 +1,18 @@
-<div class="min-h-screen bg-surface-950 font-sans selection:bg-primary-500 selection:text-white relative">
-  <!-- Subtle ambient background glow -->
-  <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[500px] bg-gradient-to-b from-primary-100/40 via-mint-50/20 to-transparent blur-3xl pointer-events-none"></div>
+<div class="min-h-screen bg-surface-950 font-sans selection:bg-frost-300 selection:text-primary-800 relative">
+  <!-- Soft ambient background vignette gradient -->
+  <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[650px] bg-gradient-to-b from-primary-100/50 via-frost-200/30 to-transparent blur-3xl pointer-events-none"></div>
 
-  <!-- Oper Credits Floating Pill Navbar -->
+  <!-- Frosted Floating Pill Navbar -->
   <div class="sticky top-4 z-50 px-4 md:px-8 max-w-7xl mx-auto">
-    <nav class="bg-white/90 backdrop-blur-lg border border-surface-700/80 rounded-full px-5 py-3 shadow-soft flex items-center justify-between transition-all duration-300">
+    <nav class="bg-white/85 backdrop-blur-xl border border-surface-700/80 rounded-full px-5 py-3 shadow-pill flex items-center justify-between transition-all duration-300">
       <a routerLink="/" class="flex items-center gap-3 cursor-pointer group">
-        <div class="w-9 h-9 rounded-xl bg-primary-600 text-white flex items-center justify-center shadow-glow group-hover:scale-105 transition-transform">
+        <div class="w-9 h-9 rounded-2xl bg-primary-800 text-white flex items-center justify-center shadow-dusk group-hover:scale-105 transition-transform">
           <span class="material-symbols-outlined text-xl">shield</span>
         </div>
-        <span class="font-display font-bold text-lg tracking-tight text-surface-100">Merchant Risk Engine</span>
+        <span class="font-display font-extrabold text-lg tracking-tight text-surface-100">Merchant Risk Engine</span>
       </a>
 
-      <div class="hidden lg:flex items-center bg-surface-800/80 rounded-full px-2 py-1 border border-surface-700">
+      <div class="hidden lg:flex items-center bg-surface-800/80 rounded-full px-2 py-1 border border-surface-700/60 shadow-inner">
         @for (section of navSections; track section.id) {
           <button (click)="scrollToSection(section.id)"
                   class="px-4 py-1.5 text-xs font-semibold text-surface-300 hover:text-surface-100 rounded-full transition-colors cursor-pointer">
@@ -22,10 +22,10 @@
       </div>
 
       <div class="flex items-center gap-3">
-        <a routerLink="/auth/login" class="text-xs font-semibold text-surface-200 hover:text-surface-100 transition-colors px-3 py-2">
+        <a routerLink="/auth/login" class="text-xs font-semibold text-surface-300 hover:text-surface-100 transition-colors px-3 py-2">
           Sign In
         </a>
-        <a routerLink="/auth/register" class="btn-primary !py-2 !px-4 !text-xs !rounded-full shadow-sm">
+        <a routerLink="/auth/register" class="btn-primary !py-2.5 !px-5 !text-xs !rounded-full shadow-dusk">
           <span>Onboard KYB</span>
           <span class="material-symbols-outlined text-sm">arrow_forward</span>
         </a>
@@ -34,57 +34,239 @@
   </div>
 
   <!-- Hero Section -->
-  <main class="flex flex-col items-center justify-center px-6 pt-16 pb-20 relative z-10 text-center max-w-6xl mx-auto">
+  <main class="flex flex-col items-center justify-center px-6 pt-16 pb-16 relative z-10 text-center max-w-6xl mx-auto">
     <!-- Scheme Compliance Capsule Badge -->
-    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-mono font-semibold bg-primary-50 text-primary-700 border border-primary-200 shadow-sm mb-8 animate-fade-in">
+    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-mono font-semibold bg-surface-800 text-primary-800 border border-surface-700/80 shadow-pill mb-6 animate-fade-in">
       <span class="w-2 h-2 rounded-full bg-mint-500 animate-pulse"></span>
       VISA VAMP 2026 &amp; MASTERCARD ECP COMPLIANT
     </div>
 
     <!-- Main Headline with Tight Tracking -->
     <h1 class="font-display text-4xl md:text-6xl lg:text-7xl font-extrabold text-surface-100 leading-[1.12] tracking-tight max-w-5xl mx-auto">
-      Automated Merchant Risk, Rolling Reserve &amp; <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary-600 via-primary-700 to-navy-900">Dispute Settlement</span>
+      Your Card Your Control.<br/>
+      <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary-800 via-primary-700 to-primary-900">
+        Spend Smarter Every Day.
+      </span>
     </h1>
 
-    <p class="mt-6 text-base md:text-xl text-surface-300 max-w-3xl mx-auto leading-relaxed font-normal">
-      Adyen-style exposure-coverage underwriting, deterministic 4-tier FIFO dispute resolution waterfalls, and zero-sum R2DBC reactive PostgreSQL double-entry financial ledgering.
+    <p class="mt-5 text-base md:text-xl text-surface-300 max-w-3xl mx-auto leading-relaxed font-normal">
+      Manage your credit cards, monitor risk velocity, rolling escrow reserves, and settle cross-network chargebacks with institutional confidence.
     </p>
 
-    <!-- CTAs with Oper Credits Lift Effect -->
-    <div class="mt-10 flex flex-wrap justify-center gap-4">
-      <a routerLink="/auth/register" class="btn-primary px-7 py-3.5 !rounded-xl font-semibold text-sm shadow-card flex items-center gap-2">
-        <span>Start Merchant Onboarding</span>
+    <!-- CTAs with Pill & Dusk Buttons -->
+    <div class="mt-8 flex flex-wrap justify-center gap-4">
+      <a routerLink="/auth/register" class="btn-primary px-8 py-3.5 !rounded-2xl font-semibold text-sm shadow-dusk flex items-center gap-2">
+        <span>Get Started</span>
         <span class="material-symbols-outlined text-base">arrow_forward</span>
       </a>
-      <a routerLink="/auth/login" class="btn-secondary px-7 py-3.5 !rounded-xl font-semibold text-sm flex items-center gap-2">
-        <span>Platform Demo Login</span>
+      <a routerLink="/auth/login" class="btn-secondary px-8 py-3.5 !rounded-2xl font-semibold text-sm flex items-center gap-2">
+        <span>Card Details Demo</span>
       </a>
     </div>
 
-    <!-- Oper Credits Style Metric Barometer Cards -->
-    <div class="mt-16 w-full grid grid-cols-1 md:grid-cols-3 gap-5 text-left">
-      <div class="card p-6 bg-white border border-surface-700 rounded-2xl shadow-card">
+    <!-- ─── FLOATING MOBILE INTERFACE SHOWCASE (Payno Inspired) ─── -->
+    <div class="mt-16 w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 text-left">
+      
+      <!-- Phone 1: Perspective Onboarding Card -->
+      <div class="card p-6 bg-white border border-surface-700 rounded-4xl shadow-card flex flex-col justify-between h-[480px] relative overflow-hidden group hover:shadow-elevated transition-all">
+        <!-- Top Status Bar Mock -->
+        <div class="flex items-center justify-between text-xs text-surface-400 font-mono mb-4">
+          <span>9:41</span>
+          <div class="flex items-center gap-1.5">
+            <span class="w-1.5 h-1.5 rounded-full bg-surface-400"></span>
+            <span class="w-1.5 h-1.5 rounded-full bg-surface-400"></span>
+            <span class="w-3 h-1.5 rounded-full bg-primary-800"></span>
+            <span class="text-[10px]">4/4</span>
+          </div>
+        </div>
+
+        <div>
+          <span class="text-[11px] font-semibold uppercase tracking-wider text-surface-400 bg-surface-800 px-3 py-1 rounded-full border border-surface-700/60 inline-block mb-3">
+            Flexible Spending
+          </span>
+          <h3 class="text-xl font-extrabold text-surface-100 tracking-tight">Your Card Your Control</h3>
+          <p class="text-xs text-surface-300 mt-1.5 leading-relaxed">
+            Manage credit limits, real-time exposure underwriting, and enjoy secure settlement.
+          </p>
+        </div>
+
+        <!-- 3D Perspective Floating Card -->
+        <div class="my-4 relative">
+          <div class="w-full h-44 rounded-2xl card-gradient-slate p-4 text-white shadow-xl flex flex-col justify-between relative transform -rotate-3 group-hover:rotate-0 transition-transform duration-300 border border-white/20">
+            <div class="flex justify-between items-start">
+              <div class="w-9 h-7 rounded bg-amber-400/80 border border-amber-300/90 flex items-center justify-center">
+                <span class="text-[9px] font-mono text-amber-950 font-bold">EMV</span>
+              </div>
+              <span class="font-extrabold tracking-widest text-sm text-white/90">VISA</span>
+            </div>
+            <div class="flex justify-between items-end">
+              <span class="font-mono text-xs text-white/80 tracking-widest">•••• 4125</span>
+              <span class="material-symbols-outlined text-white/70 text-base">contactless</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom Action Row -->
+        <div class="flex items-center gap-3 pt-2">
+          <a routerLink="/auth/login" class="flex-1 py-2.5 rounded-2xl bg-surface-800 hover:bg-surface-700 text-surface-200 text-xs font-semibold text-center border border-surface-700/80 transition-colors">
+            Skip
+          </a>
+          <a routerLink="/auth/register" class="flex-1 py-2.5 rounded-2xl bg-primary-800 hover:bg-primary-900 text-white text-xs font-semibold text-center shadow-dusk transition-colors">
+            Get Started
+          </a>
+        </div>
+      </div>
+
+      <!-- Phone 2: Active Cards Hub with Quick Actions -->
+      <div class="card p-6 bg-white border border-surface-700 rounded-4xl shadow-card flex flex-col justify-between h-[480px] relative">
+        <!-- Header with Coral Notification Bell -->
+        <div class="flex items-center justify-between pb-2 border-b border-surface-700/60">
+          <span class="material-symbols-outlined text-surface-400 text-base cursor-pointer">arrow_back_ios</span>
+          <h4 class="font-extrabold text-sm text-surface-100 font-display">Cards</h4>
+          <div class="relative">
+            <span class="material-symbols-outlined text-surface-400 text-lg cursor-pointer">notifications</span>
+            <span class="absolute top-0 right-0 w-2 h-2 rounded-full bg-coral-500 ring-2 ring-white"></span>
+          </div>
+        </div>
+
+        <!-- Featured Card -->
+        <div class="w-full h-44 rounded-2xl card-gradient-slate p-4 text-white shadow-lg flex flex-col justify-between border border-white/20 my-2">
+          <div class="flex justify-between items-start">
+            <div class="w-9 h-7 rounded bg-amber-400/80 border border-amber-300/90 flex items-center justify-center">
+              <span class="text-[9px] font-mono text-amber-950 font-bold">EMV</span>
+            </div>
+            <span class="font-extrabold tracking-widest text-sm text-white/90">VISA</span>
+          </div>
+          <div>
+            <p class="text-[10px] text-white/70 uppercase font-mono tracking-wider">Merchant Reserve</p>
+            <div class="flex justify-between items-end mt-0.5">
+              <span class="font-bold text-base tracking-wide text-white">$193,200.00</span>
+              <span class="material-symbols-outlined text-white/70 text-base">contactless</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pagination Dots -->
+        <div class="flex justify-center items-center gap-1.5 my-1">
+          <span class="w-4 h-1.5 rounded-full bg-primary-800"></span>
+          <span class="w-1.5 h-1.5 rounded-full bg-surface-600"></span>
+          <span class="w-1.5 h-1.5 rounded-full bg-surface-600"></span>
+        </div>
+
+        <!-- 4 Circular Quick Action Buttons -->
+        <div class="grid grid-cols-4 gap-2 my-2 text-center">
+          <div class="flex flex-col items-center">
+            <button class="circle-action-btn">
+              <span class="material-symbols-outlined text-base text-primary-800">contactless</span>
+            </button>
+            <span class="text-[10px] text-surface-400 mt-1 font-medium">NFC Off</span>
+          </div>
+          <div class="flex flex-col items-center">
+            <button class="circle-action-btn">
+              <span class="material-symbols-outlined text-base text-primary-800">tune</span>
+            </button>
+            <span class="text-[10px] text-surface-400 mt-1 font-medium">Card Limit</span>
+          </div>
+          <div class="flex flex-col items-center">
+            <button class="circle-action-btn">
+              <span class="material-symbols-outlined text-base text-primary-800">ac_unit</span>
+            </button>
+            <span class="text-[10px] text-surface-400 mt-1 font-medium">Freeze Card</span>
+          </div>
+          <div class="flex flex-col items-center">
+            <button class="circle-action-btn">
+              <span class="material-symbols-outlined text-base text-primary-800">settings</span>
+            </button>
+            <span class="text-[10px] text-surface-400 mt-1 font-medium">Setting</span>
+          </div>
+        </div>
+
+        <!-- Card Details Button -->
+        <a routerLink="/merchant/dashboard" class="w-full py-2.5 rounded-2xl bg-surface-800 hover:bg-surface-700 text-surface-100 text-xs font-semibold text-center border border-surface-700/80 transition-colors">
+          Card Details
+        </a>
+      </div>
+
+      <!-- Phone 3: Sliding Balance & Daily Limit Card -->
+      <div class="card p-6 bg-white border border-surface-700 rounded-4xl shadow-card flex flex-col justify-between h-[480px] relative">
+        <div>
+          <div class="flex items-center justify-between pb-3 border-b border-surface-700/60">
+            <span class="text-xs font-mono uppercase text-surface-400 font-semibold">Available Balance</span>
+            <div class="w-8 h-5 rounded bg-primary-800 text-[8px] text-white flex items-center justify-center font-bold">VISA</div>
+          </div>
+          <div class="text-3xl font-extrabold text-surface-100 mt-3 font-mono tracking-tight">
+            $56,751.23
+          </div>
+        </div>
+
+        <!-- Daily Limit with 64% Striped Progress Bar -->
+        <div class="bg-surface-850 p-4 rounded-2xl border border-surface-700/60 my-2">
+          <div class="flex justify-between items-center text-xs">
+            <span class="text-surface-400 font-medium">Transaction Limit</span>
+            <span class="font-mono font-bold text-surface-100">$6,400 / $10,000</span>
+          </div>
+          <!-- Striped Progress Bar -->
+          <div class="mt-2.5 w-full h-3 bg-surface-800 rounded-full overflow-hidden border border-surface-700/60 relative">
+            <div class="h-full bg-primary-700 rounded-full" style="width: 64%; background-image: repeating-linear-gradient(45deg, transparent, transparent 4px, rgba(255,255,255,0.2) 4px, rgba(255,255,255,0.2) 8px);"></div>
+          </div>
+          <div class="text-right text-[10px] text-surface-400 font-mono mt-1 font-semibold">64% Utilized</div>
+        </div>
+
+        <!-- Card Information -->
+        <div class="space-y-2 text-xs">
+          <div class="flex justify-between items-center py-1.5 border-b border-surface-700/50">
+            <span class="text-surface-400">Card Name</span>
+            <span class="font-semibold text-surface-100">Payno Platinum Card</span>
+          </div>
+          <div class="flex justify-between items-center py-1.5 border-b border-surface-700/50">
+            <span class="text-surface-400">Card Number</span>
+            <span class="font-mono font-semibold text-surface-100">2123 6925 4125</span>
+          </div>
+          <div class="flex justify-between items-center py-1.5">
+            <div>
+              <span class="text-surface-400 text-[10px] block">CVV</span>
+              <span class="font-mono font-bold text-surface-100">592</span>
+            </div>
+            <div class="text-right">
+              <span class="text-surface-400 text-[10px] block">EXP</span>
+              <span class="font-mono font-bold text-surface-100">9/32</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Share Card Details Button -->
+        <button class="w-full py-2.5 rounded-2xl bg-surface-800 hover:bg-surface-700 text-surface-100 text-xs font-semibold text-center border border-surface-700/80 transition-colors flex items-center justify-center gap-1.5">
+          <span class="material-symbols-outlined text-sm text-primary-800">share</span>
+          <span>Share Card Details</span>
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Scheme Metric Barometer Cards below showcase -->
+    <div class="mt-12 w-full grid grid-cols-1 md:grid-cols-3 gap-5 text-left">
+      <div class="card p-6 bg-white border border-surface-700 rounded-3xl shadow-card">
         <div class="flex items-center justify-between mb-3">
           <span class="text-xs font-mono uppercase font-semibold text-surface-400">Visa VAMP Threshold</span>
-          <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-mint-50 text-mint-700 border border-mint-200 font-mono">150 bps Target</span>
+          <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-mint-50 text-mint-700 border border-mint-200 font-mono">150 bps Target</span>
         </div>
         <div class="text-3xl font-extrabold font-mono text-surface-100">1.12%</div>
         <p class="text-xs text-surface-300 mt-2">Continuous TC40 fraud &amp; TC15 dispute ratio evaluation over CNP volume</p>
       </div>
 
-      <div class="card p-6 bg-white border border-surface-700 rounded-2xl shadow-card">
+      <div class="card p-6 bg-white border border-surface-700 rounded-3xl shadow-card">
         <div class="flex items-center justify-between mb-3">
           <span class="text-xs font-mono uppercase font-semibold text-surface-400">Mastercard CTR</span>
-          <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-primary-50 text-primary-700 border border-primary-200 font-mono">M-1 Lagged</span>
+          <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-frost-200 text-primary-800 border border-frost-300 font-mono">M-1 Lagged</span>
         </div>
         <div class="text-3xl font-extrabold font-mono text-surface-100">85.4 <span class="text-base font-normal text-surface-400">bps</span></div>
         <p class="text-xs text-surface-300 mt-2">Lagged denominator protection against ECM and HECM fine escalations</p>
       </div>
 
-      <div class="card p-6 bg-white border border-surface-700 rounded-2xl shadow-card">
+      <div class="card p-6 bg-white border border-surface-700 rounded-3xl shadow-card">
         <div class="flex items-center justify-between mb-3">
           <span class="text-xs font-mono uppercase font-semibold text-surface-400">Escrow Liquidity</span>
-          <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-mint-50 text-mint-700 border border-mint-200 font-mono">FIFO Maturing</span>
+          <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-mint-50 text-mint-700 border border-mint-200 font-mono">FIFO Maturing</span>
         </div>
         <div class="text-3xl font-extrabold font-mono text-mint-600">$193,200<span class="text-base font-normal text-surface-400">.00</span></div>
         <p class="text-xs text-surface-300 mt-2">Chronological 90/180-day tranche withholdings with Adyen exposure check</p>
@@ -95,10 +277,10 @@
   <!-- Section 2: Platform Architecture -->
   <section id="what-is" class="py-20 px-6 md:px-10 border-y border-surface-700 bg-white">
     <div class="max-w-5xl mx-auto text-center">
-      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-surface-800 text-surface-300 border border-surface-700 mb-4">
+      <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-mono font-semibold bg-surface-800 text-surface-300 border border-surface-700 mb-4">
         INSTITUTIONAL FINTECH SPECIFICATION
       </div>
-      <h2 class="text-3xl md:text-4xl font-extrabold text-surface-100 tracking-tight">Institutional Payment Risk Architecture</h2>
+      <h2 class="text-3xl md:text-4xl font-extrabold text-surface-100 tracking-tight font-display">Institutional Payment Risk Architecture</h2>
       <p class="mt-4 text-base md:text-lg text-surface-300 leading-relaxed max-w-3xl mx-auto">
         Engineered according to the Visa Acquirer Monitoring Program (VAMP 2026) and Mastercard Excessive Chargeback Program (ECP) standards. Processes non-blocking high-velocity card transaction telemetry over Spring WebFlux and Reactor Netty event loops.
       </p>
@@ -108,36 +290,36 @@
   <!-- Section 3: Dynamic Rolling Reserves -->
   <section id="rolling-reserves" class="py-24 px-6 md:px-10 max-w-6xl mx-auto w-full">
     <div class="text-center mb-16">
-      <h2 class="text-3xl md:text-4xl font-extrabold text-surface-100 tracking-tight">Dynamic Rolling Reserve Mechanics</h2>
+      <h2 class="text-3xl md:text-4xl font-extrabold text-surface-100 tracking-tight font-display">Dynamic Rolling Reserve Mechanics</h2>
       <p class="text-sm text-surface-300 mt-2">Chronological FIFO Tranche Maturation &amp; Exposure Offsets</p>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div class="card p-7 bg-white border border-surface-700 rounded-2xl shadow-card hover:-translate-y-1 transition-all">
-        <div class="w-12 h-12 rounded-xl bg-primary-50 text-primary-600 flex items-center justify-center mb-5 border border-primary-100">
+      <div class="card p-7 bg-white border border-surface-700 rounded-3xl shadow-card hover:-translate-y-1 transition-all">
+        <div class="w-12 h-12 rounded-2xl bg-frost-200 text-primary-800 flex items-center justify-center mb-5 border border-frost-300">
           <span class="material-symbols-outlined text-2xl">schedule</span>
         </div>
-        <h3 class="text-lg font-bold text-surface-100">FIFO Tranche Holds</h3>
+        <h3 class="text-lg font-bold text-surface-100 font-display">FIFO Tranche Holds</h3>
         <p class="text-sm text-surface-300 mt-2 leading-relaxed">
           Withholds 5%–20% of eligible gross card processing volume into chronological tranches maturing at 90 or 180 days with capped ceiling enforcement.
         </p>
       </div>
 
-      <div class="card p-7 bg-white border border-surface-700 rounded-2xl shadow-card hover:-translate-y-1 transition-all">
-        <div class="w-12 h-12 rounded-xl bg-mint-50 text-mint-600 flex items-center justify-center mb-5 border border-mint-100">
+      <div class="card p-7 bg-white border border-surface-700 rounded-3xl shadow-card hover:-translate-y-1 transition-all">
+        <div class="w-12 h-12 rounded-2xl bg-mint-50 text-mint-600 flex items-center justify-center mb-5 border border-mint-200">
           <span class="material-symbols-outlined text-2xl">analytics</span>
         </div>
-        <h3 class="text-lg font-bold text-surface-100">Adyen Exposure Check</h3>
+        <h3 class="text-lg font-bold text-surface-100 font-display">Adyen Exposure Check</h3>
         <p class="text-sm text-surface-300 mt-2 leading-relaxed">
           Continuously balances total exposure (<span class="font-mono text-xs">reversals × volume + unfulfilled</span>) against active escrow with automated €10,000 withholding triggers.
         </p>
       </div>
 
-      <div class="card p-7 bg-white border border-surface-700 rounded-2xl shadow-card hover:-translate-y-1 transition-all">
-        <div class="w-12 h-12 rounded-xl bg-navy-100 text-navy-800 flex items-center justify-center mb-5 border border-navy-200">
+      <div class="card p-7 bg-white border border-surface-700 rounded-3xl shadow-card hover:-translate-y-1 transition-all">
+        <div class="w-12 h-12 rounded-2xl bg-surface-800 text-primary-800 flex items-center justify-center mb-5 border border-surface-700">
           <span class="material-symbols-outlined text-2xl">trending_up</span>
         </div>
-        <h3 class="text-lg font-bold text-surface-100">Dynamic Re-Underwriting</h3>
+        <h3 class="text-lg font-bold text-surface-100 font-display">Dynamic Re-Underwriting</h3>
         <p class="text-sm text-surface-300 mt-2 leading-relaxed">
           Detects velocity anomalies including 7-day GMV spikes (≥ 2.5x), AOV surges (> 2.5σ), fulfillment drops (&lt; 98%), and refund surges (> 1%).
         </p>
@@ -149,25 +331,25 @@
   <section id="scheme-thresholds" class="py-24 px-6 md:px-10 border-y border-surface-700 bg-white">
     <div class="max-w-6xl mx-auto">
       <div class="text-center mb-16">
-        <h2 class="text-3xl md:text-4xl font-extrabold text-surface-100 tracking-tight">Card Network Dispute Thresholds</h2>
+        <h2 class="text-3xl md:text-4xl font-extrabold text-surface-100 tracking-tight font-display">Card Network Dispute Thresholds</h2>
         <p class="text-sm text-surface-300 mt-2">Automated Visa VAMP &amp; Mastercard ECP Compliance Engine</p>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div class="card p-8 bg-surface-950 border border-surface-700 rounded-2xl shadow-soft">
+        <div class="card p-8 bg-surface-950 border border-surface-700 rounded-3xl shadow-soft">
           <div class="flex items-center gap-3 mb-4">
-            <span class="text-xs font-mono font-bold px-2.5 py-1 rounded-full bg-primary-100 text-primary-700 border border-primary-200">VISA</span>
-            <h3 class="text-xl font-bold text-surface-100">VAMP (150 bps Limit)</h3>
+            <span class="text-xs font-mono font-bold px-2.5 py-1 rounded-full bg-primary-800 text-white shadow-dusk">VISA</span>
+            <h3 class="text-xl font-bold text-surface-100 font-display">VAMP (150 bps Limit)</h3>
           </div>
           <p class="text-sm text-surface-300 leading-relaxed">
             Consolidates TC40 fraud notices and TC15 chargebacks divided by TC05 settled transactions. Identifies Merchant Excessive breaches (≥ 1.50% &amp; ≥ 1,500 events) and enumeration attacks (≥ 20% decline ratio).
           </p>
         </div>
 
-        <div class="card p-8 bg-surface-950 border border-surface-700 rounded-2xl shadow-soft">
+        <div class="card p-8 bg-surface-950 border border-surface-700 rounded-3xl shadow-soft">
           <div class="flex items-center gap-3 mb-4">
-            <span class="text-xs font-mono font-bold px-2.5 py-1 rounded-full bg-navy-100 text-navy-800 border border-navy-200">MASTERCARD</span>
-            <h3 class="text-xl font-bold text-surface-100">ECP (M-1 Lagged Ratio)</h3>
+            <span class="text-xs font-mono font-bold px-2.5 py-1 rounded-full bg-surface-800 text-primary-800 border border-surface-700">MASTERCARD</span>
+            <h3 class="text-xl font-bold text-surface-100 font-display">ECP (M-1 Lagged Ratio)</h3>
           </div>
           <p class="text-sm text-surface-300 leading-relaxed">
             Calculates Chargeback-to-Transaction Ratio using previous month's sales denominator. Tracks ECM (100–299 bps) and HECM (≥ 300 bps) with fine schedule tracking up to $200,000/mo and 3-month clean exit criteria.
@@ -180,31 +362,31 @@
   <!-- Section 5: 4-Tier Waterfall & Double-Entry Ledger -->
   <section id="waterfall-ledger" class="py-24 px-6 md:px-10 max-w-6xl mx-auto w-full">
     <div class="text-center mb-16">
-      <h2 class="text-3xl md:text-4xl font-extrabold text-surface-100 tracking-tight">4-Tier FIFO Waterfall &amp; Double-Entry Ledger</h2>
+      <h2 class="text-3xl md:text-4xl font-extrabold text-surface-100 tracking-tight font-display">4-Tier FIFO Waterfall &amp; Double-Entry Ledger</h2>
       <p class="text-sm text-surface-300 mt-2">Zero-Sum Multi-Entity Trial Balance Balancing (Σ Debits == Σ Credits)</p>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-      <div class="p-6 rounded-2xl border border-surface-700 bg-white shadow-card">
-        <div class="text-xs font-mono font-bold text-primary-600">TIER 1</div>
+      <div class="p-6 rounded-3xl border border-surface-700 bg-white shadow-card">
+        <div class="text-xs font-mono font-bold text-primary-800">TIER 1</div>
         <div class="font-bold text-surface-100 mt-1.5 text-base">Settlement Account</div>
         <p class="text-xs text-surface-300 mt-2 leading-relaxed">Primary liquidation pool from daily merchant sales.</p>
       </div>
 
-      <div class="p-6 rounded-2xl border border-surface-700 bg-white shadow-card">
+      <div class="p-6 rounded-3xl border border-surface-700 bg-white shadow-card">
         <div class="text-xs font-mono font-bold text-mint-600">TIER 2</div>
         <div class="font-bold text-surface-100 mt-1.5 text-base">Matured Tranches</div>
         <p class="text-xs text-surface-300 mt-2 leading-relaxed">FIFO drawdown of matured unreleased reserve tranches.</p>
       </div>
 
-      <div class="p-6 rounded-2xl border border-surface-700 bg-white shadow-card">
+      <div class="p-6 rounded-3xl border border-surface-700 bg-white shadow-card">
         <div class="text-xs font-mono font-bold text-amber-600">TIER 3</div>
         <div class="font-bold text-surface-100 mt-1.5 text-base">Locked Tranches</div>
         <p class="text-xs text-surface-300 mt-2 leading-relaxed">FIFO drawdown of active locked escrow tranches.</p>
       </div>
 
-      <div class="p-6 rounded-2xl border border-surface-700 bg-white shadow-card">
-        <div class="text-xs font-mono font-bold text-rose-600">TIER 4</div>
+      <div class="p-6 rounded-3xl border border-surface-700 bg-white shadow-card">
+        <div class="text-xs font-mono font-bold text-coral-500">TIER 4</div>
         <div class="font-bold text-surface-100 mt-1.5 text-base">Clawback Deficit</div>
         <p class="text-xs text-surface-300 mt-2 leading-relaxed">Negative balance offset against future settled batches.</p>
       </div>
