@@ -34,7 +34,10 @@ export class MerchantReservesComponent implements OnInit {
     this.apiService.getReservePolicy(merchantId).subscribe({
       next: (pol) => {
         this.policy.set(pol);
-        if (pol.holdRate) this.holdRatePct.set(parseFloat(pol.holdRate) * 100);
+        if (pol.holdRate) {
+          const rate = typeof pol.holdRate === 'number' ? pol.holdRate : parseFloat(pol.holdRate.toString());
+          this.holdRatePct.set(rate * 100);
+        }
         if (pol.maturityDays) this.maturityDays.set(pol.maturityDays);
         if (pol.withholdingBasis) this.withholdingBasis.set(pol.withholdingBasis as any);
       },

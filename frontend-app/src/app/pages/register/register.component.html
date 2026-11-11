@@ -2,19 +2,19 @@
   <div class="w-full max-w-lg">
     <!-- Header -->
     <div class="text-center mb-8">
-      <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary-500/10 border border-primary-500/20 text-primary-400 mb-4">
+      <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-mint-50 border border-mint-200 text-mint-600 mb-4 shadow-sm">
         <span class="material-symbols-outlined text-3xl">storefront</span>
       </div>
-      <h1 class="text-2xl font-bold text-surface-100">Merchant Onboarding</h1>
-      <p class="text-sm text-surface-200 mt-1">Register Entity for Risk Assessment & Rolling Reserve Escrow</p>
+      <h1 class="text-2xl font-extrabold text-surface-100 tracking-tight font-display">Merchant Onboarding</h1>
+      <p class="text-sm text-surface-300 mt-1">Register Entity for Risk Assessment & Rolling Reserve Escrow</p>
     </div>
 
     <!-- Card -->
-    <div class="card p-8 border border-surface-800 bg-surface-900/80 backdrop-blur-sm rounded-2xl shadow-2xl">
-      <h2 class="text-lg font-semibold text-surface-100 mb-6">Create Merchant Account</h2>
+    <div class="card p-8 md:p-9 border border-surface-700 bg-white rounded-3xl shadow-card">
+      <h2 class="text-lg font-bold text-surface-100 mb-6 font-display">Create Merchant Account</h2>
 
       @if (error()) {
-        <div class="mb-4 p-3 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs flex items-center gap-2">
+        <div class="mb-5 p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2.5">
           <span class="material-symbols-outlined text-base">error</span>
           <span>{{ error() }}</span>
         </div>
@@ -22,16 +22,16 @@
 
       <form [formGroup]="registerForm" (ngSubmit)="onRegister()" class="space-y-4">
         <div>
-          <label class="block text-xs font-mono uppercase text-surface-200 mb-1.5">Legal Business Name</label>
+          <label class="block text-xs font-mono uppercase text-surface-400 font-semibold mb-1.5">Legal Business Name</label>
           <input type="text" formControlName="businessName" placeholder="Acme Global Technologies Inc."
-                 class="w-full bg-surface-950 border border-surface-800 rounded-xl px-4 py-2.5 text-sm text-surface-100 focus:outline-none focus:border-primary-500 transition-colors" />
+                 class="w-full bg-white border border-surface-700 rounded-xl px-4 py-2.5 text-sm text-surface-100 placeholder:text-surface-400 focus:outline-none focus:border-primary-600 focus:ring-2 focus:ring-primary-100 transition-all" />
         </div>
 
-        <div class="grid grid-cols-2 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label class="block text-xs font-mono uppercase text-surface-200 mb-1.5">Merchant Category Code (MCC)</label>
+            <label class="block text-xs font-mono uppercase text-surface-400 font-semibold mb-1.5">Merchant Category (MCC)</label>
             <select formControlName="mcc"
-                    class="w-full bg-surface-950 border border-surface-800 rounded-xl px-4 py-2.5 text-sm text-surface-100 focus:outline-none focus:border-primary-500 transition-colors">
+                    class="w-full bg-white border border-surface-700 rounded-xl px-4 py-2.5 text-sm text-surface-100 focus:outline-none focus:border-primary-600 focus:ring-2 focus:ring-primary-100 transition-all">
               <option value="5734">5734 - Software & SaaS</option>
               <option value="5817">5817 - Digital Goods</option>
               <option value="7995">7995 - Gaming / High Risk</option>
@@ -39,26 +39,26 @@
             </select>
           </div>
           <div>
-            <label class="block text-xs font-mono uppercase text-surface-200 mb-1.5">Descriptor Prefix (6 chars)</label>
+            <label class="block text-xs font-mono uppercase text-surface-400 font-semibold mb-1.5">Descriptor Prefix (6 chars)</label>
             <input type="text" formControlName="billingDescriptorPrefix" maxlength="6" placeholder="ACMECO"
-                   class="w-full bg-surface-950 border border-surface-800 rounded-xl px-4 py-2.5 text-sm text-surface-100 focus:outline-none focus:border-primary-500 uppercase font-mono transition-colors" />
+                   class="w-full bg-white border border-surface-700 rounded-xl px-4 py-2.5 text-sm text-surface-100 placeholder:text-surface-400 focus:outline-none focus:border-primary-600 focus:ring-2 focus:ring-primary-100 uppercase font-mono transition-all" />
           </div>
         </div>
 
         <div>
-          <label class="block text-xs font-mono uppercase text-surface-200 mb-1.5">Corporate Email Address</label>
+          <label class="block text-xs font-mono uppercase text-surface-400 font-semibold mb-1.5">Corporate Email Address</label>
           <input type="email" formControlName="email" placeholder="owner@acme-corp.com"
-                 class="w-full bg-surface-950 border border-surface-800 rounded-xl px-4 py-2.5 text-sm text-surface-100 focus:outline-none focus:border-primary-500 transition-colors" />
+                 class="w-full bg-white border border-surface-700 rounded-xl px-4 py-2.5 text-sm text-surface-100 placeholder:text-surface-400 focus:outline-none focus:border-primary-600 focus:ring-2 focus:ring-primary-100 transition-all" />
         </div>
 
         <div>
-          <label class="block text-xs font-mono uppercase text-surface-200 mb-1.5">Password</label>
+          <label class="block text-xs font-mono uppercase text-surface-400 font-semibold mb-1.5">Password</label>
           <input type="password" formControlName="password" placeholder="••••••••"
-                 class="w-full bg-surface-950 border border-surface-800 rounded-xl px-4 py-2.5 text-sm text-surface-100 focus:outline-none focus:border-primary-500 transition-colors" />
+                 class="w-full bg-white border border-surface-700 rounded-xl px-4 py-2.5 text-sm text-surface-100 placeholder:text-surface-400 focus:outline-none focus:border-primary-600 focus:ring-2 focus:ring-primary-100 transition-all" />
         </div>
 
         <button type="submit" [disabled]="loading()"
-                class="w-full btn-primary py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 mt-2">
+                class="w-full btn-primary py-3 rounded-xl font-semibold text-sm flex items-center justify-center gap-2 mt-2 shadow-sm">
           @if (loading()) {
             <span class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
           }
@@ -67,9 +67,9 @@
       </form>
 
       <div class="mt-6 text-center">
-        <p class="text-surface-200 text-sm">
+        <p class="text-surface-300 text-sm">
           Already registered?
-          <a routerLink="/auth/login" class="text-primary-400 hover:text-primary-300 font-medium">Sign In</a>
+          <a routerLink="/auth/login" class="text-primary-600 hover:text-primary-700 font-semibold">Sign In</a>
         </p>
       </div>
     </div>

@@ -38,12 +38,12 @@ export class MerchantDashboardComponent implements OnInit {
       next: (res) => {
         this.ratios.set(res);
         if (res.vampRatio) {
-          const pct = parseFloat(res.vampRatio) * 100;
+          const pct = parseFloat(res.vampRatio.toString()) * 100;
           this.vampRatio.set(pct);
           this.vampStatus.set(pct >= 1.5 ? 'BREACH' : pct >= 1.2 ? 'ELEVATED' : 'NORMAL');
         }
         if (res.ctrBps) {
-          this.mastercardCtrBps.set(parseFloat(res.ctrBps));
+          this.mastercardCtrBps.set(parseFloat(res.ctrBps.toString()));
         }
         this.loading.set(false);
       },
@@ -56,7 +56,8 @@ export class MerchantDashboardComponent implements OnInit {
       next: (pol) => {
         this.policy.set(pol);
         if (pol.holdRate) {
-          this.holdRatePct.set(parseFloat(pol.holdRate) * 100);
+          const rate = typeof pol.holdRate === 'number' ? pol.holdRate : parseFloat(pol.holdRate.toString());
+          this.holdRatePct.set(rate * 100);
         }
       },
       error: () => {}

@@ -34,6 +34,10 @@ export class StaffLayoutComponent implements OnDestroy {
   showNotifications = signal(false);
   @ViewChild('notificationBellContainer') notificationBellContainer?: ElementRef;
 
+  unreadCount = computed(() => {
+    return this.notificationService.notifications().length;
+  });
+
   visibleNavItems = computed(() => {
     const role = this.authService.userRole();
     if (!role) return [];

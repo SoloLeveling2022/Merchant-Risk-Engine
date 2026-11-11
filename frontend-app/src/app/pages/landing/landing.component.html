@@ -1,182 +1,222 @@
-<div class="min-h-screen bg-surface-950 p-2 md:p-4 font-sans selection:bg-primary-500 selection:text-white relative">
-  <div class="relative bg-surface-900 border border-surface-800 rounded-[24px] overflow-hidden flex flex-col shadow-2xl">
+<div class="min-h-screen bg-surface-950 font-sans selection:bg-primary-500 selection:text-white relative">
+  <!-- Subtle ambient background glow -->
+  <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-[500px] bg-gradient-to-b from-primary-100/40 via-mint-50/20 to-transparent blur-3xl pointer-events-none"></div>
 
-    <!-- Sticky Navigation -->
-    <nav [class.bg-surface-900/90]="isScrolled" [class.backdrop-blur-xl]="isScrolled" [class.shadow-md]="isScrolled" [class.py-3]="isScrolled" [class.py-5]="!isScrolled" class="sticky top-0 w-full z-50 flex items-center justify-between px-6 md:px-10 transition-all duration-300 border-b border-surface-800">
+  <!-- Oper Credits Floating Pill Navbar -->
+  <div class="sticky top-4 z-50 px-4 md:px-8 max-w-7xl mx-auto">
+    <nav class="bg-white/90 backdrop-blur-lg border border-surface-700/80 rounded-full px-5 py-3 shadow-soft flex items-center justify-between transition-all duration-300">
       <a routerLink="/" class="flex items-center gap-3 cursor-pointer group">
-        <div class="w-10 h-10 rounded-xl bg-primary-500/10 flex items-center justify-center text-primary-400 border border-primary-500/30 group-hover:scale-105 transition-transform">
-          <span class="material-symbols-outlined text-2xl">shield</span>
+        <div class="w-9 h-9 rounded-xl bg-primary-600 text-white flex items-center justify-center shadow-glow group-hover:scale-105 transition-transform">
+          <span class="material-symbols-outlined text-xl">shield</span>
         </div>
-        <span class="font-display font-bold text-xl tracking-tight text-surface-100 leading-none">Merchant Risk Engine</span>
+        <span class="font-display font-bold text-lg tracking-tight text-surface-100">Merchant Risk Engine</span>
       </a>
 
-      <div class="hidden lg:flex items-center bg-surface-950/80 rounded-full px-2 py-1.5 border border-surface-800">
+      <div class="hidden lg:flex items-center bg-surface-800/80 rounded-full px-2 py-1 border border-surface-700">
         @for (section of navSections; track section.id) {
           <button (click)="scrollToSection(section.id)"
-                  class="px-5 py-2 text-sm font-medium text-surface-200 hover:text-surface-100 rounded-full transition-colors cursor-pointer">
+                  class="px-4 py-1.5 text-xs font-semibold text-surface-300 hover:text-surface-100 rounded-full transition-colors cursor-pointer">
             {{ section.label }}
           </button>
         }
       </div>
 
-      <div class="flex items-center gap-4">
-        <a routerLink="/auth/login" class="text-sm font-semibold text-surface-200 hover:text-surface-100 transition-colors cursor-pointer">
+      <div class="flex items-center gap-3">
+        <a routerLink="/auth/login" class="text-xs font-semibold text-surface-200 hover:text-surface-100 transition-colors px-3 py-2">
           Sign In
         </a>
-        <a routerLink="/auth/register" class="btn-primary px-5 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 group shadow-lg cursor-pointer">
-          Merchant Onboarding
-          <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+        <a routerLink="/auth/register" class="btn-primary !py-2 !px-4 !text-xs !rounded-full shadow-sm">
+          <span>Onboard KYB</span>
+          <span class="material-symbols-outlined text-sm">arrow_forward</span>
         </a>
       </div>
     </nav>
+  </div>
 
-    <!-- 1. Hero Section -->
-    <main class="flex flex-col items-center justify-center px-6 pt-24 pb-16 relative z-10 text-center">
-      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-mono font-semibold bg-primary-500/10 text-primary-400 border border-primary-500/30 mb-8">
-        <span class="w-2 h-2 rounded-full bg-primary-400 animate-pulse"></span>
-        VISA VAMP 2026 & MASTERCARD ECP COMPLIANT
+  <!-- Hero Section -->
+  <main class="flex flex-col items-center justify-center px-6 pt-16 pb-20 relative z-10 text-center max-w-6xl mx-auto">
+    <!-- Scheme Compliance Capsule Badge -->
+    <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-mono font-semibold bg-primary-50 text-primary-700 border border-primary-200 shadow-sm mb-8 animate-fade-in">
+      <span class="w-2 h-2 rounded-full bg-mint-500 animate-pulse"></span>
+      VISA VAMP 2026 &amp; MASTERCARD ECP COMPLIANT
+    </div>
+
+    <!-- Main Headline with Tight Tracking -->
+    <h1 class="font-display text-4xl md:text-6xl lg:text-7xl font-extrabold text-surface-100 leading-[1.12] tracking-tight max-w-5xl mx-auto">
+      Automated Merchant Risk, Rolling Reserve &amp; <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary-600 via-primary-700 to-navy-900">Dispute Settlement</span>
+    </h1>
+
+    <p class="mt-6 text-base md:text-xl text-surface-300 max-w-3xl mx-auto leading-relaxed font-normal">
+      Adyen-style exposure-coverage underwriting, deterministic 4-tier FIFO dispute resolution waterfalls, and zero-sum R2DBC reactive PostgreSQL double-entry financial ledgering.
+    </p>
+
+    <!-- CTAs with Oper Credits Lift Effect -->
+    <div class="mt-10 flex flex-wrap justify-center gap-4">
+      <a routerLink="/auth/register" class="btn-primary px-7 py-3.5 !rounded-xl font-semibold text-sm shadow-card flex items-center gap-2">
+        <span>Start Merchant Onboarding</span>
+        <span class="material-symbols-outlined text-base">arrow_forward</span>
+      </a>
+      <a routerLink="/auth/login" class="btn-secondary px-7 py-3.5 !rounded-xl font-semibold text-sm flex items-center gap-2">
+        <span>Platform Demo Login</span>
+      </a>
+    </div>
+
+    <!-- Oper Credits Style Metric Barometer Cards -->
+    <div class="mt-16 w-full grid grid-cols-1 md:grid-cols-3 gap-5 text-left">
+      <div class="card p-6 bg-white border border-surface-700 rounded-2xl shadow-card">
+        <div class="flex items-center justify-between mb-3">
+          <span class="text-xs font-mono uppercase font-semibold text-surface-400">Visa VAMP Threshold</span>
+          <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-mint-50 text-mint-700 border border-mint-200 font-mono">150 bps Target</span>
+        </div>
+        <div class="text-3xl font-extrabold font-mono text-surface-100">1.12%</div>
+        <p class="text-xs text-surface-300 mt-2">Continuous TC40 fraud &amp; TC15 dispute ratio evaluation over CNP volume</p>
       </div>
-      <h1 class="font-display text-4xl md:text-6xl lg:text-7xl font-extrabold text-surface-100 leading-[1.1] tracking-tight max-w-5xl mx-auto">
-        Merchant Risk, Rolling Reserve &amp; <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 via-sky-400 to-indigo-400">Automated Dispute Settlement</span>
-      </h1>
-      <p class="mt-6 text-lg md:text-xl text-surface-200 max-w-3xl mx-auto leading-relaxed">
-        Adyen-style exposure-coverage underwriting, deterministic 4-tier FIFO dispute resolution waterfalls, and zero-sum R2DBC reactive PostgreSQL double-entry financial ledgering.
+
+      <div class="card p-6 bg-white border border-surface-700 rounded-2xl shadow-card">
+        <div class="flex items-center justify-between mb-3">
+          <span class="text-xs font-mono uppercase font-semibold text-surface-400">Mastercard CTR</span>
+          <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-primary-50 text-primary-700 border border-primary-200 font-mono">M-1 Lagged</span>
+        </div>
+        <div class="text-3xl font-extrabold font-mono text-surface-100">85.4 <span class="text-base font-normal text-surface-400">bps</span></div>
+        <p class="text-xs text-surface-300 mt-2">Lagged denominator protection against ECM and HECM fine escalations</p>
+      </div>
+
+      <div class="card p-6 bg-white border border-surface-700 rounded-2xl shadow-card">
+        <div class="flex items-center justify-between mb-3">
+          <span class="text-xs font-mono uppercase font-semibold text-surface-400">Escrow Liquidity</span>
+          <span class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-mint-50 text-mint-700 border border-mint-200 font-mono">FIFO Maturing</span>
+        </div>
+        <div class="text-3xl font-extrabold font-mono text-mint-600">$193,200<span class="text-base font-normal text-surface-400">.00</span></div>
+        <p class="text-xs text-surface-300 mt-2">Chronological 90/180-day tranche withholdings with Adyen exposure check</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- Section 2: Platform Architecture -->
+  <section id="what-is" class="py-20 px-6 md:px-10 border-y border-surface-700 bg-white">
+    <div class="max-w-5xl mx-auto text-center">
+      <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-surface-800 text-surface-300 border border-surface-700 mb-4">
+        INSTITUTIONAL FINTECH SPECIFICATION
+      </div>
+      <h2 class="text-3xl md:text-4xl font-extrabold text-surface-100 tracking-tight">Institutional Payment Risk Architecture</h2>
+      <p class="mt-4 text-base md:text-lg text-surface-300 leading-relaxed max-w-3xl mx-auto">
+        Engineered according to the Visa Acquirer Monitoring Program (VAMP 2026) and Mastercard Excessive Chargeback Program (ECP) standards. Processes non-blocking high-velocity card transaction telemetry over Spring WebFlux and Reactor Netty event loops.
       </p>
+    </div>
+  </section>
 
-      <div class="mt-10 flex flex-wrap justify-center gap-4">
-        <a routerLink="/auth/register" class="btn-primary px-6 py-3 rounded-xl font-bold text-sm shadow-xl flex items-center gap-2">
-          <span>Start KYB Onboarding</span>
-          <span class="material-symbols-outlined text-base">arrow_forward</span>
-        </a>
-        <a routerLink="/auth/login" class="btn-secondary px-6 py-3 rounded-xl font-bold text-sm flex items-center gap-2">
-          <span>Platform Demo Login</span>
-        </a>
-      </div>
-    </main>
+  <!-- Section 3: Dynamic Rolling Reserves -->
+  <section id="rolling-reserves" class="py-24 px-6 md:px-10 max-w-6xl mx-auto w-full">
+    <div class="text-center mb-16">
+      <h2 class="text-3xl md:text-4xl font-extrabold text-surface-100 tracking-tight">Dynamic Rolling Reserve Mechanics</h2>
+      <p class="text-sm text-surface-300 mt-2">Chronological FIFO Tranche Maturation &amp; Exposure Offsets</p>
+    </div>
 
-    <!-- 2. What Is Merchant Risk Engine -->
-    <section id="what-is" class="py-20 px-6 md:px-10 border-y border-surface-800 bg-surface-950/60">
-      <div class="max-w-5xl mx-auto text-center">
-        <h2 class="text-3xl md:text-4xl font-bold text-surface-100">Tier-1 Payment Risk Architecture</h2>
-        <p class="mt-4 text-base md:text-lg text-surface-200 leading-relaxed max-w-3xl mx-auto">
-          Built according to the Visa Acquirer Monitoring Program (VAMP 2026) and Mastercard Excessive Chargeback Program (ECP) standards. Processes non-blocking high-velocity card transaction telemetry over Spring WebFlux and Reactor Netty event loops.
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="card p-7 bg-white border border-surface-700 rounded-2xl shadow-card hover:-translate-y-1 transition-all">
+        <div class="w-12 h-12 rounded-xl bg-primary-50 text-primary-600 flex items-center justify-center mb-5 border border-primary-100">
+          <span class="material-symbols-outlined text-2xl">schedule</span>
+        </div>
+        <h3 class="text-lg font-bold text-surface-100">FIFO Tranche Holds</h3>
+        <p class="text-sm text-surface-300 mt-2 leading-relaxed">
+          Withholds 5%–20% of eligible gross card processing volume into chronological tranches maturing at 90 or 180 days with capped ceiling enforcement.
         </p>
       </div>
-    </section>
 
-    <!-- 3. Dynamic Rolling Reserves -->
-    <section id="rolling-reserves" class="py-20 px-6 md:px-10 max-w-6xl mx-auto w-full">
-      <div class="text-center mb-14">
-        <h2 class="text-3xl md:text-4xl font-bold text-surface-100">Dynamic Rolling Reserve Mechanics</h2>
-        <p class="text-sm text-surface-200 mt-2">Chronological FIFO Tranche Maturation & Exposure Offsets</p>
+      <div class="card p-7 bg-white border border-surface-700 rounded-2xl shadow-card hover:-translate-y-1 transition-all">
+        <div class="w-12 h-12 rounded-xl bg-mint-50 text-mint-600 flex items-center justify-center mb-5 border border-mint-100">
+          <span class="material-symbols-outlined text-2xl">analytics</span>
+        </div>
+        <h3 class="text-lg font-bold text-surface-100">Adyen Exposure Check</h3>
+        <p class="text-sm text-surface-300 mt-2 leading-relaxed">
+          Continuously balances total exposure (<span class="font-mono text-xs">reversals × volume + unfulfilled</span>) against active escrow with automated €10,000 withholding triggers.
+        </p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="card p-6 border border-surface-800 bg-surface-900/60 rounded-2xl">
-          <div class="w-12 h-12 rounded-xl bg-primary-500/10 text-primary-400 flex items-center justify-center mb-4">
-            <span class="material-symbols-outlined text-2xl">schedule</span>
+      <div class="card p-7 bg-white border border-surface-700 rounded-2xl shadow-card hover:-translate-y-1 transition-all">
+        <div class="w-12 h-12 rounded-xl bg-navy-100 text-navy-800 flex items-center justify-center mb-5 border border-navy-200">
+          <span class="material-symbols-outlined text-2xl">trending_up</span>
+        </div>
+        <h3 class="text-lg font-bold text-surface-100">Dynamic Re-Underwriting</h3>
+        <p class="text-sm text-surface-300 mt-2 leading-relaxed">
+          Detects velocity anomalies including 7-day GMV spikes (≥ 2.5x), AOV surges (> 2.5σ), fulfillment drops (&lt; 98%), and refund surges (> 1%).
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Section 4: Card Network Scheme Thresholds -->
+  <section id="scheme-thresholds" class="py-24 px-6 md:px-10 border-y border-surface-700 bg-white">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-16">
+        <h2 class="text-3xl md:text-4xl font-extrabold text-surface-100 tracking-tight">Card Network Dispute Thresholds</h2>
+        <p class="text-sm text-surface-300 mt-2">Automated Visa VAMP &amp; Mastercard ECP Compliance Engine</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="card p-8 bg-surface-950 border border-surface-700 rounded-2xl shadow-soft">
+          <div class="flex items-center gap-3 mb-4">
+            <span class="text-xs font-mono font-bold px-2.5 py-1 rounded-full bg-primary-100 text-primary-700 border border-primary-200">VISA</span>
+            <h3 class="text-xl font-bold text-surface-100">VAMP (150 bps Limit)</h3>
           </div>
-          <h3 class="text-lg font-bold text-surface-100">FIFO Tranche Holds</h3>
-          <p class="text-sm text-surface-200 mt-2 leading-relaxed">
-            Withholds 5%–20% of eligible gross card processing volume into chronological tranches maturing at 90 or 180 days with capped ceiling enforcement.
+          <p class="text-sm text-surface-300 leading-relaxed">
+            Consolidates TC40 fraud notices and TC15 chargebacks divided by TC05 settled transactions. Identifies Merchant Excessive breaches (≥ 1.50% &amp; ≥ 1,500 events) and enumeration attacks (≥ 20% decline ratio).
           </p>
         </div>
 
-        <div class="card p-6 border border-surface-800 bg-surface-900/60 rounded-2xl">
-          <div class="w-12 h-12 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center mb-4">
-            <span class="material-symbols-outlined text-2xl">analytics</span>
+        <div class="card p-8 bg-surface-950 border border-surface-700 rounded-2xl shadow-soft">
+          <div class="flex items-center gap-3 mb-4">
+            <span class="text-xs font-mono font-bold px-2.5 py-1 rounded-full bg-navy-100 text-navy-800 border border-navy-200">MASTERCARD</span>
+            <h3 class="text-xl font-bold text-surface-100">ECP (M-1 Lagged Ratio)</h3>
           </div>
-          <h3 class="text-lg font-bold text-surface-100">Adyen Exposure Check</h3>
-          <p class="text-sm text-surface-200 mt-2 leading-relaxed">
-            Continuously balances total exposure (<span class="font-mono text-xs">expectedReversalRate180d × volume + unfulfilled</span>) against active escrow with automated €10,000 withholding triggers.
-          </p>
-        </div>
-
-        <div class="card p-6 border border-surface-800 bg-surface-900/60 rounded-2xl">
-          <div class="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center mb-4">
-            <span class="material-symbols-outlined text-2xl">trending_up</span>
-          </div>
-          <h3 class="text-lg font-bold text-surface-100">Dynamic Re-Underwriting</h3>
-          <p class="text-sm text-surface-200 mt-2 leading-relaxed">
-            Detects velocity anomalies including 7-day GMV spikes (≥ 2.5x), AOV surges (> 2.5σ), fulfillment drops (< 98%), and refund surges (> 1%).
+          <p class="text-sm text-surface-300 leading-relaxed">
+            Calculates Chargeback-to-Transaction Ratio using previous month's sales denominator. Tracks ECM (100–299 bps) and HECM (≥ 300 bps) with fine schedule tracking up to $200,000/mo and 3-month clean exit criteria.
           </p>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- 4. Scheme Thresholds -->
-    <section id="scheme-thresholds" class="py-20 px-6 md:px-10 border-y border-surface-800 bg-surface-950/60">
-      <div class="max-w-6xl mx-auto">
-        <div class="text-center mb-14">
-          <h2 class="text-3xl md:text-4xl font-bold text-surface-100">Card Network Dispute Thresholds</h2>
-          <p class="text-sm text-surface-200 mt-2">Automated Visa VAMP & Mastercard ECP Compliance Engine</p>
-        </div>
+  <!-- Section 5: 4-Tier Waterfall & Double-Entry Ledger -->
+  <section id="waterfall-ledger" class="py-24 px-6 md:px-10 max-w-6xl mx-auto w-full">
+    <div class="text-center mb-16">
+      <h2 class="text-3xl md:text-4xl font-extrabold text-surface-100 tracking-tight">4-Tier FIFO Waterfall &amp; Double-Entry Ledger</h2>
+      <p class="text-sm text-surface-300 mt-2">Zero-Sum Multi-Entity Trial Balance Balancing (Σ Debits == Σ Credits)</p>
+    </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div class="card p-8 border border-surface-800 bg-surface-900/80 rounded-2xl">
-            <div class="flex items-center gap-3 mb-4">
-              <span class="text-xs font-mono font-bold px-2.5 py-1 rounded bg-blue-500/20 text-blue-400 border border-blue-500/30">VISA</span>
-              <h3 class="text-xl font-bold text-surface-100">VAMP (150 bps Limit)</h3>
-            </div>
-            <p class="text-sm text-surface-200 leading-relaxed">
-              Consolidates TC40 fraud notices and TC15 chargebacks divided by TC05 settled transactions. Identifies Merchant Excessive breaches (≥ 1.50% & ≥ 1,500 events) and enumeration attacks (≥ 20% decline ratio).
-            </p>
-          </div>
-
-          <div class="card p-8 border border-surface-800 bg-surface-900/80 rounded-2xl">
-            <div class="flex items-center gap-3 mb-4">
-              <span class="text-xs font-mono font-bold px-2.5 py-1 rounded bg-orange-500/20 text-orange-400 border border-orange-500/30">MASTERCARD</span>
-              <h3 class="text-xl font-bold text-surface-100">ECP (M-1 Lagged Ratio)</h3>
-            </div>
-            <p class="text-sm text-surface-200 leading-relaxed">
-              Calculates Chargeback-to-Transaction Ratio using previous month's sales denominator. Tracks ECM (100–299 bps) and HECM (≥ 300 bps) with fine schedule tracking up to $200,000/mo and 3-month clean exit criteria.
-            </p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- 5. 4-Tier Waterfall & Double-Entry Ledger -->
-    <section id="waterfall-ledger" class="py-20 px-6 md:px-10 max-w-6xl mx-auto w-full">
-      <div class="text-center mb-14">
-        <h2 class="text-3xl md:text-4xl font-bold text-surface-100">4-Tier FIFO Waterfall & Double-Entry Ledger</h2>
-        <p class="text-sm text-surface-200 mt-2">Zero-Sum Multi-Entity Trial Balance Balancing (Σ DR == Σ CR)</p>
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div class="p-6 rounded-2xl border border-surface-700 bg-white shadow-card">
+        <div class="text-xs font-mono font-bold text-primary-600">TIER 1</div>
+        <div class="font-bold text-surface-100 mt-1.5 text-base">Settlement Account</div>
+        <p class="text-xs text-surface-300 mt-2 leading-relaxed">Primary liquidation pool from daily merchant sales.</p>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div class="p-5 rounded-xl border border-surface-800 bg-surface-900/60">
-          <div class="text-xs font-mono font-bold text-primary-400">TIER 1</div>
-          <div class="font-bold text-surface-100 mt-1">Settlement Account</div>
-          <p class="text-xs text-surface-200 mt-2">Primary liquidation pool from daily merchant sales.</p>
-        </div>
-
-        <div class="p-5 rounded-xl border border-surface-800 bg-surface-900/60">
-          <div class="text-xs font-mono font-bold text-sky-400">TIER 2</div>
-          <div class="font-bold text-surface-100 mt-1">Matured Tranches</div>
-          <p class="text-xs text-surface-200 mt-2">FIFO drawdown of matured unreleased reserve tranches.</p>
-        </div>
-
-        <div class="p-5 rounded-xl border border-surface-800 bg-surface-900/60">
-          <div class="text-xs font-mono font-bold text-amber-400">TIER 3</div>
-          <div class="font-bold text-surface-100 mt-1">Locked Tranches</div>
-          <p class="text-xs text-surface-200 mt-2">FIFO drawdown of active locked escrow tranches.</p>
-        </div>
-
-        <div class="p-5 rounded-xl border border-surface-800 bg-surface-900/60">
-          <div class="text-xs font-mono font-bold text-rose-400">TIER 4</div>
-          <div class="font-bold text-surface-100 mt-1">Clawback Deficit</div>
-          <p class="text-xs text-surface-200 mt-2">Negative balance offset against future settled batches.</p>
-        </div>
+      <div class="p-6 rounded-2xl border border-surface-700 bg-white shadow-card">
+        <div class="text-xs font-mono font-bold text-mint-600">TIER 2</div>
+        <div class="font-bold text-surface-100 mt-1.5 text-base">Matured Tranches</div>
+        <p class="text-xs text-surface-300 mt-2 leading-relaxed">FIFO drawdown of matured unreleased reserve tranches.</p>
       </div>
-    </section>
 
-    <!-- Footer -->
-    <footer class="bg-surface-950 pt-8 pb-6 px-6 md:px-10 text-surface-200 text-xs border-t border-surface-800">
-      <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
-        <p>&copy; 2026 Merchant Risk Engine. All rights reserved.</p>
-        <p class="font-mono">Spring WebFlux · R2DBC PostgreSQL · Reactor Netty</p>
+      <div class="p-6 rounded-2xl border border-surface-700 bg-white shadow-card">
+        <div class="text-xs font-mono font-bold text-amber-600">TIER 3</div>
+        <div class="font-bold text-surface-100 mt-1.5 text-base">Locked Tranches</div>
+        <p class="text-xs text-surface-300 mt-2 leading-relaxed">FIFO drawdown of active locked escrow tranches.</p>
       </div>
-    </footer>
 
-  </div>
+      <div class="p-6 rounded-2xl border border-surface-700 bg-white shadow-card">
+        <div class="text-xs font-mono font-bold text-rose-600">TIER 4</div>
+        <div class="font-bold text-surface-100 mt-1.5 text-base">Clawback Deficit</div>
+        <p class="text-xs text-surface-300 mt-2 leading-relaxed">Negative balance offset against future settled batches.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-white pt-10 pb-8 px-6 md:px-10 text-surface-400 text-xs border-t border-surface-700">
+    <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+      <p>&copy; 2026 Merchant Risk Engine. All rights reserved.</p>
+      <p class="font-mono text-surface-400">Spring WebFlux · R2DBC PostgreSQL · Reactor Netty</p>
+    </div>
+  </footer>
+
 </div>
