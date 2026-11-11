@@ -1,0 +1,58 @@
+<div class="space-y-6">
+  <!-- Header -->
+  <div class="bg-surface-900 border border-surface-800 p-6 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-bold text-surface-100">Merchant Portfolio Directory</h1>
+      <p class="text-sm text-surface-200 mt-1">Merchant Category Codes (MCC), Billing Descriptors & KYB Compliance Tiers</p>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="card border border-surface-800 bg-surface-900/60 rounded-xl overflow-hidden">
+    <div class="p-5 border-b border-surface-800 flex justify-between items-center">
+      <h2 class="font-bold text-surface-100">Active Acquired Merchants</h2>
+      <span class="text-xs font-mono text-surface-200">Portfolio Aggregation</span>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-sm">
+        <thead class="bg-surface-950 text-surface-200 font-mono text-xs uppercase border-b border-surface-800">
+          <tr>
+            <th class="p-4">Merchant ID (MID)</th>
+            <th class="p-4">Legal Business Name</th>
+            <th class="p-4">MCC</th>
+            <th class="p-4">Descriptor (6c)</th>
+            <th class="p-4">KYB Status</th>
+            <th class="p-4">Risk Tier</th>
+            <th class="p-4">VAMP Ratio</th>
+            <th class="p-4">MC CTR</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-surface-800 text-surface-200">
+          @for (m of merchants(); track m.mid) {
+            <tr class="hover:bg-surface-800/30 transition-colors">
+              <td class="p-4 font-mono text-xs text-primary-400 font-semibold">{{ m.mid }}</td>
+              <td class="p-4 text-surface-100 font-medium">{{ m.legalName }}</td>
+              <td class="p-4 font-mono text-xs">{{ m.mcc }}</td>
+              <td class="p-4 font-mono font-bold text-amber-400">{{ m.descriptorPrefix }}</td>
+              <td class="p-4">
+                <span class="px-2 py-0.5 rounded text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                  {{ m.kybStatus }}
+                </span>
+              </td>
+              <td class="p-4 font-mono text-xs">
+                <span class="px-2 py-0.5 rounded text-xs font-semibold"
+                      [ngClass]="m.riskTier === 'TIER_1_LOW' ? 'bg-emerald-500/10 text-emerald-400' :
+                                m.riskTier === 'TIER_2_MODERATE' ? 'bg-amber-500/10 text-amber-400' :
+                                'bg-rose-500/10 text-rose-400'">
+                  {{ m.riskTier }}
+                </span>
+              </td>
+              <td class="p-4 font-mono" [ngClass]="m.vampRatioPct >= 1.5 ? 'text-rose-400 font-bold' : ''">{{ m.vampRatioPct }}%</td>
+              <td class="p-4 font-mono" [ngClass]="m.ctrBps >= 100 ? 'text-rose-400 font-bold' : ''">{{ m.ctrBps }} bps</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

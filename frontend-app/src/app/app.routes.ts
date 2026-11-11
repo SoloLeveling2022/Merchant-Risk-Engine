@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { authGuard, roleGuard, kycGuard, defaultRoleRedirectGuard, noAuthGuard } from '@frontend/shared-auth';
+import { authGuard, roleGuard, defaultRoleRedirectGuard, noAuthGuard } from '@frontend/shared-auth';
 import { LayoutComponent } from './layout/layout.component';
 import { StaffLayoutComponent } from './layout/staff-layout.component';
 
@@ -38,143 +38,88 @@ export const routes: Routes = [
     ],
   },
 
-  // ─── Protected Routes (inside Layout) ──
+  // ─── Protected Merchant Routes (LayoutComponent) ──
   {
-    path: '',
+    path: 'merchant',
     component: LayoutComponent,
-    canActivate: [authGuard],
+    canActivate: [authGuard, roleGuard('ROLE_MERCHANT_OWNER', 'ROLE_MERCHANT_FINANCE')],
     children: [
-      // KYC
       {
-        path: 'kyc',
-        loadComponent: () => import('./pages/kyc/kyc.component').then(m => m.KycComponent),
+        path: 'dashboard',
+        loadComponent: () => import('./pages/merchant/dashboard/dashboard.component').then(m => m.MerchantDashboardComponent),
       },
-
-      // ─── Investor Routes ─────────────
       {
-        path: 'investor',
-        canActivate: [roleGuard('ROLE_INVESTOR')],
-        children: [
-          {
-            path: 'dashboard',
-            loadComponent: () => import('./pages/investor/dashboard/dashboard.component').then(m => m.InvestorDashboardComponent),
-          },
-          {
-            path: 'portfolio',
-            loadComponent: () => import('./pages/investor/portfolio/portfolio.component').then(m => m.PortfolioComponent),
-          },
-          {
-            path: 'quotes',
-            loadComponent: () => import('./pages/investor/quotes/quotes.component').then(m => m.QuotesComponent),
-          },
-          {
-            path: 'policies',
-            loadComponent: () => import('./pages/investor/policies/policies.component').then(m => m.PoliciesComponent),
-          },
-          {
-            path: 'policies/:id',
-            loadComponent: () => import('./pages/investor/policy-detail/policy-detail.component').then(m => m.PolicyDetailComponent),
-          },
-          {
-            path: 'claims',
-            loadComponent: () => import('./pages/investor/claims/claims.component').then(m => m.ClaimsComponent),
-          },
-          {
-            path: 'documents',
-            loadComponent: () => import('./pages/investor/documents/documents.component').then(m => m.DocumentsComponent),
-          },
-          { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-        ],
+        path: 'reserves',
+        loadComponent: () => import('./pages/merchant/reserves/reserves.component').then(m => m.MerchantReservesComponent),
       },
-
-      // Default redirect based on role
-      { path: '', canActivate: [defaultRoleRedirectGuard], pathMatch: 'full', children: [] },
+      {
+        path: 'disputes',
+        loadComponent: () => import('./pages/merchant/disputes/disputes.component').then(m => m.MerchantDisputesComponent),
+      },
+      {
+        path: 'payouts',
+        loadComponent: () => import('./pages/merchant/payouts/payouts.component').then(m => m.MerchantPayoutsComponent),
+      },
+      {
+        path: 'kyb',
+        loadComponent: () => import('./pages/merchant/kyb/kyb.component').then(m => m.MerchantKybComponent),
+      },
+      { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     ],
   },
 
-  // ─── Protected Routes (Staff Layout) ──
+  // Backward compatibility alias for /kyb
   {
-    path: '',
+    path: 'kyb',
+    redirectTo: 'merchant/kyb',
+    pathMatch: 'full'
+  },
+
+  // ─── Protected Risk Ops Routes (StaffLayoutComponent) ──
+  {
+    path: 'risk-ops',
     component: StaffLayoutComponent,
-    canActivate: [authGuard],
+    canActivate: [authGuard, roleGuard('ROLE_RISK_ANALYST', 'ROLE_RISK_ADMIN')],
     children: [
-      // ─── Underwriter Routes ──────────
       {
-        path: 'underwriter',
-        canActivate: [roleGuard('ROLE_UNDERWRITER', 'ROLE_ADMIN')],
-        children: [
-          {
-            path: 'dashboard',
-            loadComponent: () => import('./pages/underwriter/dashboard/underwriter-dashboard.component').then(m => m.UnderwriterDashboardComponent),
-          },
-          {
-            path: 'crm',
-            loadComponent: () => import('./pages/admin/crm/admin-crm.component').then(m => m.AdminCrmComponent),
-          },
-          { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-        ],
+        path: 'control-tower',
+        loadComponent: () => import('./pages/risk-ops/control-tower/control-tower.component').then(m => m.RiskControlTowerComponent),
       },
-
-      // ─── Claims Analyst Routes ───────
       {
-        path: 'claims-analyst',
-        canActivate: [roleGuard('ROLE_CLAIMS_ANALYST', 'ROLE_ADMIN')],
-        children: [
-          {
-            path: 'dashboard',
-            loadComponent: () => import('./pages/claims-analyst/dashboard/claims-analyst-dashboard.component').then(m => m.ClaimsAnalystDashboardComponent),
-          },
-          {
-            path: 'crm',
-            loadComponent: () => import('./pages/admin/crm/admin-crm.component').then(m => m.AdminCrmComponent),
-          },
-          { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
-        ],
+        path: 'underwriting',
+        loadComponent: () => import('./pages/risk-ops/underwriting/underwriting.component').then(m => m.RiskUnderwritingComponent),
       },
-
-      // ─── Compliance Routes ───────────
       {
-        path: 'compliance',
-        canActivate: [roleGuard('ROLE_COMPLIANCE', 'ROLE_COMPLIANCE_OFFICER', 'ROLE_ADMIN')],
-        children: [
-          {
-            path: 'kyc',
-            loadComponent: () => import('./pages/admin/kyc-management/admin-kyc-management.component').then(m => m.AdminKycManagementComponent),
-          },
-          {
-            path: 'crm',
-            loadComponent: () => import('./pages/admin/crm/admin-crm.component').then(m => m.AdminCrmComponent),
-          },
-          { path: '', redirectTo: 'kyc', pathMatch: 'full' },
-        ],
+        path: 'disputes',
+        loadComponent: () => import('./pages/risk-ops/disputes/disputes.component').then(m => m.RiskDisputesComponent),
       },
-
-      // ─── Admin Routes ───────
       {
-        path: 'admin',
-        canActivate: [roleGuard('ROLE_ADMIN')],
-        children: [
-          {
-            path: 'kyc',
-            loadComponent: () => import('./pages/admin/kyc-management/admin-kyc-management.component').then(m => m.AdminKycManagementComponent),
-          },
-          {
-            path: 'crm',
-            loadComponent: () => import('./pages/admin/crm/admin-crm.component').then(m => m.AdminCrmComponent),
-          },
-          {
-            path: 'create-staff',
-            loadComponent: () => import('./pages/admin/create-staff/create-staff.component').then(m => m.CreateStaffComponent),
-          }
-        ]
+        path: 'ledger',
+        loadComponent: () => import('./pages/risk-ops/ledger/ledger.component').then(m => m.RiskLedgerComponent),
       },
-
-      // Default redirect based on role
-      { path: '', canActivate: [defaultRoleRedirectGuard], pathMatch: 'full', children: [] },
+      {
+        path: 'merchants',
+        loadComponent: () => import('./pages/risk-ops/merchants/merchants.component').then(m => m.RiskMerchantsComponent),
+      },
+      { path: '', redirectTo: 'control-tower', pathMatch: 'full' },
     ],
   },
 
-  // ─── Fallback ────────────────────────
-  { path: 'unauthorized', loadComponent: () => import('./pages/unauthorized/unauthorized.component').then(m => m.UnauthorizedComponent) },
-  { path: '**', redirectTo: '' },
+  // ─── Legacy Route Aliases ──
+  { path: 'investor', redirectTo: 'merchant/dashboard', pathMatch: 'prefix' },
+  { path: 'underwriter', redirectTo: 'risk-ops/underwriting', pathMatch: 'prefix' },
+  { path: 'claims-analyst', redirectTo: 'risk-ops/disputes', pathMatch: 'prefix' },
+  { path: 'compliance', redirectTo: 'risk-ops/merchants', pathMatch: 'prefix' },
+  { path: 'admin', redirectTo: 'risk-ops/control-tower', pathMatch: 'prefix' },
+
+  // ─── Unauthorized & Fallback ──
+  {
+    path: 'unauthorized',
+    loadComponent: () => import('./pages/unauthorized/unauthorized.component').then(m => m.UnauthorizedComponent),
+  },
+  {
+    path: '**',
+    canActivate: [defaultRoleRedirectGuard],
+    children: []
+  }
 ];

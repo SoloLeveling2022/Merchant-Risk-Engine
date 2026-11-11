@@ -23,13 +23,11 @@ export class LayoutComponent {
   sidebarCollapsed = signal(false);
 
   navItems: NavItem[] = [
-    { label: 'KYC Verification', icon: '<span class="material-symbols-outlined align-middle">badge</span>', route: '/kyc', roles: ['ROLE_INVESTOR'] },
-    { label: 'Overview', icon: '<span class="material-symbols-outlined align-middle">bar_chart</span>', route: '/investor/dashboard', roles: ['ROLE_INVESTOR'] },
-    { label: 'My Portfolio', icon: '<span class="material-symbols-outlined align-middle">work</span>', route: '/investor/portfolio', roles: ['ROLE_INVESTOR'] },
-    { label: 'Quotes & Risk', icon: '<span class="material-symbols-outlined align-middle">content_paste</span>', route: '/investor/quotes', roles: ['ROLE_INVESTOR'] },
-    { label: 'My Policies', icon: '<span class="material-symbols-outlined align-middle">shield</span>', route: '/investor/policies', roles: ['ROLE_INVESTOR'] },
-    { label: 'Claims', icon: '<span class="material-symbols-outlined align-middle">edit_document</span>', route: '/investor/claims', roles: ['ROLE_INVESTOR'] },
-    { label: 'Documents', icon: '<span class="material-symbols-outlined align-middle">description</span>', route: '/investor/documents', roles: ['ROLE_INVESTOR'] },
+    { label: 'Risk & Velocity Overview', icon: '<span class="material-symbols-outlined align-middle">speed</span>', route: '/merchant/dashboard', roles: ['ROLE_MERCHANT_OWNER', 'ROLE_MERCHANT_FINANCE', 'ROLE_INVESTOR'] },
+    { label: 'Rolling Reserve Tranches', icon: '<span class="material-symbols-outlined align-middle">account_balance</span>', route: '/merchant/reserves', roles: ['ROLE_MERCHANT_OWNER', 'ROLE_MERCHANT_FINANCE', 'ROLE_INVESTOR'] },
+    { label: 'Disputes & Chargebacks', icon: '<span class="material-symbols-outlined align-middle">gavel</span>', route: '/merchant/disputes', roles: ['ROLE_MERCHANT_OWNER', 'ROLE_MERCHANT_FINANCE', 'ROLE_INVESTOR'] },
+    { label: 'Payouts & Settlement', icon: '<span class="material-symbols-outlined align-middle">payments</span>', route: '/merchant/payouts', roles: ['ROLE_MERCHANT_OWNER', 'ROLE_MERCHANT_FINANCE', 'ROLE_INVESTOR'] },
+    { label: 'KYB & Business Profile', icon: '<span class="material-symbols-outlined align-middle">verified_user</span>', route: '/merchant/kyb', roles: ['ROLE_MERCHANT_OWNER', 'ROLE_MERCHANT_FINANCE', 'ROLE_INVESTOR'] },
   ];
 
   visibleNavItems = computed(() => {
@@ -45,28 +43,27 @@ export class LayoutComponent {
       const prefix = u.email.split('@')[0];
       return prefix.charAt(0).toUpperCase() + prefix.slice(1);
     }
-    return 'User';
+    return 'Acme Merchant';
   });
 
   userInitial = computed(() => {
     const name = this.userName();
-    return name ? name.charAt(0).toUpperCase() : 'U';
+    return name ? name.charAt(0).toUpperCase() : 'M';
   });
 
   roleName = computed(() => {
     const role = this.authService.userRole();
     const map: Record<string, string> = {
-      ROLE_INVESTOR: 'Investor',
-      ROLE_UNDERWRITER: 'Underwriter',
-      ROLE_CLAIMS_ANALYST: 'Claims Analyst',
-      ROLE_COMPLIANCE: 'Compliance Officer',
-      ROLE_COMPLIANCE_OFFICER: 'Compliance Officer',
+      ROLE_MERCHANT_OWNER: 'Merchant Owner',
+      ROLE_MERCHANT_FINANCE: 'Merchant Finance',
+      ROLE_RISK_ANALYST: 'Risk Analyst',
+      ROLE_RISK_ADMIN: 'Risk Admin',
       ROLE_ADMIN: 'Administrator',
     };
-    return role ? map[role] ?? role : '';
+    return role ? map[role] ?? role : 'Merchant Portal';
   });
 
-  pageTitle = computed(() => 'Stock Market Insurance Platform');
+  pageTitle = computed(() => 'Merchant Risk & Rolling Reserve Engine');
 
   kycBadgeClass = computed(() => {
     const status = this.authService.kycStatus();
@@ -76,7 +73,7 @@ export class LayoutComponent {
       case 'SUBMITTED':
       case 'PENDING': return 'badge-warning';
       case 'REJECTED': return 'badge-danger';
-      default: return 'badge-info';
+      default: return 'badge-success';
     }
   });
 
@@ -84,7 +81,6 @@ export class LayoutComponent {
     public authService: AuthService,
     public notificationService: NotificationService,
   ) {
-    // Connect SSE on layout init
     const userId = this.authService.userId();
     if (userId) {
       this.notificationService.connect(userId);
@@ -98,27 +94,19 @@ export class LayoutComponent {
     return this.notificationService.notifications().length;
   });
 
-  toggleNotifications(event?: MouseEvent) {
-    if (event) {
-      event.stopPropagation();
-    }
-    this.showNotifications.update(v => !v);
+  toggleNotifications(event: MouseEvent): void {
+    event.stopPropagation();
+    this.showNotifications.set(!this.showNotifications());
   }
 
   @HostListener('document:click', ['$event'])
-  onDocumentClick(event: MouseEvent) {
-    if (!this.showNotifications()) return;
-    const target = event.target as HTMLElement;
-    if (this.notificationBellContainer && !this.notificationBellContainer.nativeElement.contains(target)) {
-      this.showNotifications.set(false);
-    }
-  }
-
-  @HostListener('document:keydown.escape')
-  onEscape() {
-    if (this.showNotifications()) {
+  onDocumentClick(event: MouseEvent): void {
+    if (
+      this.showNotifications() &&
+      this.notificationBellContainer &&
+      !this.notificationBellContainer.nativeElement.contains(event.target)
+    ) {
       this.showNotifications.set(false);
     }
   }
 }
-

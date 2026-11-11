@@ -1,0 +1,95 @@
+<div class="space-y-6">
+  <!-- Header -->
+  <div class="bg-surface-900 border border-surface-800 p-6 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-bold text-surface-100">Disputes & Chargeback Operations</h1>
+      <p class="text-sm text-surface-200 mt-1">Visa Compelling Evidence (CE 3.0), Pre-Dispute RDR & FIFO Settlement Ledger</p>
+    </div>
+    <div class="flex items-center gap-3">
+      <span class="text-xs font-mono px-3 py-1.5 rounded-lg bg-surface-800 border border-surface-700 text-surface-200">
+        4-Tier FIFO Protected
+      </span>
+    </div>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+    <div class="card p-5 border border-surface-800 bg-surface-900/60 rounded-xl">
+      <span class="text-xs font-mono uppercase text-surface-200">Open Disputes</span>
+      <div class="text-2xl font-bold text-amber-400 mt-1">{{ activeDisputeCount() }}</div>
+      <p class="text-xs text-surface-200 mt-2">Active inquiries & chargebacks</p>
+    </div>
+    <div class="card p-5 border border-surface-800 bg-surface-900/60 rounded-xl">
+      <span class="text-xs font-mono uppercase text-surface-200">Total Disputed Volume</span>
+      <div class="text-2xl font-bold text-surface-100 mt-1">${{ totalDisputedAmount() | number:'1.2-2' }}</div>
+      <p class="text-xs text-surface-200 mt-2">Offset via 4-Tier FIFO Waterfall</p>
+    </div>
+    <div class="card p-5 border border-surface-800 bg-surface-900/60 rounded-xl">
+      <span class="text-xs font-mono uppercase text-surface-200">Visa CE 3.0 Qualified</span>
+      <div class="text-2xl font-bold text-emerald-400 mt-1">{{ ce30QualifiedCount() }}</div>
+      <p class="text-xs text-surface-200 mt-2">120d History + IP/Device match</p>
+    </div>
+    <div class="card p-5 border border-surface-800 bg-surface-900/60 rounded-xl">
+      <span class="text-xs font-mono uppercase text-surface-200">RDR Auto-Resolved</span>
+      <div class="text-2xl font-bold text-sky-400 mt-1">{{ rdrEligibleCount() }}</div>
+      <p class="text-xs text-surface-200 mt-2">Deflected prior to formal chargeback</p>
+    </div>
+  </div>
+
+  <!-- Disputes Table -->
+  <div class="card border border-surface-800 bg-surface-900/60 rounded-xl overflow-hidden">
+    <div class="p-5 border-b border-surface-800 flex justify-between items-center">
+      <h2 class="font-bold text-surface-100">Dispute Cases</h2>
+      <span class="text-xs font-mono text-surface-200">Scheme Lifecycles</span>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-sm">
+        <thead class="bg-surface-950 text-surface-200 font-mono text-xs uppercase border-b border-surface-800">
+          <tr>
+            <th class="p-4">Case ID</th>
+            <th class="p-4">Scheme Ref</th>
+            <th class="p-4">Network</th>
+            <th class="p-4">Reason Code</th>
+            <th class="p-4">Amount</th>
+            <th class="p-4">CE 3.0</th>
+            <th class="p-4">Status</th>
+            <th class="p-4">Logged At</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-surface-800 text-surface-200">
+          @for (c of disputes(); track c.id) {
+            <tr class="hover:bg-surface-800/30 transition-colors">
+              <td class="p-4 font-mono text-xs text-primary-400 font-semibold">{{ c.id }}</td>
+              <td class="p-4 font-mono text-xs">{{ c.disputeRef }}</td>
+              <td class="p-4">
+                <span class="font-semibold text-xs" [ngClass]="c.scheme === 'VISA' ? 'text-blue-400' : 'text-orange-400'">
+                  {{ c.scheme }}
+                </span>
+              </td>
+              <td class="p-4 text-xs font-mono">{{ c.reasonCode }}</td>
+              <td class="p-4 font-mono font-bold text-surface-100">${{ c.amount | number:'1.2-2' }}</td>
+              <td class="p-4">
+                @if (c.ce30Eligible) {
+                  <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                    QUALIFIED
+                  </span>
+                } @else {
+                  <span class="text-surface-200 text-xs">-</span>
+                }
+              </td>
+              <td class="p-4">
+                <span class="px-2.5 py-1 rounded text-xs font-semibold"
+                      [ngClass]="c.status === 'CHARGEBACK_RECORDED' ? 'bg-rose-500/10 text-rose-400 border border-rose-500/30' :
+                                c.status === 'INQUIRY' ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30' :
+                                'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'">
+                  {{ c.status }}
+                </span>
+              </td>
+              <td class="p-4 font-mono text-xs text-surface-200">{{ c.createdAt | date:'short' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

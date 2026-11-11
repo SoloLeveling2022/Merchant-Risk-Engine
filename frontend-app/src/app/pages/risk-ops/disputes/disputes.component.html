@@ -1,0 +1,59 @@
+<div class="space-y-6">
+  <!-- Header -->
+  <div class="bg-surface-900 border border-surface-800 p-6 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-bold text-surface-100">Dispute Arbitration & Fraud Intelligence</h1>
+      <p class="text-sm text-surface-200 mt-1">Cross-Network Chargeback Defense, Bust-Out Fraud Scoring & Visa CE 3.0 Automation</p>
+    </div>
+  </div>
+
+  <!-- Table -->
+  <div class="card border border-surface-800 bg-surface-900/60 rounded-xl overflow-hidden">
+    <div class="p-5 border-b border-surface-800 flex justify-between items-center">
+      <h2 class="font-bold text-surface-100">Arbitration Queue</h2>
+      <span class="text-xs font-mono text-surface-200">Active Scheme Cases</span>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-sm">
+        <thead class="bg-surface-950 text-surface-200 font-mono text-xs uppercase border-b border-surface-800">
+          <tr>
+            <th class="p-4">Case ID</th>
+            <th class="p-4">Merchant ID</th>
+            <th class="p-4">Scheme</th>
+            <th class="p-4">Reason Code</th>
+            <th class="p-4">Disputed Amount</th>
+            <th class="p-4">CE 3.0 Evidence</th>
+            <th class="p-4">Waterfall Tier</th>
+            <th class="p-4">Status</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-surface-800 text-surface-200">
+          @for (c of cases(); track c.id) {
+            <tr class="hover:bg-surface-800/30 transition-colors">
+              <td class="p-4 font-mono text-xs text-primary-400 font-semibold">{{ c.id }}</td>
+              <td class="p-4 font-mono text-xs">{{ c.merchantId }}</td>
+              <td class="p-4 font-bold text-xs" [ngClass]="c.scheme === 'VISA' ? 'text-blue-400' : 'text-orange-400'">{{ c.scheme }}</td>
+              <td class="p-4 font-mono text-xs">{{ c.reasonCode }}</td>
+              <td class="p-4 font-mono font-bold text-surface-100">${{ c.amount | number:'1.2-2' }}</td>
+              <td class="p-4">
+                @if (c.ce30Eligible) {
+                  <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                    CE 3.0 VERIFIED
+                  </span>
+                } @else {
+                  <span class="text-xs text-surface-200">RDR Ineligible</span>
+                }
+              </td>
+              <td class="p-4 text-xs font-mono text-amber-400">Tier 3 (Locked Escrow)</td>
+              <td class="p-4">
+                <span class="px-2.5 py-1 rounded text-xs font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/30">
+                  {{ c.status }}
+                </span>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

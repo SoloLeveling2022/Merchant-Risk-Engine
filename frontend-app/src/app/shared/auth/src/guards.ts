@@ -27,18 +27,18 @@ export const noAuthGuard: CanActivateFn = () => {
   if (authService.isLoggedIn()) {
     const role = authService.userRole();
     switch (role) {
-      case 'ROLE_UNDERWRITER':
-        return router.createUrlTree(['/underwriter/dashboard']);
-      case 'ROLE_CLAIMS_ANALYST':
-        return router.createUrlTree(['/claims-analyst/dashboard']);
-      case 'ROLE_COMPLIANCE':
-      case 'ROLE_COMPLIANCE_OFFICER':
-        return router.createUrlTree(['/compliance/kyc']);
+      case 'ROLE_RISK_ANALYST':
+      case 'ROLE_RISK_ADMIN':
       case 'ROLE_ADMIN':
-        return router.createUrlTree(['/underwriter/dashboard']);
+      case 'ROLE_UNDERWRITER':
+      case 'ROLE_CLAIMS_ANALYST':
+      case 'ROLE_COMPLIANCE':
+        return router.createUrlTree(['/risk-ops/control-tower']);
+      case 'ROLE_MERCHANT_FINANCE':
+      case 'ROLE_MERCHANT_OWNER':
       case 'ROLE_INVESTOR':
       default:
-        return router.createUrlTree(['/investor/dashboard']);
+        return router.createUrlTree(['/merchant/dashboard']);
     }
   }
   return true;
@@ -54,7 +54,7 @@ export const roleGuard = (...allowedRoles: UserRole[]): CanActivateFn => {
     
     const role = authService.userRole();
 
-    if (role && (allowedRoles.includes(role) || role === 'ROLE_ADMIN')) {
+    if (role && (allowedRoles.includes(role) || role === 'ROLE_ADMIN' || role === 'ROLE_RISK_ADMIN')) {
       return true;
     }
     return router.createUrlTree(['/unauthorized']);
@@ -71,7 +71,7 @@ export const kycGuard: CanActivateFn = () => {
   if (authService.isKycApproved()) {
     return true;
   }
-  return router.createUrlTree(['/kyc']);
+  return router.createUrlTree(['/merchant/kyb']);
 };
 
 export const defaultRoleRedirectGuard: CanActivateFn = () => {
@@ -79,26 +79,17 @@ export const defaultRoleRedirectGuard: CanActivateFn = () => {
   const router = inject(Router);
   const platformId = inject(PLATFORM_ID);
 
-  // Don't redirect on server as we don't have localstorage auth state
-  if (isPlatformServer(platformId)) {
-    // Only redirect if absolutely necessary on server, otherwise let it fall through
-    return true; 
-  }
+  if (isPlatformServer(platformId)) return true;
 
   const role = authService.userRole();
-
   switch (role) {
-    case 'ROLE_UNDERWRITER':
-      return router.createUrlTree(['/underwriter/dashboard']);
-    case 'ROLE_CLAIMS_ANALYST':
-      return router.createUrlTree(['/claims-analyst/dashboard']);
-    case 'ROLE_COMPLIANCE':
-    case 'ROLE_COMPLIANCE_OFFICER':
-      return router.createUrlTree(['/compliance/kyc']);
+    case 'ROLE_RISK_ANALYST':
+    case 'ROLE_RISK_ADMIN':
     case 'ROLE_ADMIN':
-      return router.createUrlTree(['/underwriter/dashboard']);
-    case 'ROLE_INVESTOR':
+      return router.createUrlTree(['/risk-ops/control-tower']);
+    case 'ROLE_MERCHANT_OWNER':
+    case 'ROLE_MERCHANT_FINANCE':
     default:
-      return router.createUrlTree(['/investor/dashboard']);
+      return router.createUrlTree(['/merchant/dashboard']);
   }
 };

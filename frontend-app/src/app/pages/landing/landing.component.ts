@@ -13,10 +13,10 @@ export class LandingComponent {
   isScrolled = false;
 
   navSections = [
-    { id: 'what-is', label: 'What is StockShield' },
-    { id: 'how-it-works', label: 'How it works' },
-    { id: 'benefits', label: 'Benefits' },
-    { id: 'risk-model', label: 'Risk Model' },
+    { id: 'what-is', label: 'Overview' },
+    { id: 'rolling-reserves', label: 'Rolling Reserves' },
+    { id: 'scheme-thresholds', label: 'VAMP & ECP' },
+    { id: 'waterfall-ledger', label: '4-Tier Waterfall' },
   ];
 
   @HostListener('window:scroll', [])
@@ -31,4 +31,3 @@ export class LandingComponent {
     }
   }
 }
-

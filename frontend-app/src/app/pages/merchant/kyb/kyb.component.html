@@ -1,0 +1,69 @@
+<div class="space-y-6 max-w-4xl">
+  <!-- Header -->
+  <div class="bg-surface-900 border border-surface-800 p-6 rounded-2xl flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-bold text-surface-100">Merchant KYB & Identity Profile</h1>
+      <p class="text-sm text-surface-200 mt-1">Know Your Business (KYB) Verification, Merchant Category Code & Card Descriptors</p>
+    </div>
+    <div class="flex items-center gap-2">
+      <span class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5">
+        <span class="material-symbols-outlined text-sm">verified</span>
+        KYB Status: {{ kybStatus() }}
+      </span>
+    </div>
+  </div>
+
+  <!-- Profile Card -->
+  <div class="card p-6 border border-surface-800 bg-surface-900/60 rounded-xl space-y-6">
+    <h2 class="text-lg font-bold text-surface-100 border-b border-surface-800 pb-3">Corporate Details</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+      <div>
+        <label class="block text-xs font-mono uppercase text-surface-200 mb-1">Merchant ID (MID)</label>
+        <div class="font-mono text-primary-400 font-semibold text-base">{{ mid() }}</div>
+      </div>
+      <div>
+        <label class="block text-xs font-mono uppercase text-surface-200 mb-1">Legal Entity Name</label>
+        <div class="text-surface-100 font-medium text-base">{{ legalName() }}</div>
+      </div>
+      <div>
+        <label class="block text-xs font-mono uppercase text-surface-200 mb-1">Doing Business As (DBA)</label>
+        <div class="text-surface-100 font-medium">{{ dba() }}</div>
+      </div>
+      <div>
+        <label class="block text-xs font-mono uppercase text-surface-200 mb-1">Tax ID / EIN</label>
+        <div class="font-mono text-surface-200">{{ taxId() }}</div>
+      </div>
+      <div>
+        <label class="block text-xs font-mono uppercase text-surface-200 mb-1">Merchant Category Code (MCC)</label>
+        <div class="font-mono text-sky-400 font-medium">{{ mcc() }}</div>
+      </div>
+      <div>
+        <label class="block text-xs font-mono uppercase text-surface-200 mb-1">Jurisdiction</label>
+        <div class="text-surface-200">{{ jurisdiction() }}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scheme Descriptors & JWKS -->
+  <div class="card p-6 border border-surface-800 bg-surface-900/60 rounded-xl space-y-6">
+    <h2 class="text-lg font-bold text-surface-100 border-b border-surface-800 pb-3">Card Network Descriptors & Asymmetric Auth</h2>
+    <div class="space-y-4">
+      <div>
+        <label class="block text-xs font-mono uppercase text-surface-200 mb-1">Billing Descriptor Prefix (6-Characters Fixed)</label>
+        <div class="flex items-center gap-3">
+          <span class="font-mono font-bold text-lg text-amber-400 bg-surface-950 px-4 py-2 rounded-lg border border-surface-800">
+            {{ billingDescriptorPrefix() }}
+          </span>
+          <span class="text-xs text-surface-200">Required for Visa CE 3.0 descriptor string matching on cardholder statements.</span>
+        </div>
+      </div>
+
+      <div class="pt-2">
+        <label class="block text-xs font-mono uppercase text-surface-200 mb-1">JWKS RSA Public Key Endpoint</label>
+        <div class="font-mono text-xs text-surface-200 bg-surface-950 p-3 rounded-lg border border-surface-800 break-all">
+          https://api.merchantrisk.fintech.internal/auth/jwks.json
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

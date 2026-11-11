@@ -1,61 +1,74 @@
 export interface SchemeRatioReportDTO {
   merchantId: string;
-  visaVampRatioBps: number;
-  visaVampTier: 'COMPLIANT' | 'EARLY_WARNING' | 'EXCESSIVE';
-  visaTotalCountMtd: number;
-  visaDisputeCountMtd: number;
-  visaEnumerationRatioBps: number;
-  visaEnumerationTier: 'COMPLIANT' | 'EXCESSIVE';
-  mastercardLaggedCtrBps: number;
-  mastercardEcpTier: 'COMPLIANT' | 'ECM' | 'HECM';
-  mastercardChargebacksMtd: number;
-  mastercardSalesPrevMonth: number;
-  gmvSpikeDetected: boolean;
-  aovAnomalyDetected: boolean;
-  fulfillmentDipDetected: boolean;
-  refundSurgeDetected: boolean;
-  evaluatedAt: string;
+  visaVampRatioBps?: number;
+  vampRatio?: string;
+  visaVampTier?: 'COMPLIANT' | 'EARLY_WARNING' | 'EXCESSIVE';
+  visaTotalCountMtd?: number;
+  visaDisputeCountMtd?: number;
+  visaEnumerationRatioBps?: number;
+  visaEnumerationTier?: 'COMPLIANT' | 'EXCESSIVE';
+  mastercardLaggedCtrBps?: number;
+  ctrBps?: string;
+  mastercardEcpTier?: 'COMPLIANT' | 'ECM' | 'HECM';
+  mastercardChargebacksMtd?: number;
+  mastercardSalesPrevMonth?: number;
+  gmvSpikeDetected?: boolean;
+  aovAnomalyDetected?: boolean;
+  fulfillmentDipDetected?: boolean;
+  refundSurgeDetected?: boolean;
+  evaluatedAt?: string;
 }
 
 export interface ReservePolicyDTO {
-  id: string;
+  id?: string;
   merchantId: string;
-  reserveType: 'ROLLING' | 'CAPPED' | 'FIXED' | 'ADYEN_DEPOSIT';
-  calculationBase: 'GROSS' | 'NET_AFTER_FEES';
-  holdRate: number;
-  maturityDays: number;
+  reserveType?: 'ROLLING' | 'CAPPED' | 'FIXED' | 'ADYEN_DEPOSIT';
+  calculationBase?: 'GROSS' | 'NET_AFTER_FEES';
+  withholdingBasis?: 'GROSS' | 'NET_AFTER_FEES';
+  holdRate?: string | number;
+  maturityDays?: number;
   capAmount?: number;
-  active: boolean;
-  effectiveFrom: string;
+  active?: boolean;
+  effectiveFrom?: string;
 }
 
 export interface ReserveTrancheDTO {
-  trancheId: string;
+  id?: string;
+  trancheId?: string;
   merchantId: string;
-  policyId: string;
-  captureBatchRef: string;
-  captureDate: string;
-  maturityDate: string;
-  initialAmount: number;
-  remainingAmount: number;
-  status: 'LOCKED' | 'MATURED_UNRELEASED' | 'MATURED_RELEASED' | 'DEPLETED';
+  policyId?: string;
+  captureBatchRef?: string;
+  captureDate?: string;
+  maturityDate?: string;
+  eligibleVolume?: string | number;
+  holdRate?: string | number;
+  initialAmount?: string | number;
+  remainingAmount?: string | number;
+  status: 'LOCKED' | 'MATURED_UNRELEASED' | 'MATURED_RELEASED' | 'DEPLETED' | 'DRAWN_DOWN';
 }
 
 export interface DisputeCaseDTO {
-  disputeId: string;
-  networkDisputeRef: string;
+  id?: string;
+  disputeId?: string;
+  disputeRef?: string;
+  networkDisputeRef?: string;
   merchantId: string;
-  originalTxId: string;
-  cardNetwork: string;
-  recordCode: 'VISA_TC40' | 'VISA_TC15' | 'MC_FIRST_PRES' | 'RDR_PRE_DISPUTE';
-  reasonCode: string;
-  disputeAmount: number;
-  disputeFee: number;
-  ce30Eligible: boolean;
-  within24hFirstPayout: boolean;
-  bustOutRiskScore: number;
-  status: 'OPEN' | 'RDR_REFUNDED' | 'REPRESENTMENT_SUBMITTED' | 'WON' | 'LOST';
-  filedAt: string;
+  originalTxId?: string;
+  scheme?: string;
+  cardNetwork?: string;
+  recordCode?: 'VISA_TC40' | 'VISA_TC15' | 'MC_FIRST_PRES' | 'RDR_PRE_DISPUTE' | string;
+  reasonCode?: string;
+  amount?: string | number;
+  disputeAmount?: number;
+  currency?: string;
+  disputeFee?: number;
+  ce30Eligible?: boolean;
+  rdrResolved?: boolean;
+  within24hFirstPayout?: boolean;
+  bustOutRiskScore?: number;
+  status: string;
+  createdAt?: string;
+  filedAt?: string;
 }
 
 export interface TrialBalanceReportDTO {
@@ -63,21 +76,24 @@ export interface TrialBalanceReportDTO {
   totalDebits: number;
   totalCredits: number;
   isBalanced: boolean;
-  assetBalance: number;
-  liabilityBalance: number;
-  revenueBalance: number;
-  accountBalances: Record<string, number>;
-  generatedAt: string;
+  assetBalance?: number;
+  liabilityBalance?: number;
+  revenueBalance?: number;
+  accountBalances?: Record<string, number>;
+  generatedAt?: string;
 }
 
 export interface ControlTowerAlertDTO {
-  alertId: string;
-  category: string;
-  region: string;
+  id?: string;
+  alertId?: string;
+  type?: string;
+  category?: string;
+  region?: string;
   merchantId: string;
-  severity: string;
-  headline: string;
-  detail: string;
-  metricValue: number;
+  severity: 'CRITICAL' | 'WARNING' | 'INFO' | string;
+  headline?: string;
+  message?: string;
+  detail?: string;
+  metricValue?: number;
   timestamp: string;
 }

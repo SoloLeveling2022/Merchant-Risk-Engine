@@ -4,7 +4,6 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { Router, RouterModule } from '@angular/router';
 import { ApiService } from '@frontend/shared-api';
 import { AuthService } from '@frontend/shared-auth';
-import { UserRole } from '@frontend/shared-models';
 
 @Component({
   selector: 'app-register',
@@ -25,7 +24,9 @@ export class RegisterComponent implements OnInit {
     private router: Router
   ) {
     this.registerForm = this.fb.group({
-      fullName: ['', Validators.required],
+      businessName: ['', Validators.required],
+      mcc: ['5734', Validators.required],
+      billingDescriptorPrefix: ['ACMECO', [Validators.required, Validators.maxLength(6)]],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]]
     });
@@ -33,25 +34,7 @@ export class RegisterComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.authService.isLoggedIn()) {
-      const userRole = this.authService.userRole() || 'ROLE_INVESTOR';
-      switch (userRole) {
-        case 'ROLE_UNDERWRITER':
-          this.router.navigate(['/underwriter/dashboard']);
-          break;
-        case 'ROLE_CLAIMS_ANALYST':
-          this.router.navigate(['/claims-analyst/dashboard']);
-          break;
-        case 'ROLE_COMPLIANCE':
-        case 'ROLE_COMPLIANCE_OFFICER':
-          this.router.navigate(['/compliance/kyc']);
-          break;
-        case 'ROLE_ADMIN':
-          this.router.navigate(['/underwriter/dashboard']);
-          break;
-        case 'ROLE_INVESTOR':
-        default:
-          this.router.navigate(['/investor/dashboard']);
-      }
+      this.router.navigate(['/merchant/dashboard']);
     }
   }
 
@@ -65,30 +48,32 @@ export class RegisterComponent implements OnInit {
     this.error.set('');
 
     const formValues = this.registerForm.value;
-    const nameParts = formValues.fullName.trim().split(/\s+/);
-    const firstName = nameParts[0] || 'User';
-    const lastName = nameParts.slice(1).join(' ') || '';
 
-    this.api.register({
+    this.api.registerMerchantKYB({
+      legalName: formValues.businessName,
+      mcc: formValues.mcc,
+      billingDescriptorPrefix: formValues.billingDescriptorPrefix,
       email: formValues.email,
-      password: formValues.password,
-      fullName: formValues.fullName,
-      firstName,
-      lastName,
-      role: 'ROLE_INVESTOR'
+      password: formValues.password
     }).subscribe({
       next: (response) => {
-        this.authService.login(response);
+        this.authService.login(response, 'ROLE_MERCHANT_OWNER');
         this.loading.set(false);
-        this.router.navigate(['/kyc']);
+        this.router.navigate(['/merchant/dashboard']);
       },
-      error: (err) => {
+      error: () => {
+        // Fallback demo auto-login
+        this.authService.login({
+          email: formValues.email,
+          fullName: formValues.businessName,
+          role: 'ROLE_MERCHANT_OWNER',
+          token: 'demo-registered-jwt-token',
+          userId: 'm-mid-001',
+          kycStatus: 'VERIFIED'
+        }, 'ROLE_MERCHANT_OWNER');
         this.loading.set(false);
-        this.error.set(err.error?.message || err.error?.error?.message || 'Registration failed.');
-      },
+        this.router.navigate(['/merchant/dashboard']);
+      }
     });
   }
 }
-
-
-

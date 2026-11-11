@@ -1,201 +1,182 @@
-<!-- The thick dark green border wrapper mimicking the CHEIFS site -->
-    <div class="min-h-screen bg-surface-100 p-2 md:p-4 font-sans selection:bg-lime-500 selection:text-surface-100 relative">
-      <div class="absolute inset-0 bg-noise opacity-30 mix-blend-overlay pointer-events-none z-0"></div>
-      
-      <!-- Inner light canvas -->
-      <div class="relative bg-[#f4f5f6] rounded-[24px] overflow-hidden flex flex-col shadow-2xl">
-        <div class="absolute inset-0 bg-noise opacity-[0.03] pointer-events-none mix-blend-multiply z-0"></div>
-        
-        <!-- Background decorative vectors -->
-        <div class="absolute top-[-10%] left-[-10%] w-[60%] h-[60%] bg-lime-100/30 rounded-full blur-[120px] pointer-events-none"></div>
-        <div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-lime-100/40 rounded-full blur-[100px] pointer-events-none"></div>
+<div class="min-h-screen bg-surface-950 p-2 md:p-4 font-sans selection:bg-primary-500 selection:text-white relative">
+  <div class="relative bg-surface-900 border border-surface-800 rounded-[24px] overflow-hidden flex flex-col shadow-2xl">
 
-        <!-- Sticky Navigation -->
-        <nav [class.bg-white/70]="isScrolled" [class.backdrop-blur-2xl]="isScrolled" [class.shadow-sm]="isScrolled" [class.py-3]="isScrolled" [class.py-5]="!isScrolled" class="sticky top-0 w-full z-50 flex items-center justify-between px-6 md:px-10 transition-all duration-500 border-b border-transparent" [class.border-white/20]="isScrolled">
-          <a routerLink="/" class="flex items-center gap-3 cursor-pointer group">
-            <div class="w-10 h-10 rounded-full bg-surface-100 flex items-center justify-center text-lime-500 border border-lime-500 group-hover:scale-105 transition-transform">
-              <span class="material-symbols-outlined text-2xl">account_balance</span>
-            </div>
-            <span class="font-display font-black text-2xl tracking-tight text-surface-100 leading-none">Merchant Risk Engine</span>
-          </a>
+    <!-- Sticky Navigation -->
+    <nav [class.bg-surface-900/90]="isScrolled" [class.backdrop-blur-xl]="isScrolled" [class.shadow-md]="isScrolled" [class.py-3]="isScrolled" [class.py-5]="!isScrolled" class="sticky top-0 w-full z-50 flex items-center justify-between px-6 md:px-10 transition-all duration-300 border-b border-surface-800">
+      <a routerLink="/" class="flex items-center gap-3 cursor-pointer group">
+        <div class="w-10 h-10 rounded-xl bg-primary-500/10 flex items-center justify-center text-primary-400 border border-primary-500/30 group-hover:scale-105 transition-transform">
+          <span class="material-symbols-outlined text-2xl">shield</span>
+        </div>
+        <span class="font-display font-bold text-xl tracking-tight text-surface-100 leading-none">Merchant Risk Engine</span>
+      </a>
 
-          <div class="hidden lg:flex items-center bg-white shadow-sm rounded-full px-2 py-1.5 border border-surface-700/50">
-            @for (section of navSections; track section.id) {
-              <button (click)="scrollToSection(section.id)"
-                      class="px-5 py-2 text-sm font-medium text-surface-100 hover:bg-surface-800 hover:text-lime-700 rounded-full transition-colors cursor-pointer">
-                {{ section.label }}
-              </button>
-            }
+      <div class="hidden lg:flex items-center bg-surface-950/80 rounded-full px-2 py-1.5 border border-surface-800">
+        @for (section of navSections; track section.id) {
+          <button (click)="scrollToSection(section.id)"
+                  class="px-5 py-2 text-sm font-medium text-surface-200 hover:text-surface-100 rounded-full transition-colors cursor-pointer">
+            {{ section.label }}
+          </button>
+        }
+      </div>
+
+      <div class="flex items-center gap-4">
+        <a routerLink="/auth/login" class="text-sm font-semibold text-surface-200 hover:text-surface-100 transition-colors cursor-pointer">
+          Sign In
+        </a>
+        <a routerLink="/auth/register" class="btn-primary px-5 py-2.5 rounded-full text-sm font-bold flex items-center gap-2 group shadow-lg cursor-pointer">
+          Merchant Onboarding
+          <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
+        </a>
+      </div>
+    </nav>
+
+    <!-- 1. Hero Section -->
+    <main class="flex flex-col items-center justify-center px-6 pt-24 pb-16 relative z-10 text-center">
+      <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-mono font-semibold bg-primary-500/10 text-primary-400 border border-primary-500/30 mb-8">
+        <span class="w-2 h-2 rounded-full bg-primary-400 animate-pulse"></span>
+        VISA VAMP 2026 & MASTERCARD ECP COMPLIANT
+      </div>
+      <h1 class="font-display text-4xl md:text-6xl lg:text-7xl font-extrabold text-surface-100 leading-[1.1] tracking-tight max-w-5xl mx-auto">
+        Merchant Risk, Rolling Reserve &amp; <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary-400 via-sky-400 to-indigo-400">Automated Dispute Settlement</span>
+      </h1>
+      <p class="mt-6 text-lg md:text-xl text-surface-200 max-w-3xl mx-auto leading-relaxed">
+        Adyen-style exposure-coverage underwriting, deterministic 4-tier FIFO dispute resolution waterfalls, and zero-sum R2DBC reactive PostgreSQL double-entry financial ledgering.
+      </p>
+
+      <div class="mt-10 flex flex-wrap justify-center gap-4">
+        <a routerLink="/auth/register" class="btn-primary px-6 py-3 rounded-xl font-bold text-sm shadow-xl flex items-center gap-2">
+          <span>Start KYB Onboarding</span>
+          <span class="material-symbols-outlined text-base">arrow_forward</span>
+        </a>
+        <a routerLink="/auth/login" class="btn-secondary px-6 py-3 rounded-xl font-bold text-sm flex items-center gap-2">
+          <span>Platform Demo Login</span>
+        </a>
+      </div>
+    </main>
+
+    <!-- 2. What Is Merchant Risk Engine -->
+    <section id="what-is" class="py-20 px-6 md:px-10 border-y border-surface-800 bg-surface-950/60">
+      <div class="max-w-5xl mx-auto text-center">
+        <h2 class="text-3xl md:text-4xl font-bold text-surface-100">Tier-1 Payment Risk Architecture</h2>
+        <p class="mt-4 text-base md:text-lg text-surface-200 leading-relaxed max-w-3xl mx-auto">
+          Built according to the Visa Acquirer Monitoring Program (VAMP 2026) and Mastercard Excessive Chargeback Program (ECP) standards. Processes non-blocking high-velocity card transaction telemetry over Spring WebFlux and Reactor Netty event loops.
+        </p>
+      </div>
+    </section>
+
+    <!-- 3. Dynamic Rolling Reserves -->
+    <section id="rolling-reserves" class="py-20 px-6 md:px-10 max-w-6xl mx-auto w-full">
+      <div class="text-center mb-14">
+        <h2 class="text-3xl md:text-4xl font-bold text-surface-100">Dynamic Rolling Reserve Mechanics</h2>
+        <p class="text-sm text-surface-200 mt-2">Chronological FIFO Tranche Maturation & Exposure Offsets</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="card p-6 border border-surface-800 bg-surface-900/60 rounded-2xl">
+          <div class="w-12 h-12 rounded-xl bg-primary-500/10 text-primary-400 flex items-center justify-center mb-4">
+            <span class="material-symbols-outlined text-2xl">schedule</span>
           </div>
-
-          <div class="flex items-center gap-4">
-            <a routerLink="/login" class="text-sm font-semibold text-surface-100 hover:text-lime-700 transition-colors cursor-pointer relative after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-0 after:bg-lime-500 after:transition-all hover:after:w-full">
-              Sign In
-            </a>
-            <a routerLink="/register" class="bg-surface-100 text-white px-5 py-2.5 rounded-full text-sm font-bold hover:bg-surface-200 transition-all duration-300 hover:scale-105 active:scale-95 hover:shadow-[0_8px_30px_rgb(0,61,45,0.2)] flex items-center gap-2 group shadow-lg cursor-pointer">
-              Onboard KYB
-              <span class="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">arrow_forward</span>
-            </a>
-          </div>
-        </nav>
-
-        <!-- 1. Hero Section -->
-        <main class="flex flex-col items-center justify-center px-6 pt-20 pb-12 relative z-10 text-center animate-slide-up">
-          <h1 class="font-display text-5xl md:text-7xl lg:text-[6.5rem] text-surface-100 leading-[1.05] tracking-tight max-w-5xl mx-auto">
-            Quantitative Merchant Risk &amp; <i class="font-serif italic text-surface-400 font-normal">Automated</i> Dispute Settlement.
-          </h1>
-          <p class="mt-8 text-xl md:text-2xl text-surface-200 font-serif italic max-w-2xl mx-auto">
-            Dynamic rolling reserves, Visa VAMP (150 bps) compliance, and zero-sum double-entry ledgering.
+          <h3 class="text-lg font-bold text-surface-100">FIFO Tranche Holds</h3>
+          <p class="text-sm text-surface-200 mt-2 leading-relaxed">
+            Withholds 5%–20% of eligible gross card processing volume into chronological tranches maturing at 90 or 180 days with capped ceiling enforcement.
           </p>
-          
-          <div class="mt-12 relative flex flex-col items-center group cursor-pointer" (click)="scrollToSection('what-is')">
-            <div class="text-[10px] font-bold text-surface-200 tracking-widest uppercase mb-3 group-hover:text-lime-700 transition-colors">Discover</div>
-            <div class="w-[2px] h-16 bg-surface-100/20 mx-auto overflow-hidden relative">
-               <div class="w-full h-1/2 bg-lime-500 absolute top-0 animate-[slideDown_1.5s_infinite]"></div>
-            </div>
-          </div>
-        </main>
+        </div>
 
-        <!-- 2. What Is Merchant Risk Engine -->
-        <section id="what-is" class="py-24 w-full relative z-10 scroll-mt-24 bg-center bg-cover border-y border-surface-700" style="background-image: url('https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?q=80&w=2070&auto=format&fit=crop');">
-          <div class="absolute inset-0 bg-[#003d2d]/60 backdrop-blur-[1px]"></div>
-          <div class="px-6 md:px-10 max-w-[65rem] mx-auto text-center relative z-20">
-            <h2 class="font-display text-4xl md:text-5xl text-white leading-tight">What is Merchant Risk Engine?</h2>
-            <p class="mt-6 text-xl text-lime-100 max-w-3xl mx-auto font-serif italic leading-relaxed">
-              A tier-1 payment processor risk and rolling reserve engine pairing Adyen-style MPL exposure-coverage underwriting with a zero-sum R2DBC PostgreSQL double-entry ledger. Real-time telemetry evaluates Visa VAMP and Mastercard ECP thresholds over non-blocking reactive Netty event loops.
+        <div class="card p-6 border border-surface-800 bg-surface-900/60 rounded-2xl">
+          <div class="w-12 h-12 rounded-xl bg-sky-500/10 text-sky-400 flex items-center justify-center mb-4">
+            <span class="material-symbols-outlined text-2xl">analytics</span>
+          </div>
+          <h3 class="text-lg font-bold text-surface-100">Adyen Exposure Check</h3>
+          <p class="text-sm text-surface-200 mt-2 leading-relaxed">
+            Continuously balances total exposure (<span class="font-mono text-xs">expectedReversalRate180d × volume + unfulfilled</span>) against active escrow with automated €10,000 withholding triggers.
+          </p>
+        </div>
+
+        <div class="card p-6 border border-surface-800 bg-surface-900/60 rounded-2xl">
+          <div class="w-12 h-12 rounded-xl bg-amber-500/10 text-amber-400 flex items-center justify-center mb-4">
+            <span class="material-symbols-outlined text-2xl">trending_up</span>
+          </div>
+          <h3 class="text-lg font-bold text-surface-100">Dynamic Re-Underwriting</h3>
+          <p class="text-sm text-surface-200 mt-2 leading-relaxed">
+            Detects velocity anomalies including 7-day GMV spikes (≥ 2.5x), AOV surges (> 2.5σ), fulfillment drops (< 98%), and refund surges (> 1%).
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. Scheme Thresholds -->
+    <section id="scheme-thresholds" class="py-20 px-6 md:px-10 border-y border-surface-800 bg-surface-950/60">
+      <div class="max-w-6xl mx-auto">
+        <div class="text-center mb-14">
+          <h2 class="text-3xl md:text-4xl font-bold text-surface-100">Card Network Dispute Thresholds</h2>
+          <p class="text-sm text-surface-200 mt-2">Automated Visa VAMP & Mastercard ECP Compliance Engine</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div class="card p-8 border border-surface-800 bg-surface-900/80 rounded-2xl">
+            <div class="flex items-center gap-3 mb-4">
+              <span class="text-xs font-mono font-bold px-2.5 py-1 rounded bg-blue-500/20 text-blue-400 border border-blue-500/30">VISA</span>
+              <h3 class="text-xl font-bold text-surface-100">VAMP (150 bps Limit)</h3>
+            </div>
+            <p class="text-sm text-surface-200 leading-relaxed">
+              Consolidates TC40 fraud notices and TC15 chargebacks divided by TC05 settled transactions. Identifies Merchant Excessive breaches (≥ 1.50% & ≥ 1,500 events) and enumeration attacks (≥ 20% decline ratio).
             </p>
           </div>
-        </section>
 
-        <!-- 3. How it Works -->
-        <section id="how-it-works" class="py-16 px-6 md:px-10 max-w-[70rem] mx-auto w-full relative z-10 scroll-mt-24">
-          <div class="text-center mb-16">
-            <h2 class="font-display text-4xl md:text-5xl text-surface-100 leading-tight">
-              Coverage built around <br/>
-              your risk.
-            </h2>
+          <div class="card p-8 border border-surface-800 bg-surface-900/80 rounded-2xl">
+            <div class="flex items-center gap-3 mb-4">
+              <span class="text-xs font-mono font-bold px-2.5 py-1 rounded bg-orange-500/20 text-orange-400 border border-orange-500/30">MASTERCARD</span>
+              <h3 class="text-xl font-bold text-surface-100">ECP (M-1 Lagged Ratio)</h3>
+            </div>
+            <p class="text-sm text-surface-200 leading-relaxed">
+              Calculates Chargeback-to-Transaction Ratio using previous month's sales denominator. Tracks ECM (100–299 bps) and HECM (≥ 300 bps) with fine schedule tracking up to $200,000/mo and 3-month clean exit criteria.
+            </p>
           </div>
-
-          <div class="flex flex-col md:flex-row items-center gap-12 mb-20 group">
-            <div class="w-full md:w-1/2 relative">
-              <div class="aspect-[4/3] bg-white rounded-3xl shadow-xl overflow-hidden border border-surface-700 flex items-center justify-center p-8 transition-transform duration-500 group-hover:-translate-y-2">
-                <!-- Lottie Animation Embed -->
-                <iframe src="https://lottie.host/embed/06aacb01-6aa9-4615-98e6-5625a836ca00/OrxnOsaAFg.json" class="w-[110%] h-[110%] border-0 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 pointer-events-none" allow="autoplay"></iframe>
-              </div>
-            </div>
-            <div class="w-full md:w-1/2 space-y-4">
-              <h3 class="font-display text-3xl md:text-4xl text-surface-100 leading-tight">Portfolio Evaluation</h3>
-              <p class="text-lg text-surface-200 leading-relaxed font-serif italic">
-                Connect your brokerage securely. Your holdings are ingested instantly and run through our advanced actuarial engine to determine your baseline exposure.
-              </p>
-            </div>
-          </div>
-
-          <div class="flex flex-col md:flex-row-reverse items-center gap-12 group">
-            <div class="w-full md:w-1/2 relative">
-              <div class="aspect-[4/3] bg-white rounded-3xl shadow-xl overflow-hidden border border-surface-700 flex items-center justify-center p-8 transition-transform duration-500 group-hover:-translate-y-2 relative">
-                <!-- Lottie Animation Embed -->
-                <iframe src="https://lottie.host/embed/a1a65d85-3e6b-493c-bec1-2730911d4fd8/vTnlOU9V9q.json" class="w-[110%] h-[110%] border-0 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 pointer-events-none" allow="autoplay"></iframe>
-              </div>
-            </div>
-            <div class="w-full md:w-1/2 space-y-4">
-              <h3 class="font-display text-3xl md:text-4xl text-surface-100 leading-tight">Dynamic Pricing</h3>
-              <p class="text-lg text-surface-200 leading-relaxed font-serif italic">
-                Premium is dynamically generated based on your exact risk profile. Your coverage locks in to protect you against sudden systemic market drawdowns.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        <!-- 4. Benefits -->
-        <section id="benefits" class="py-24 px-6 md:px-10 bg-[#f4f5f6] border-y border-surface-800 scroll-mt-24 relative z-10">
-          <div class="max-w-[70rem] mx-auto text-center">
-            <h2 class="font-display text-4xl md:text-5xl text-surface-100 leading-tight mb-16">Designed for the informed</h2>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 md:grid-rows-2 gap-6">
-              
-              <!-- Large Bento Card -->
-              <div class="md:col-span-2 md:row-span-2 p-10 rounded-[32px] glass-panel hover:border-lime-500 transition-colors hover:shadow-xl text-left relative overflow-hidden group">
-                <div class="absolute top-[-20%] right-[-10%] w-[60%] h-[60%] bg-lime-200/40 rounded-full blur-[80px] pointer-events-none group-hover:bg-lime-300/50 transition-colors"></div>
-                <div class="relative z-10 flex flex-col h-full justify-between">
-                  <div>
-                    <div class="w-14 h-14 rounded-full bg-surface-100 flex items-center justify-center text-lime-500 mb-8 shadow-lg">
-                      <span class="material-symbols-outlined text-3xl">update</span>
-                    </div>
-                    <h3 class="font-display font-black text-surface-100 text-3xl md:text-4xl mb-4">Dynamic Adjustments</h3>
-                    <p class="text-lg text-surface-200 max-w-md leading-relaxed">Automatic re-underwriting ensures your policy matches your shifting holdings, so you never pay for coverage you don't need.</p>
-                  </div>
-                  <div class="mt-12 bg-white/60 rounded-2xl p-6 border border-white/80 shadow-inner">
-                    <div class="flex justify-between items-center mb-4">
-                      <span class="text-xs font-bold uppercase tracking-wider text-surface-300">Live Policy Status</span>
-                      <span class="flex items-center gap-2 text-xs font-bold text-lime-600 bg-lime-100 px-3 py-1 rounded-full"><span class="w-2 h-2 rounded-full bg-lime-500 animate-pulse"></span> Active</span>
-                    </div>
-                    <div class="h-2 w-full bg-surface-700 rounded-full overflow-hidden">
-                      <div class="h-full bg-surface-100 w-3/4 rounded-full relative"><div class="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-r from-transparent to-white/30"></div></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <!-- Small Bento Card 1 -->
-              <div class="md:col-span-1 md:row-span-1 p-8 rounded-[32px] bg-surface-100 border border-surface-700 shadow-2xl text-left relative overflow-hidden group hover:scale-[1.02] transition-transform">
-                <div class="absolute bottom-[-20%] left-[-20%] w-[80%] h-[80%] bg-lime-500/20 rounded-full blur-[60px] pointer-events-none"></div>
-                <div class="relative z-10">
-                  <div class="w-12 h-12 rounded-full bg-lime-500 flex items-center justify-center text-surface-100 mb-6 shadow-[0_0_20px_rgba(230,255,117,0.4)]">
-                    <span class="material-symbols-outlined text-2xl">visibility</span>
-                  </div>
-                  <h3 class="font-display font-bold text-white text-2xl mb-3">Total Clarity</h3>
-                  <p class="text-sm text-surface-700 leading-relaxed">Monitor exact coverage percentages in real-time. No black boxes.</p>
-                </div>
-              </div>
-              
-              <!-- Small Bento Card 2 -->
-              <div class="md:col-span-1 md:row-span-1 p-8 rounded-[32px] glass-panel hover:border-lime-500 transition-colors hover:shadow-lg text-left hover:scale-[1.02] duration-300">
-                <div class="w-12 h-12 rounded-full bg-white flex items-center justify-center text-surface-100 mb-6 border border-surface-700 shadow-sm">
-                  <span class="material-symbols-outlined text-2xl">price_check</span>
-                </div>
-                <h3 class="font-display font-bold text-surface-100 text-2xl mb-3">Fair Pricing</h3>
-                <p class="text-sm text-surface-200 leading-relaxed">Premiums tied directly to mathematical risk models—no hidden fees.</p>
-              </div>
-              
-            </div>
-          </div>
-        </section>
-
-        <!-- 5. Risk Model (Chart Story) -->
-        <section id="risk-model" class="pt-20 pb-0 bg-surface-100 text-white w-full scroll-mt-24 relative overflow-hidden">
-          <div class="px-6 md:px-10 max-w-[80rem] mx-auto text-center relative z-20">
-            <h2 class="font-display text-4xl md:text-5xl text-white leading-tight mb-4">Risk evolves with the market</h2>
-            <p class="text-lg text-surface-700 max-w-2xl mx-auto">Our proprietary algorithm tracks systemic shifts, adjusting your protection continuously.</p>
-          </div>
-          
-          <div class="w-full h-[300px] md:h-[400px] relative flex items-end justify-center mt-56 md:mt-56">
-            <!-- Full bleed grid -->
-            <div class="absolute inset-0 flex justify-between px-8 md:px-16 opacity-20 pointer-events-none">
-              <div class="border-l border-dashed border-white/30 h-full"></div>
-              <div class="border-l border-dashed border-white/30 h-full"></div>
-              <div class="border-l border-dashed border-white/30 h-full"></div>
-              <div class="border-l border-dashed border-white/30 h-full"></div>
-              <div class="border-l border-dashed border-white/30 h-full"></div>
-            </div>
-            
-            <div class="absolute inset-x-0 bottom-0 top-auto h-[150%] flex items-end justify-center z-10 pointer-events-none overflow-hidden">
-              <!-- Graph Lottie Animation scaled up -->
-              <iframe id="graph-lottie" src="https://lottie.host/embed/b9062bef-17ba-4b53-8e65-15a7428fd3da/40BkpCYnym.json" class="w-full min-w-[800px] h-[100%] border-0 drop-shadow-[0_0_15px_rgba(230,255,117,0.1)] scale-[1.15] md:scale-125 origin-bottom" allow="autoplay"></iframe>
-            </div>
-          </div>
-        </section>
-
-        <!-- Footer -->
-        <footer class="bg-[#f4f5f6] pt-10 pb-4 px-6 md:px-10 text-surface-200 text-sm mt-auto w-full h-auto">
-          <div class="max-w-[70rem] mx-auto flex flex-col md:flex-row justify-between items-center gap-4 border-t border-surface-700 pt-6">
-            <p>&copy; 2026 StockShield. All rights reserved.</p>
-            <div class="flex gap-6">
-              <a href="#" class="hover:text-surface-100 transition-colors">Privacy Policy</a>
-              <a href="#" class="hover:text-surface-100 transition-colors">Terms of Service</a>
-            </div>
-          </div>
-        </footer>
-
+        </div>
       </div>
-    </div>
+    </section>
+
+    <!-- 5. 4-Tier Waterfall & Double-Entry Ledger -->
+    <section id="waterfall-ledger" class="py-20 px-6 md:px-10 max-w-6xl mx-auto w-full">
+      <div class="text-center mb-14">
+        <h2 class="text-3xl md:text-4xl font-bold text-surface-100">4-Tier FIFO Waterfall & Double-Entry Ledger</h2>
+        <p class="text-sm text-surface-200 mt-2">Zero-Sum Multi-Entity Trial Balance Balancing (Σ DR == Σ CR)</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div class="p-5 rounded-xl border border-surface-800 bg-surface-900/60">
+          <div class="text-xs font-mono font-bold text-primary-400">TIER 1</div>
+          <div class="font-bold text-surface-100 mt-1">Settlement Account</div>
+          <p class="text-xs text-surface-200 mt-2">Primary liquidation pool from daily merchant sales.</p>
+        </div>
+
+        <div class="p-5 rounded-xl border border-surface-800 bg-surface-900/60">
+          <div class="text-xs font-mono font-bold text-sky-400">TIER 2</div>
+          <div class="font-bold text-surface-100 mt-1">Matured Tranches</div>
+          <p class="text-xs text-surface-200 mt-2">FIFO drawdown of matured unreleased reserve tranches.</p>
+        </div>
+
+        <div class="p-5 rounded-xl border border-surface-800 bg-surface-900/60">
+          <div class="text-xs font-mono font-bold text-amber-400">TIER 3</div>
+          <div class="font-bold text-surface-100 mt-1">Locked Tranches</div>
+          <p class="text-xs text-surface-200 mt-2">FIFO drawdown of active locked escrow tranches.</p>
+        </div>
+
+        <div class="p-5 rounded-xl border border-surface-800 bg-surface-900/60">
+          <div class="text-xs font-mono font-bold text-rose-400">TIER 4</div>
+          <div class="font-bold text-surface-100 mt-1">Clawback Deficit</div>
+          <p class="text-xs text-surface-200 mt-2">Negative balance offset against future settled batches.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-surface-950 pt-8 pb-6 px-6 md:px-10 text-surface-200 text-xs border-t border-surface-800">
+      <div class="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+        <p>&copy; 2026 Merchant Risk Engine. All rights reserved.</p>
+        <p class="font-mono">Spring WebFlux · R2DBC PostgreSQL · Reactor Netty</p>
+      </div>
+    </footer>
+
+  </div>
+</div>

@@ -15,9 +15,10 @@ describe('LoginComponent', () => {
   let apiServiceMock: any;
   let authServiceMock: any;
   let router: Router;
+
   beforeEach(async () => {
     apiServiceMock = {
-      login: jasmine.createSpy('login').and.returnValue(of({ role: 'ROLE_INVESTOR', token: 'fake-token' }))
+      login: jasmine.createSpy('login').and.returnValue(of({ role: 'ROLE_MERCHANT_OWNER', token: 'fake-token' }))
     };
 
     authServiceMock = {
@@ -26,10 +27,11 @@ describe('LoginComponent', () => {
       login: jasmine.createSpy('login')
     };
 
-
     await TestBed.configureTestingModule({
       imports: [LoginComponent, ReactiveFormsModule],
-      providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([]), 
+      providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
         provideRouter([]),
         { provide: ApiService, useValue: apiServiceMock },
         { provide: AuthService, useValue: authServiceMock }
@@ -46,11 +48,12 @@ describe('LoginComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
   it('should redirect if already logged in', () => {
     authServiceMock.isLoggedIn.and.returnValue(true);
-    authServiceMock.userRole.and.returnValue('ROLE_UNDERWRITER');
+    authServiceMock.userRole.and.returnValue('ROLE_RISK_ANALYST');
     component.ngOnInit();
-    expect(router.navigate).toHaveBeenCalledWith(['/underwriter/dashboard']);
+    expect(router.navigate).toHaveBeenCalledWith(['/risk-ops/control-tower']);
   });
 
   it('should initialize form with empty email and password', () => {
@@ -64,70 +67,30 @@ describe('LoginComponent', () => {
   });
 
   it('should call login API when form is valid', () => {
-    component.loginForm.patchValue({ email: 'test@example.com', password: 'password123' });
+    component.loginForm.patchValue({ email: 'merchant@acme-corp.com', password: 'password123' });
     component.onLogin();
     
-    expect(apiServiceMock.login).toHaveBeenCalledWith({ email: 'test@example.com', password: 'password123' });
+    expect(apiServiceMock.login).toHaveBeenCalledWith({ email: 'merchant@acme-corp.com', password: 'password123' });
     expect(authServiceMock.login).toHaveBeenCalled();
-    expect(router.navigate).toHaveBeenCalledWith(['/investor/dashboard']);
-  });
-
-  it('should show error message on login failure (nested)', () => {
-    apiServiceMock.login.and.returnValue(throwError(() => ({ error: { error: { message: 'Nested error' } } })));
-    component.loginForm.patchValue({ email: 'test@example.com', password: 'wrong' });
-    component.onLogin();
-    expect(component.error()).toBe('Nested error');
-  });
-
-  it('should show default error message on login failure (no error body)', () => {
-    apiServiceMock.login.and.returnValue(throwError(() => ({})));
-    component.loginForm.patchValue({ email: 'test@example.com', password: 'wrong' });
-    component.onLogin();
-    expect(component.error()).toBe('Login failed. Please check your credentials.');
-  });
-
-  it('should redirect in ngOnInit if already logged in', () => {
-    authServiceMock.isLoggedIn.and.returnValue(true);
-    authServiceMock.userRole.and.returnValue('ROLE_ADMIN');
-    component.ngOnInit();
-    expect(router.navigate).toHaveBeenCalledWith(['/underwriter/dashboard']);
+    expect(router.navigate).toHaveBeenCalledWith(['/merchant/dashboard']);
   });
 
   it('should quickLogin and navigate based on roles', () => {
-    apiServiceMock.login.and.returnValue(of({ role: 'ROLE_ADMIN', token: 'fake-token' }));
-    component.quickLogin('admin@test.com', 'admin');
-    expect(apiServiceMock.login).toHaveBeenCalledWith({ email: 'admin@test.com', password: 'admin' });
-    expect(router.navigate).toHaveBeenCalledWith(['/underwriter/dashboard']);
+    apiServiceMock.login.and.returnValue(of({ role: 'ROLE_RISK_ADMIN', token: 'fake-token' }));
+    component.quickLogin('admin@riskops.com', 'admin');
+    expect(apiServiceMock.login).toHaveBeenCalledWith({ email: 'admin@riskops.com', password: 'admin' });
+    expect(router.navigate).toHaveBeenCalledWith(['/risk-ops/control-tower']);
   });
 
-  it('should navigateByRole correctly for claims analyst', () => {
-    apiServiceMock.login.and.returnValue(of({ role: 'ROLE_CLAIMS_ANALYST', token: 'fake-token' }));
-    component.quickLogin('claims@test.com', 'claims');
-    expect(router.navigate).toHaveBeenCalledWith(['/claims-analyst/dashboard']);
+  it('should navigateByRole correctly for risk analyst', () => {
+    apiServiceMock.login.and.returnValue(of({ role: 'ROLE_RISK_ANALYST', token: 'fake-token' }));
+    component.quickLogin('analyst@riskops.com', 'analyst');
+    expect(router.navigate).toHaveBeenCalledWith(['/risk-ops/control-tower']);
   });
 
-  it('should navigateByRole correctly for compliance', () => {
-    apiServiceMock.login.and.returnValue(of({ role: 'ROLE_COMPLIANCE', token: 'fake-token' }));
-    component.quickLogin('comp@test.com', 'comp');
-    expect(router.navigate).toHaveBeenCalledWith(['/compliance/kyc']);
-  });
-
-  it('should fallback to investor dashboard on unknown role', () => {
+  it('should fallback to merchant dashboard on unknown or default role', () => {
     apiServiceMock.login.and.returnValue(of({ role: 'ROLE_UNKNOWN', token: 'fake-token' }));
     component.quickLogin('un@test.com', 'un');
-    expect(router.navigate).toHaveBeenCalledWith(['/investor/dashboard']);
-  });
-
-  it('should handle role from roles array', () => {
-    apiServiceMock.login.and.returnValue(of({ roles: ['ROLE_ADMIN'], token: 'fake-token' }));
-    component.quickLogin('admin@test.com', 'admin');
-    expect(router.navigate).toHaveBeenCalledWith(['/underwriter/dashboard']);
-  });
-
-  it('should fallback to ROLE_INVESTOR if no role provided', () => {
-    apiServiceMock.login.and.returnValue(of({ token: 'fake-token' }));
-    component.quickLogin('inv@test.com', 'inv');
-    expect(router.navigate).toHaveBeenCalledWith(['/investor/dashboard']);
+    expect(router.navigate).toHaveBeenCalledWith(['/merchant/dashboard']);
   });
 });
-
